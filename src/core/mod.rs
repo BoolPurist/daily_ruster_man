@@ -30,7 +30,6 @@ pub fn fetch_all_daily_names() -> Vec<String> {
     filter_by_valid_format.map(|str| str.to_string()).collect()
 }
 
-/// TODO: write unit tests for this func
 fn filter_out_non_daily<'a>(
     to_filter: impl Iterator<Item = &'a str> + 'a,
 ) -> impl Iterator<Item = DailyName> + 'a {
