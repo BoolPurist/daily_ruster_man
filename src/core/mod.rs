@@ -34,6 +34,7 @@ pub fn fetch_all_daily_names() -> Vec<String> {
         .collect()
 }
 
+/// TODO: write unit tests for this func
 fn filter_out_non_daily<'a, T>(to_filter: &[&'a T]) -> Vec<DailyName>
 where
     T: AsRef<str> + ?Sized,
