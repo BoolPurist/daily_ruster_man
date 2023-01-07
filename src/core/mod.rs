@@ -1,9 +1,7 @@
 mod daily_names;
 mod file_access;
 
-use core::borrow::Borrow;
 use std::path::Path;
-use std::path::PathBuf;
 use std::process::Command;
 
 use self::daily_names::DailyName;
@@ -24,42 +22,33 @@ fn create_today_name() -> DailyName {
 }
 
 pub fn fetch_all_daily_names() -> Vec<String> {
-    let daily_paths: Vec<PathBuf> = file_access::get_all_daily_paths().collect();
-    let file_names = strip_expect_file_name(&daily_paths);
-    let filter_by_valid_format = filter_out_non_daily(&file_names);
+    let daily_paths = file_access::get_all_daily_paths();
 
-    filter_by_valid_format
-        .into_iter()
-        .map(|str| str.to_string())
-        .collect()
+    let file_names = strip_expect_file_name(&daily_paths);
+    let filter_by_valid_format = filter_out_non_daily(file_names);
+
+    filter_by_valid_format.map(|str| str.to_string()).collect()
 }
 
 /// TODO: write unit tests for this func
-fn filter_out_non_daily<'a, T>(to_filter: &[&'a T]) -> Vec<DailyName>
-where
-    T: AsRef<str> + ?Sized,
-{
-    to_filter
-        .iter()
-        .filter_map(|file_name| file_name.as_ref().parse().ok())
-        .collect()
+fn filter_out_non_daily<'a>(
+    to_filter: impl Iterator<Item = &'a str> + 'a,
+) -> impl Iterator<Item = DailyName> + 'a {
+    to_filter.filter_map(|file_name| file_name.parse().ok())
 }
 
-fn strip_expect_file_name<'a, T>(paths: &'a [T]) -> Vec<&'a str>
+fn strip_expect_file_name<T>(paths: &[T]) -> impl Iterator<Item = &str>
 where
     T: AsRef<Path>,
 {
-    paths
-        .iter()
-        .map(|full_path| {
-            full_path
-                .as_ref()
-                .file_name()
-                .expect("Could not get file name")
-                .to_str()
-                .expect("Could convert os string to utf string")
-        })
-        .collect()
+    paths.iter().map(|full_path| {
+        full_path
+            .as_ref()
+            .file_name()
+            .expect("Could not get file name")
+            .to_str()
+            .expect("Could convert os string to utf string")
+    })
 }
 
 fn start_process_with(path: &Path) {
@@ -77,7 +66,9 @@ fn start_process_with(path: &Path) {
 
 #[cfg(test)]
 mod testing {
-    use super::strip_expect_file_name;
+    use chrono::NaiveDate;
+
+    use super::*;
     use std::path::Path;
     #[test]
     fn test_strip_expect_file_name() {
@@ -89,7 +80,24 @@ mod testing {
 
         let expected = vec!["text.txt", "aaa.a", "ssss.s"];
 
-        let actual = strip_expect_file_name(&given);
+        let actual: Vec<&str> = strip_expect_file_name(&given).collect();
+
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_filter_out_non_daily() {
+        let given = ["text.txt", "2022_02_2_daily.md", "2001_2_22_daily.md"];
+        let actual: Vec<NaiveDate> = filter_out_non_daily(given.into_iter())
+            .map(|daily_name| daily_name.get_date())
+            .collect();
+
+        assert_eq!(
+            actual,
+            vec![
+                NaiveDate::from_ymd_opt(2022, 2, 2).unwrap(),
+                NaiveDate::from_ymd_opt(2001, 2, 22).unwrap()
+            ]
+        );
     }
 }

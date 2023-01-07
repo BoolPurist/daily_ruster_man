@@ -7,6 +7,7 @@ const DAILY_INFIX: &str = "daily";
 const DIGIT_SEP: &str = "_";
 pub const MD_EXT: &str = "md";
 
+#[derive(Debug)]
 pub struct DailyName {
     date: NaiveDate,
     name: String,
@@ -23,14 +24,14 @@ impl DailyName {
     }
 
     fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
-        format!(
-            "{year}{0}{month:02}{0}{day:02}{0}{DAILY_INFIX}.{ext}",
-            DIGIT_SEP
-        )
+        format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
     }
 
     pub fn get_name(&self) -> &str {
         &self.name
+    }
+    pub fn get_date(&self) -> NaiveDate {
+        self.date
     }
 }
 

@@ -21,7 +21,7 @@ pub fn create_new_path_for(file_name: &str) -> PathBuf {
     data_folder_root.join(file_name)
 }
 
-pub fn get_all_daily_paths() -> impl Iterator<Item = PathBuf> {
+pub fn get_all_daily_paths() -> Vec<PathBuf> {
     let data_folder = fetch_ensure_data_folder();
 
     return fs::read_dir(data_folder)
@@ -33,7 +33,8 @@ pub fn get_all_daily_paths() -> impl Iterator<Item = PathBuf> {
             } else {
                 None
             }
-        });
+        })
+        .collect();
 
     fn is_file(to_check: &DirEntry) -> bool {
         if let Ok(file_type) = to_check.file_type() {
