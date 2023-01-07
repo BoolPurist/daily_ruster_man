@@ -1,0 +1,12 @@
+[package]
+name = "daily_ruster_man"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+chrono = {version = "0.4.23", features = ["clock"]} 
+clap = { version = "4.0.32", features = ["derive"] }
+dirs = "4.0.0"
+thiserror = "1.0.38"
+
