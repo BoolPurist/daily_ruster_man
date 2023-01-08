@@ -16,6 +16,18 @@ pub struct DailyName {
     name: String,
 }
 
+impl PartialOrd for DailyName {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.date.partial_cmp(&other.date)
+    }
+}
+
+impl Ord for DailyName {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.date.cmp(&other.date)
+    }
+}
+
 impl DailyName {
     pub fn new(date: NaiveDate, ext: &str) -> Self {
         let year = date.year();
