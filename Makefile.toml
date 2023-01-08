@@ -1,0 +1,4 @@
+[tasks.dev-run]
+env = { RUST_BACKTRACE = 1 }
+command = "cargo"
+args = ["run", "${@}"]

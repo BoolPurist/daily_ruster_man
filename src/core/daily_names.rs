@@ -1,3 +1,4 @@
+use super::data_models::*;
 use chrono::prelude::*;
 use std::fmt::Display;
 use std::str::FromStr;
@@ -7,7 +8,7 @@ const DAILY_INFIX: &str = "daily";
 const DIGIT_SEP: &str = "_";
 pub const MD_EXT: &str = "md";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DailyName {
     date: NaiveDate,
     name: String,
@@ -32,6 +33,29 @@ impl DailyName {
     }
     pub fn get_date(&self) -> NaiveDate {
         self.date
+    }
+    pub fn create_daily_name_from(date: NaiveDate) -> Self {
+        Self::new(date, MD_EXT)
+    }
+    pub fn create_today_name() -> DailyName {
+        let now = chrono::Local::now();
+        let date_now = now.date_naive();
+
+        Self::create_daily_name_from(date_now)
+    }
+
+    fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
+        match range {
+            PastFuture::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
+            PastFuture::Future(days) => wanted_date += chrono::Duration::days(*days as i64),
+        };
+
+        Self::create_daily_name_from(wanted_date)
+    }
+
+    pub fn create_from_range(range: &PastFuture) -> Self {
+        let wanted_date = chrono::Local::now().date_naive();
+        Self::create_from_point_and_range(range, wanted_date)
     }
 }
 
@@ -93,29 +117,6 @@ pub enum ParseDailyNameError {
 #[cfg(test)]
 mod testing {
     use super::*;
-    fn assert_daily_name_new(y: i32, m: u32, d: u32) {
-        let given = NaiveDate::from_ymd_opt(y, m, d).expect("actual date as test input is invalid");
-
-        let expected = format!("{y}_{m:02}_{d:02}_daily.{MD_EXT}");
-
-        let actual = DailyName::new(given, MD_EXT);
-        assert_eq!(expected, actual.get_name());
-    }
-
-    fn assert_if_parse_fails_with(invalid_input: &str, expected_error: ParseDailyNameError) {
-        match invalid_input.parse::<DailyName>() {
-            Ok(_) => panic!("Should not parse on this invalid input {}", invalid_input),
-            Err(error) => assert_eq!(error, expected_error),
-        };
-    }
-
-    fn assert_parse(valid: &str, expected: NaiveDate) {
-        if let Ok(parsed) = valid.parse::<DailyName>() {
-            assert_eq!(parsed.date, expected);
-        } else {
-            panic!("Did parse valid input correctly, ({})", valid);
-        }
-    }
 
     #[test]
     fn test_parse_error() {
@@ -146,10 +147,67 @@ mod testing {
     }
 
     #[test]
+    fn test_create_daily_in_past() {
+        assert_daily_from_range(PastFuture::Past(2), 2022, 2, 8, 2022, 2, 6);
+        assert_daily_from_range(PastFuture::Past(40), 2022, 2, 7, 2021, 12, 29);
+        assert_daily_from_range(PastFuture::Past(0), 1980, 1, 1, 1980, 1, 1);
+    }
+    #[test]
+    fn test_create_daily_in_future() {
+        assert_daily_from_range(PastFuture::Future(2), 2022, 2, 8, 2022, 2, 10);
+        assert_daily_from_range(PastFuture::Future(40), 2022, 2, 7, 2022, 3, 19);
+        assert_daily_from_range(PastFuture::Future(0), 1980, 1, 1, 1980, 1, 1);
+    }
+
+    #[test]
     fn test_new() {
         assert_daily_name_new(2000, 8, 20);
         assert_daily_name_new(1988, 5, 2);
         assert_daily_name_new(2022, 1, 30);
         assert_daily_name_new(1970, 12, 1);
+    }
+
+    fn assert_daily_from_range(
+        range: PastFuture,
+        g_year: u32,
+        g_month: u32,
+        g_day: u32,
+        ex_year: u32,
+        ex_month: u32,
+        ex_day: u32,
+    ) {
+        let given_date =
+            NaiveDate::from_ymd_opt(g_year as i32, g_month, g_day).expect("Invalid given date");
+        let actual = DailyName::create_from_point_and_range(&range, given_date);
+        let expected = DailyName::new(
+            NaiveDate::from_ymd_opt(ex_year as i32, ex_month, ex_day)
+                .expect("Invalid expected date"),
+            MD_EXT,
+        );
+        assert_eq!(expected, actual);
+    }
+
+    fn assert_daily_name_new(y: i32, m: u32, d: u32) {
+        let given = NaiveDate::from_ymd_opt(y, m, d).expect("actual date as test input is invalid");
+
+        let expected = format!("{y}_{m:02}_{d:02}_daily.{MD_EXT}");
+
+        let actual = DailyName::new(given, MD_EXT);
+        assert_eq!(expected, actual.get_name());
+    }
+
+    fn assert_if_parse_fails_with(invalid_input: &str, expected_error: ParseDailyNameError) {
+        match invalid_input.parse::<DailyName>() {
+            Ok(_) => panic!("Should not parse on this invalid input {}", invalid_input),
+            Err(error) => assert_eq!(error, expected_error),
+        };
+    }
+
+    fn assert_parse(valid: &str, expected: NaiveDate) {
+        if let Ok(parsed) = valid.parse::<DailyName>() {
+            assert_eq!(parsed.date, expected);
+        } else {
+            panic!("Did parse valid input correctly, ({})", valid);
+        }
     }
 }

@@ -3,10 +3,12 @@ name = "daily_ruster_man"
 version = "0.1.0"
 edition = "2021"
 
-
 [dependencies]
+anyhow ={version = "1.0.68", features = ["backtrace"]} 
 chrono = {version = "0.4.23", features = ["clock"]} 
 clap = { version = "4.0.32", features = ["derive"] }
+derive-new = "0.5.9"
 dirs = "4.0.0"
+getset = "0.1.2"
 thiserror = "1.0.38"
 

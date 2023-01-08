@@ -1,0 +1,26 @@
+pub enum PastFuture {
+    Past(u32),
+    Future(u32),
+}
+impl PastFuture {
+    pub fn new(past_or_future: i32) -> Self {
+        if past_or_future < 0 {
+            Self::Past(past_or_future.abs() as u32)
+        } else {
+            Self::Future(past_or_future as u32)
+        }
+    }
+}
+#[derive(new, Getters)]
+#[getset(get_copy = "pub")]
+pub struct DayOfYear {
+    year: u32,
+    day_of_year: u32,
+}
+#[derive(new, Getters)]
+#[getset(get_copy = "pub")]
+pub struct DayMonthYear {
+    year: u32,
+    month: u32,
+    day: u32,
+}
