@@ -46,7 +46,7 @@ mod testing {
     fn test_filter_out_non_daily() {
         let given = ["text.txt", "2022_02_2_daily.md", "2001_2_22_daily.md"];
         let actual: Vec<NaiveDate> = filter_out_non_daily(given.into_iter())
-            .map(|daily_name| daily_name.get_date())
+            .map(|daily_name| daily_name.date())
             .collect();
 
         assert_eq!(

@@ -1,4 +1,4 @@
-use super::data_models::*;
+use super::{data_models::*, AppResult};
 use chrono::prelude::*;
 use std::fmt::Display;
 use std::str::FromStr;
@@ -8,9 +8,11 @@ const DAILY_INFIX: &str = "daily";
 const DIGIT_SEP: &str = "_";
 pub const MD_EXT: &str = "md";
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
+    #[getset(get_copy = "pub")]
     date: NaiveDate,
+    #[getset(get = "pub")]
     name: String,
 }
 
@@ -28,12 +30,6 @@ impl DailyName {
         format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
     }
 
-    pub fn get_name(&self) -> &str {
-        &self.name
-    }
-    pub fn get_date(&self) -> NaiveDate {
-        self.date
-    }
     pub fn create_daily_name_from(date: NaiveDate) -> Self {
         Self::new(date, MD_EXT)
     }
@@ -42,6 +38,40 @@ impl DailyName {
         let date_now = now.date_naive();
 
         Self::create_daily_name_from(date_now)
+    }
+
+    const ORDINAL_DAY_SUGGESTION: &str = "
+Usual range for day is between 1 and 365 or 366 depending on the year and year shoud not be to big.";
+
+    pub fn create_from_ordinal_day(day_of_year: &DayOfYear) -> AppResult<Self> {
+        let (year, ordinal_day) = (day_of_year.year(), day_of_year.day_of_year());
+        let ordinal_date = NaiveDate::from_yo_opt(year as i32, ordinal_day).ok_or_else(|| {
+            anyhow!(
+                "Year ({}) or day of the year is ({}) not valid.{}",
+                year,
+                ordinal_day,
+                Self::ORDINAL_DAY_SUGGESTION
+            )
+        })?;
+        Ok(Self::new(ordinal_date, MD_EXT))
+    }
+    const YEAR_MONTH_DAY_SUGGESTION: &str = "
+Year should not be too big. Month must be between 1 and 12.
+Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
+
+    pub fn creaet_from_year_month_day(year_month_day: &DayMonthYear) -> AppResult<Self> {
+        let (year, month, day) = (
+            year_month_day.year() as i32,
+            year_month_day.month(),
+            year_month_day.day(),
+        );
+        let ymd = NaiveDate::from_ymd_opt(year, month, day).ok_or_else(|| {
+            anyhow!(
+                "Year, month or day are not valid.{}",
+                Self::YEAR_MONTH_DAY_SUGGESTION
+            )
+        })?;
+        Ok(Self::new(ymd, MD_EXT))
     }
 
     fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
@@ -193,7 +223,7 @@ mod testing {
         let expected = format!("{y}_{m:02}_{d:02}_daily.{MD_EXT}");
 
         let actual = DailyName::new(given, MD_EXT);
-        assert_eq!(expected, actual.get_name());
+        assert_eq!(expected, *actual.name());
     }
 
     fn assert_if_parse_fails_with(invalid_input: &str, expected_error: ParseDailyNameError) {

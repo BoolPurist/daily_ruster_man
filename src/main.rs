@@ -34,9 +34,9 @@ fn handle_commands(args: &CliArgs) -> AppResult {
 
 fn exit_with_error(error: &AppError) {
     if cfg!(debug_assertions) {
-        eprintln!("Error debug: {:?}", error);
+        eprintln!("Error debug: {error:?}");
     } else {
-        eprintln!("Error: {}", error);
+        eprintln!("Error: {error}");
     }
     std::process::exit(1);
 }
