@@ -54,9 +54,3 @@ pub fn open_by_year_month_day(ymd: &DayMonthYear) -> AppResult {
 
     Ok(())
 }
-
-fn print_if_debug(message: &str) {
-    if cfg!(debug_assertions) {
-        println!("{message}");
-    }
-}
