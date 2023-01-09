@@ -98,6 +98,16 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         format!("{0} {1:02} {2:02}", date.year(), date.month(), date.day(),)
     }
 
+    pub fn is_in_year(&self, year: u32) -> bool {
+        self.date.year() as u32 == year
+    }
+    pub fn is_in_month(&self, month: u32) -> bool {
+        self.date.month() == month
+    }
+    pub fn is_in_day(&self, day: u32) -> bool {
+        self.date.day() == day
+    }
+
     fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
         format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
     }

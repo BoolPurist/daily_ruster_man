@@ -27,9 +27,10 @@ fn init_logger() {
 
 fn handle_commands(args: &CliArgs) -> AppResult {
     return match args {
-        CliArgs::List(_) => {
-            let all = list_queries::fetch_all_daily_names().join("\n");
-            println!("{all}");
+        CliArgs::List(list_queries) => {
+            let all = list_queries::fetch_all_daily_names(&list_queries.create_ymd_listing());
+            let in_lines = all.join("\n");
+            println!("{in_lines}");
             Ok(())
         }
         CliArgs::Edit(command_arg) => {

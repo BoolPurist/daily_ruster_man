@@ -1,4 +1,7 @@
-pub use crate::cli::edit_command::{EditByDate, EditCommand};
+pub use crate::cli::{
+    edit_command::{EditByDate, EditCommand},
+    list_command::ListCommand,
+};
 pub use crate::core::data_models;
 pub use clap::Parser;
 
@@ -12,6 +15,3 @@ pub enum CliArgs {
     #[command(visible_alias = "e")]
     Edit(EditCommand),
 }
-
-#[derive(Parser)]
-pub struct ListCommand;

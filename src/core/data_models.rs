@@ -25,3 +25,11 @@ pub struct DayMonthYear {
     month: u32,
     day: u32,
 }
+
+#[derive(new, CopyGetters, Debug)]
+#[getset(get_copy = "pub")]
+pub struct FilterParamsYmD {
+    year: Option<u32>,
+    month: Option<u32>,
+    day: Option<u32>,
+}
