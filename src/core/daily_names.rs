@@ -179,6 +179,24 @@ mod testing {
     }
 
     #[test]
+    fn should_turn_to_date_tuple() {
+        assert_turn_to_date_tuple(2000, 7, 3, "2000 07 03");
+        assert_turn_to_date_tuple(1980, 11, 23, "1980 11 23");
+        assert_turn_to_date_tuple(2011, 4, 13, "2011 04 13");
+        assert_turn_to_date_tuple(2023, 10, 6, "2023 10 06");
+    }
+
+    fn assert_turn_to_date_tuple(y: u32, m: u32, d: u32, expected: &str) {
+        let given = DailyName::new(
+            NaiveDate::from_ymd_opt(y as i32, m, d).expect("Invalid date format"),
+            MD_EXT,
+        )
+        .to_ymd_tuple();
+
+        assert_eq!(expected, given);
+    }
+
+    #[test]
     fn test_parse() {
         assert_parse(
             "2023_01_07_daily.md",
