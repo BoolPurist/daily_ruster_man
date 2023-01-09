@@ -1,12 +1,15 @@
-use super::{data_models::*, AppResult};
+use super::constants::MD_EXT;
+use crate::prelude::*;
 use chrono::prelude::*;
+
+use super::data_models::*;
+
 use std::fmt::Display;
 use std::str::FromStr;
 use thiserror::Error;
 
 const DAILY_INFIX: &str = "daily";
 const DIGIT_SEP: &str = "_";
-pub const MD_EXT: &str = "md";
 
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {

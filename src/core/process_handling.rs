@@ -1,23 +1,23 @@
+use crate::prelude::*;
 use std::path::Path;
 use std::process::Command;
 
 const NVIM: &str = "nvim";
-pub fn start_process_with(path: &Path) {
+pub fn start_process_with(path: &Path) -> AppResult {
     let path_as_str = path
         .to_str()
-        .expect("Could not convert path to a text as argument for editor.");
+        .ok_or_else(|| anyhow!("Could not convert path to a text as argument for editor."))?;
 
-    print_command_if_debug(NVIM, path_as_str);
+    debug!("Starting program {NVIM} with argument: {path_as_str}");
+
     Command::new(NVIM)
         .arg(path_as_str)
         .spawn()
-        .expect("Could not spawn editor as child process")
+        .map_err(AppError::new)
+        .with_context(|| format!("Failded to start editor {NVIM} with args {path_as_str}"))?
         .wait()
-        .expect("editor failed");
+        .map_err(AppError::new)
+        .context("Editor did run correctly")?;
 
-    fn print_command_if_debug(command: &str, arg: &str) {
-        if cfg!(debug_assertions) {
-            println!("Command: {command} with args ({arg}) executed.");
-        }
-    }
+    Ok(())
 }

@@ -45,6 +45,8 @@ fn fetch_path_with_dailys() -> PathBuf {
     let app_name = Path::new(get_app_name());
     let data_folder = dirs::data_dir().expect("No data folder found");
 
+    debug!("Using {data_folder:?} as data folder");
+
     data_folder.join(app_name)
 }
 

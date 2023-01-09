@@ -9,6 +9,8 @@ chrono = {version = "0.4.23", features = ["clock"]}
 clap = { version = "4.0.32", features = ["derive"] }
 derive-new = "0.5.9"
 dirs = "4.0.0"
+env_logger = "0.10.0"
 getset = "0.1.2"
+log = "0.4.17"
 thiserror = "1.0.38"
 

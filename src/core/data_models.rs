@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum PastFuture {
     Past(u32),
     Future(u32),
@@ -11,13 +12,13 @@ impl PastFuture {
         }
     }
 }
-#[derive(new, CopyGetters)]
+#[derive(new, CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
 pub struct DayOfYear {
     year: u32,
     day_of_year: u32,
 }
-#[derive(new, CopyGetters)]
+#[derive(new, CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
 pub struct DayMonthYear {
     year: u32,

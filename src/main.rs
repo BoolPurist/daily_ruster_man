@@ -1,14 +1,28 @@
-use daily_ruster_man::cli::app_args::*;
-
 use daily_ruster_man::{
+    cli::app_args::*,
     core::{list_queries, open_actions},
-    AppError, AppResult,
 };
+use daily_ruster_man::prelude::*;
+use env_logger::Env;
+
 fn main() {
+    init_logger();
+
     let args = CliArgs::parse();
     if let Err(error) = handle_commands(&args) {
         exit_with_error(&error);
     }
+}
+
+fn init_logger() {
+    let mut logger_level = "warning";
+
+    if cfg!(debug_assertions) {
+        logger_level = "debug";
+    }
+
+    let logger_env = Env::new().default_filter_or(logger_level);
+    env_logger::Builder::from_env(logger_env).init()
 }
 
 fn handle_commands(args: &CliArgs) -> AppResult {
