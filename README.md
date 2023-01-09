@@ -1,5 +1,4 @@
 # Todos
-- Integrate logging for debug messages
 - Implement option for day, month and year in list subcommand
 - Implement limit option on list subcommand
 
