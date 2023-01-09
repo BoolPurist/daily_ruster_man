@@ -41,20 +41,6 @@ impl DailyName {
         Self { name, date }
     }
 
-    fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
-        format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
-    }
-
-    pub fn create_daily_name_from(date: NaiveDate) -> Self {
-        Self::new(date, MD_EXT)
-    }
-    pub fn create_today_name() -> DailyName {
-        let now = chrono::Local::now();
-        let date_now = now.date_naive();
-
-        Self::create_daily_name_from(date_now)
-    }
-
     const ORDINAL_DAY_SUGGESTION: &str = "
 Usual range for day is between 1 and 365 or 366 depending on the year and year shoud not be to big.";
 
@@ -73,7 +59,6 @@ Usual range for day is between 1 and 365 or 366 depending on the year and year s
     const YEAR_MONTH_DAY_SUGGESTION: &str = "
 Year should not be too big. Month must be between 1 and 12.
 Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
-
     pub fn creaet_from_year_month_day(year_month_day: &DayMonthYear) -> AppResult<Self> {
         let (year, month, day) = (
             year_month_day.year() as i32,
@@ -89,6 +74,29 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         Ok(Self::new(ymd, MD_EXT))
     }
 
+    pub fn create_from_range(range: &PastFuture) -> Self {
+        let wanted_date = chrono::Local::now().date_naive();
+        Self::create_from_point_and_range(range, wanted_date)
+    }
+
+    pub fn create_daily_name_from(date: NaiveDate) -> Self {
+        Self::new(date, MD_EXT)
+    }
+    pub fn create_today_name() -> DailyName {
+        let now = chrono::Local::now();
+        let date_now = now.date_naive();
+
+        Self::create_daily_name_from(date_now)
+    }
+
+    pub fn to_ymd_tuple(&self) -> String {
+        let date = self.date;
+        format!("{0} {1:02} {2:02}", date.year(), date.month(), date.day(),)
+    }
+
+    fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
+        format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
+    }
     fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
         match range {
             PastFuture::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
@@ -96,11 +104,6 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         };
 
         Self::create_daily_name_from(wanted_date)
-    }
-
-    pub fn create_from_range(range: &PastFuture) -> Self {
-        let wanted_date = chrono::Local::now().date_naive();
-        Self::create_from_point_and_range(range, wanted_date)
     }
 }
 

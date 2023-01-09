@@ -8,6 +8,6 @@ pub fn fetch_all_daily_names() -> Vec<String> {
 
     filter_by_valid_format
         .into_iter()
-        .map(|str| str.to_string())
+        .map(|str| str.to_ymd_tuple())
         .collect()
 }
