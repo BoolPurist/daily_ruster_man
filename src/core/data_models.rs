@@ -40,7 +40,7 @@ impl FilterParamsYmD {
     pub fn new(y_opt: Optymd, m_opt: Optymd, d_opt: Optymd) -> AppResult<Self> {
         match (y_opt, m_opt, d_opt) {
             (Some(y), Some(m), Some(d)) => {
-                if let None = chrono::NaiveDate::from_ymd_opt(y as i32, m, d) {
+                if chrono::NaiveDate::from_ymd_opt(y as i32, m, d).is_none() {
                     bail!(
                         "year, month or day is not valid for given date: year: {y}, month: {m}, day: {d}"
                     )
@@ -69,7 +69,7 @@ impl FilterParamsYmD {
             const LOWER_BOUND: u32 = 1;
             const UPPER_BOUND: u32 = 12;
 
-            if m < LOWER_BOUND || m > UPPER_BOUND {
+            if !(LOWER_BOUND..=UPPER_BOUND).contains(&m) {
                 bail!("Month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
             }
 
@@ -80,7 +80,7 @@ impl FilterParamsYmD {
             const LOWER_BOUND: u32 = 1;
             const UPPER_BOUND: u32 = 31;
 
-            if d < LOWER_BOUND || d > UPPER_BOUND {
+            if !(LOWER_BOUND..=UPPER_BOUND).contains(&d) {
                 bail!("Day of month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
             }
 
