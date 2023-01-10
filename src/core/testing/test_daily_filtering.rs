@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-
+use crate::core::date_models::FilterParamsYmD;
 use super::*;
 use std::path::Path;
 #[test]
@@ -44,7 +44,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 2, 13),
         ],
         vec![create_daily_name_from(2000, 1, 1)],
-        FilterParamsYmD::new(Some(2000), Some(1), Some(1)),
+        FilterParamsYmD::new(Some(2000), Some(1), Some(1)).unwrap(),
     );
     // Should match serveral with given year
     assert_filter_is_correct(
@@ -59,7 +59,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1999, 1, 1),
             create_daily_name_from(1999, 2, 3),
         ],
-        FilterParamsYmD::new(Some(1999), None, None),
+        FilterParamsYmD::new(Some(1999), None, None).unwrap(),
     );
     // Should match serveral with given month
     assert_filter_is_correct(
@@ -74,7 +74,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(2000, 1, 1),
             create_daily_name_from(1999, 1, 2),
         ],
-        FilterParamsYmD::new(None, Some(1), None),
+        FilterParamsYmD::new(None, Some(1), None).unwrap(),
     );
     // Should match one with given day
     assert_filter_is_correct(
@@ -86,7 +86,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 4, 13),
         ],
         vec![create_daily_name_from(2001, 8, 11)],
-        FilterParamsYmD::new(None, None, Some(11)),
+        FilterParamsYmD::new(None, None, Some(11)).unwrap(),
     );
     // Should math with given month and year
     assert_filter_is_correct(
@@ -101,7 +101,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1999, 4, 2),
             create_daily_name_from(1999, 4, 23),
         ],
-        FilterParamsYmD::new(Some(1999), Some(4), None),
+        FilterParamsYmD::new(Some(1999), Some(4), None).unwrap(),
     );
     // Should math with given month and day
     assert_filter_is_correct(
@@ -118,7 +118,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 4, 12),
             create_daily_name_from(1978, 4, 12),
         ],
-        FilterParamsYmD::new(None, Some(4), Some(12)),
+        FilterParamsYmD::new(None, Some(4), Some(12)).unwrap(),
     );
     // Should math with given year and day
     assert_filter_is_correct(
@@ -131,7 +131,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1978, 4, 12),
         ],
         vec![create_daily_name_from(2000, 7, 1)],
-        FilterParamsYmD::new(Some(2000), None, Some(1)),
+        FilterParamsYmD::new(Some(2000), None, Some(1)).unwrap(),
     );
 }
 

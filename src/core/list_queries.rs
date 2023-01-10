@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use super::file_access;
-use super::{data_models::FilterParamsYmD, daily_filtering};
+use super::{date_models::FilterParamsYmD, daily_filtering};
 
 pub fn fetch_all_daily_names(ymd_listing: &FilterParamsYmD) -> AppResult<Vec<String>> {
     let with_valid_format = file_access::fetch_valid_daily_entries()?;

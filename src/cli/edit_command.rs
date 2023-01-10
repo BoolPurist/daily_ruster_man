@@ -1,4 +1,4 @@
-use crate::core::data_models;
+use crate::core::date_models;
 use crate::AppResult;
 use clap::Parser;
 
@@ -26,13 +26,13 @@ impl EditCommand {
             self.day_of_month,
         ) {
             (Some(past_future), None, None) => {
-                Ok(EditByDate::Range(data_models::PastFuture::new(past_future)))
+                Ok(EditByDate::Range(date_models::ByDaysInTime::new(past_future)))
             }
             (Some(year), Some(day_of_year), None) => {
                 if year < 0 {
                     Err(anyhow!("year must be positive with day of year"))
                 } else {
-                    Ok(EditByDate::DayOfYear(data_models::DayOfYear::new(
+                    Ok(EditByDate::DayOfYear(date_models::DayOfYear::new(
                         year as u32,
                         day_of_year,
                     )))
@@ -42,7 +42,7 @@ impl EditCommand {
                 if year < 0 {
                     Err(anyhow!("year must be positive with provided day and month"))
                 } else {
-                    Ok(EditByDate::DayMonthYear(data_models::DayMonthYear::new(
+                    Ok(EditByDate::DayMonthYear(date_models::DayMonthYear::new(
                         year as u32,
                         month,
                         day,
@@ -57,7 +57,7 @@ impl EditCommand {
 
 pub enum EditByDate {
     None,
-    Range(data_models::PastFuture),
-    DayOfYear(data_models::DayOfYear),
-    DayMonthYear(data_models::DayMonthYear),
+    Range(date_models::ByDaysInTime),
+    DayOfYear(date_models::DayOfYear),
+    DayMonthYear(date_models::DayMonthYear),
 }

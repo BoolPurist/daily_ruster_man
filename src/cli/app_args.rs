@@ -1,8 +1,9 @@
 pub use crate::cli::{
     edit_command::{EditByDate, EditCommand},
+    month_edit_command::EditByMonthCommand,
     list_command::ListCommand,
 };
-pub use crate::core::data_models;
+pub use crate::core::date_models;
 pub use clap::Parser;
 
 #[derive(Parser)]
@@ -14,4 +15,8 @@ pub enum CliArgs {
     /// Opens or creates a journal for today or a given date via nvim
     #[command(visible_alias = "e")]
     Edit(EditCommand),
+    /// Opens or creates a journal for given month in a year
+    /// If given no month and year then the current month is created/opened.
+    #[command(visible_alias = "me")]
+    MonthEdit(EditByMonthCommand),
 }

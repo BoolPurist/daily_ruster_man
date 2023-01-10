@@ -1,15 +1,15 @@
 use crate::core::constants::MD_EXT;
+use super::DIGIT_SEP;
 use crate::prelude::*;
 use chrono::prelude::*;
 
-use crate::core::data_models::*;
+use crate::core::date_models::*;
 
 use std::fmt::Display;
 use std::str::FromStr;
 use thiserror::Error;
 
 const DAILY_INFIX: &str = "daily";
-const DIGIT_SEP: &str = "_";
 
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
@@ -74,7 +74,7 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         Ok(Self::new(ymd, MD_EXT))
     }
 
-    pub fn create_from_range(range: &PastFuture) -> Self {
+    pub fn create_from_range(range: &ByDaysInTime) -> Self {
         let wanted_date = chrono::Local::now().date_naive();
         Self::create_from_point_and_range(range, wanted_date)
     }
@@ -106,10 +106,10 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         self.date.day() == day
     }
 
-    pub fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
+    pub fn create_from_point_and_range(range: &ByDaysInTime, mut wanted_date: NaiveDate) -> Self {
         match range {
-            PastFuture::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
-            PastFuture::Future(days) => wanted_date += chrono::Duration::days(*days as i64),
+            ByDaysInTime::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
+            ByDaysInTime::Future(days) => wanted_date += chrono::Duration::days(*days as i64),
         };
 
         Self::create_daily_name_from(wanted_date)

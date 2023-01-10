@@ -1,6 +1,6 @@
 use daily_ruster_man::{
     cli::app_args::*,
-    core::{list_queries, open_actions},
+    core::{list_queries, open_actions, date_models::MonthInYear},
 };
 use daily_ruster_man::prelude::*;
 use env_logger::Env;
@@ -48,6 +48,10 @@ fn handle_commands(args: &CliArgs) -> AppResult {
                     open_actions::open_by_year_month_day(&day_month_year)
                 }
             }
+        }
+        CliArgs::MonthEdit(args) => {
+            let month_in_year: MonthInYear = args.create_month_in_year();
+            open_actions::open_by_month_in_year(month_in_year)
         }
     };
 }

@@ -1,6 +1,6 @@
 use clap::Parser;
 use crate::AppResult;
-use crate::core::data_models::FilterParamsYmD;
+use crate::core::date_models::FilterParamsYmD;
 
 #[derive(Parser)]
 pub struct ListCommand {

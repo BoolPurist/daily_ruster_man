@@ -1,10 +1,11 @@
 use crate::prelude::*;
 #[derive(Debug)]
-pub enum PastFuture {
+pub enum ByDaysInTime {
     Past(u32),
     Future(u32),
 }
-impl PastFuture {
+
+impl ByDaysInTime {
     pub fn new(past_or_future: i32) -> Self {
         if past_or_future < 0 {
             Self::Past(past_or_future.unsigned_abs())
@@ -13,6 +14,7 @@ impl PastFuture {
         }
     }
 }
+
 #[derive(new, CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
 pub struct DayOfYear {
@@ -25,6 +27,13 @@ pub struct DayMonthYear {
     year: u32,
     month: u32,
     day: u32,
+}
+
+#[derive(Debug)]
+pub enum MonthInYear {
+    CurrentMonth,
+    InCurrentYear(u32),
+    WithYear { month: u32, year: u32 },
 }
 
 #[derive(CopyGetters, Debug)]
@@ -64,27 +73,27 @@ impl FilterParamsYmD {
             month: m_opt,
             day: d_opt,
         });
-
-        fn check_for_month(m: u32) -> AppResult {
-            const LOWER_BOUND: u32 = 1;
-            const UPPER_BOUND: u32 = 12;
-
-            if !(LOWER_BOUND..=UPPER_BOUND).contains(&m) {
-                bail!("Month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
-            }
-
-            Ok(())
-        }
-
-        fn check_for_day(d: u32) -> AppResult {
-            const LOWER_BOUND: u32 = 1;
-            const UPPER_BOUND: u32 = 31;
-
-            if !(LOWER_BOUND..=UPPER_BOUND).contains(&d) {
-                bail!("Day of month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
-            }
-
-            Ok(())
-        }
     }
+}
+
+pub fn check_for_month(m: u32) -> AppResult {
+    const LOWER_BOUND: u32 = 1;
+    const UPPER_BOUND: u32 = 12;
+
+    if !(LOWER_BOUND..=UPPER_BOUND).contains(&m) {
+        bail!("Month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
+    }
+
+    Ok(())
+}
+
+pub fn check_for_day(d: u32) -> AppResult {
+    const LOWER_BOUND: u32 = 1;
+    const UPPER_BOUND: u32 = 31;
+
+    if !(LOWER_BOUND..=UPPER_BOUND).contains(&d) {
+        bail!("Day of month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
+    }
+
+    Ok(())
 }
