@@ -86,6 +86,10 @@ fn assert_daily_from_range(
     assert_eq!(expected, actual);
 }
 
+/// # panics
+/// - If param `y` is not a valid year.
+/// - If `m` param is not a valid month.
+/// - if `d` param is not a valid day of given `m` month.
 fn assert_daily_name_new(y: i32, m: u32, d: u32) {
     let given = NaiveDate::from_ymd_opt(y, m, d).expect("actual date as test input is invalid");
 

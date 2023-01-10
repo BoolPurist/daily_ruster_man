@@ -1,5 +1,5 @@
 # Todos
-- Replace expects panics cause by user by AnyhowErrors
+
 - Implment option to open entry for whole year or month
 - Implement limit option on list subcommand to limit shown items
 - Show line numbers to left from todoy up to future with positive numbers and negative for dailies 

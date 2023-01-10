@@ -2,3 +2,22 @@
 env = { RUST_BACKTRACE = 1 }
 command = "cargo"
 args = ["run", "${@}"]
+
+[tasks.check-code]
+command = "cargo"
+args = ["check"]
+
+[tasks.check-fmt]
+command = "cargo"
+args = ["fmt"]
+
+[tasks.check-lint]
+command = "cargo"
+args = ["clippy"]
+
+[tasks.check]
+dependencies = [
+  "check-code",
+  "check-fmt",
+  "check-lint",
+]
