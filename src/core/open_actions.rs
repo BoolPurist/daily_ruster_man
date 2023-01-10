@@ -24,7 +24,7 @@ pub fn open_by_day_of_year(day_of_year: &DayOfYear) -> AppResult {
 }
 pub fn open_by_year_month_day(ymd: &DayMonthYear) -> AppResult {
     debug!("open folder by using year, month and day: {ymd:?}");
-    let wanted_daily = DailyName::creaet_from_year_month_day(ymd)?;
+    let wanted_daily = DailyName::create_from_year_month_day(ymd)?;
 
     open_daily_with_editor(&wanted_daily)
 }

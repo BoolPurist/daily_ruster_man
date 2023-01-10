@@ -1,4 +1,7 @@
-use super::*;
+use chrono::NaiveDate;
+
+use crate::core::{data_models::PastFuture, DailyName, constants::MD_EXT};
+use super::daily_names::ParseDailyNameError;
 
 #[test]
 fn test_parse_error() {
@@ -108,7 +111,7 @@ fn assert_if_parse_fails_with(invalid_input: &str, expected_error: ParseDailyNam
 
 fn assert_parse(valid: &str, expected: NaiveDate) {
     if let Ok(parsed) = valid.parse::<DailyName>() {
-        assert_eq!(parsed.date, expected);
+        assert_eq!(parsed.date(), expected);
     } else {
         panic!("Did parse valid input correctly, ({})", valid);
     }

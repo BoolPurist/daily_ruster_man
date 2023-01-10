@@ -1,8 +1,8 @@
-use super::constants::MD_EXT;
+use crate::core::constants::MD_EXT;
 use crate::prelude::*;
 use chrono::prelude::*;
 
-use super::data_models::*;
+use crate::core::data_models::*;
 
 use std::fmt::Display;
 use std::str::FromStr;
@@ -10,10 +10,6 @@ use thiserror::Error;
 
 const DAILY_INFIX: &str = "daily";
 const DIGIT_SEP: &str = "_";
-
-#[path = "testing/test_daily_names.rs"]
-#[cfg(test)]
-mod test_daily_names;
 
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
@@ -63,7 +59,7 @@ Usual range for day is between 1 and 365 or 366 depending on the year and year s
     const YEAR_MONTH_DAY_SUGGESTION: &str = "
 Year should not be too big. Month must be between 1 and 12.
 Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
-    pub fn creaet_from_year_month_day(year_month_day: &DayMonthYear) -> AppResult<Self> {
+    pub fn create_from_year_month_day(year_month_day: &DayMonthYear) -> AppResult<Self> {
         let (year, month, day) = (
             year_month_day.year() as i32,
             year_month_day.month(),
@@ -101,23 +97,26 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
     pub fn is_in_year(&self, year: u32) -> bool {
         self.date.year() as u32 == year
     }
+
     pub fn is_in_month(&self, month: u32) -> bool {
         self.date.month() == month
     }
+
     pub fn is_in_day(&self, day: u32) -> bool {
         self.date.day() == day
     }
 
-    fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
-        format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
-    }
-    fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
+    pub fn create_from_point_and_range(range: &PastFuture, mut wanted_date: NaiveDate) -> Self {
         match range {
             PastFuture::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
             PastFuture::Future(days) => wanted_date += chrono::Duration::days(*days as i64),
         };
 
         Self::create_daily_name_from(wanted_date)
+    }
+
+    fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
+        format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
     }
 }
 
