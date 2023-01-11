@@ -1,15 +1,25 @@
-use super::{daily_filtering, DailyName};
-use crate::prelude::*;
+use std::{
+    str::FromStr,
+    path::{Path, PathBuf},
+    fs::{self, DirEntry},
+};
+
 use dirs;
-use std::fs::{self, DirEntry};
-use std::path::{Path, PathBuf};
 
-pub fn fetch_valid_daily_entries() -> AppResult<Vec<DailyName>> {
-    let daily_paths = get_all_daily_paths()?;
+use crate::prelude::*;
 
-    let file_names = daily_filtering::strip_expect_file_name(&daily_paths);
+use super::date_filtering;
 
-    let filtered = daily_filtering::filter_out_non_daily(file_names).collect();
+pub fn fetch_valid_date_entries<R>() -> AppResult<Vec<R>>
+where
+    R: FromStr,
+{
+    let file_names = fetch_file_names_from_dates()?;
+
+    let filtered = file_names
+        .into_iter()
+        .filter_map(|file_name| file_name.parse().ok())
+        .collect();
 
     Ok(filtered)
 }
@@ -20,7 +30,7 @@ pub fn create_new_path_for(file_name: &str) -> AppResult<PathBuf> {
     Ok(data_folder_root.join(file_name))
 }
 
-pub fn get_all_daily_paths() -> AppResult<Vec<PathBuf>> {
+pub fn get_all_journal_paths() -> AppResult<Vec<PathBuf>> {
     let data_folder = get_and_ensure_path_to_daily()?;
 
     let gathered_dailies = fs::read_dir(&data_folder)
@@ -52,6 +62,14 @@ pub fn get_all_daily_paths() -> AppResult<Vec<PathBuf>> {
             false
         }
     }
+}
+
+fn fetch_file_names_from_dates() -> AppResult<Vec<String>> {
+    let journal_paths = get_all_journal_paths()?;
+
+    let file_names = date_filtering::strip_expect_file_name(&journal_paths);
+
+    Ok(file_names.map(|slice| slice.to_owned()).collect())
 }
 
 /// # Summary

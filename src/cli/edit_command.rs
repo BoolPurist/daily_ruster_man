@@ -25,14 +25,14 @@ impl EditCommand {
             self.day_of_year_or_month,
             self.day_of_month,
         ) {
-            (Some(past_future), None, None) => {
-                Ok(EditByDate::Range(date_models::ByDaysInTime::new(past_future)))
-            }
+            (Some(past_future), None, None) => Ok(EditByDate::Range(
+                date_models::OpenByDaysInTime::new(past_future),
+            )),
             (Some(year), Some(day_of_year), None) => {
                 if year < 0 {
                     Err(anyhow!("year must be positive with day of year"))
                 } else {
-                    Ok(EditByDate::DayOfYear(date_models::DayOfYear::new(
+                    Ok(EditByDate::DayOfYear(date_models::OpenByDayOfYear::new(
                         year as u32,
                         day_of_year,
                     )))
@@ -42,11 +42,9 @@ impl EditCommand {
                 if year < 0 {
                     Err(anyhow!("year must be positive with provided day and month"))
                 } else {
-                    Ok(EditByDate::DayMonthYear(date_models::DayMonthYear::new(
-                        year as u32,
-                        month,
-                        day,
-                    )))
+                    Ok(EditByDate::DayMonthYear(
+                        date_models::OpenByDayMonthYear::new(year as u32, month, day),
+                    ))
                 }
             }
             (None, None, None) => Ok(EditByDate::None),
@@ -57,7 +55,7 @@ impl EditCommand {
 
 pub enum EditByDate {
     None,
-    Range(date_models::ByDaysInTime),
-    DayOfYear(date_models::DayOfYear),
-    DayMonthYear(date_models::DayMonthYear),
+    Range(date_models::OpenByDaysInTime),
+    DayOfYear(date_models::OpenByDayOfYear),
+    DayMonthYear(date_models::OpenByDayMonthYear),
 }

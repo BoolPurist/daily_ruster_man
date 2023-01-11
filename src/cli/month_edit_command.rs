@@ -1,5 +1,5 @@
 use clap::Parser;
-use crate::core::date_models::MonthInYear;
+use crate::core::date_models::OpenByMonthInYear;
 #[derive(Parser)]
 pub struct EditByMonthCommand {
     /// month of current or given year.
@@ -10,11 +10,11 @@ pub struct EditByMonthCommand {
 }
 
 impl EditByMonthCommand {
-    pub fn create_month_in_year(&self) -> MonthInYear {
+    pub fn create_month_in_year(&self) -> OpenByMonthInYear {
         match (self.month, self.year) {
-            (None, None) => MonthInYear::CurrentMonth,
-            (Some(month), None) => MonthInYear::InCurrentYear(month),
-            (Some(month), Some(year)) => MonthInYear::WithYear { month, year },
+            (None, None) => OpenByMonthInYear::CurrentMonth,
+            (Some(month), None) => OpenByMonthInYear::InCurrentYear(month),
+            (Some(month), Some(year)) => OpenByMonthInYear::WithYear { month, year },
             _ => unreachable!(),
         }
     }

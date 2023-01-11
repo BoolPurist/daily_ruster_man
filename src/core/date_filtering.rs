@@ -1,15 +1,15 @@
-use crate::core::{dates_names::daily_names::DailyName, date_models::FilterParamsYmD};
+use crate::core::{
+    dates_names::{HasYear, DailyName, MonthlyName, HasMonth},
+    date_models::FindByYearMonthDay,
+};
 use std::path::Path;
+
+use super::date_models::FindByMonthInYear;
 
 #[cfg(test)]
 #[path = "testing/test_daily_filtering.rs"]
 mod testing;
 
-pub fn filter_out_non_daily<'a>(
-    to_filter: impl Iterator<Item = &'a str> + 'a,
-) -> impl Iterator<Item = DailyName> + 'a {
-    to_filter.filter_map(|file_name| file_name.parse().ok())
-}
 /// # Errors
 /// - If path does not end with file name
 /// - If file_name is not valid utf8
@@ -43,7 +43,7 @@ where
 
 pub fn filter_dailies_by_ymd(
     to_filter: Vec<DailyName>,
-    ymd_listing: &FilterParamsYmD,
+    ymd_listing: &FindByYearMonthDay,
 ) -> Vec<DailyName> {
     type FilterDate = (fn(&DailyName, u32) -> bool, u32);
 
@@ -59,6 +59,32 @@ pub fn filter_dailies_by_ymd(
         filters.push((filter_by_day, day));
     }
 
+    filter_date_entries_by(to_filter, filters)
+}
+
+pub fn filter_monthly_by_ym(
+    to_filter: Vec<MonthlyName>,
+    ym_find_by: &FindByMonthInYear,
+) -> Vec<MonthlyName> {
+    type MonthlyFiltering = (fn(&MonthlyName, u32) -> bool, u32);
+    let mut filters: Vec<MonthlyFiltering> = Vec::with_capacity(2);
+
+    match ym_find_by {
+        FindByMonthInYear::All => (),
+        FindByMonthInYear::InCurrentYear(month) => filters.push((filter_by_month, *month)),
+        FindByMonthInYear::MonthYear { month, year } => {
+            filters.push((filter_by_month, *month));
+            filters.push((filter_by_year, *year));
+        }
+    }
+
+    filter_date_entries_by(to_filter, filters)
+}
+
+fn filter_date_entries_by<T, FN>(to_filter: Vec<T>, filters: Vec<(FN, u32)>) -> Vec<T>
+where
+    FN: Fn(&T, u32) -> bool,
+{
     to_filter
         .into_iter()
         .filter(|next| {
@@ -70,10 +96,10 @@ pub fn filter_dailies_by_ymd(
         .collect()
 }
 
-fn filter_by_year(to_check: &DailyName, year: u32) -> bool {
+fn filter_by_year(to_check: &impl HasYear, year: u32) -> bool {
     to_check.is_in_year(year)
 }
-fn filter_by_month(to_check: &DailyName, month: u32) -> bool {
+fn filter_by_month(to_check: &impl HasMonth, month: u32) -> bool {
     to_check.is_in_month(month)
 }
 fn filter_by_day(to_check: &DailyName, day: u32) -> bool {

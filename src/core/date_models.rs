@@ -1,11 +1,11 @@
 use crate::prelude::*;
 #[derive(Debug)]
-pub enum ByDaysInTime {
+pub enum OpenByDaysInTime {
     Past(u32),
     Future(u32),
 }
 
-impl ByDaysInTime {
+impl OpenByDaysInTime {
     pub fn new(past_or_future: i32) -> Self {
         if past_or_future < 0 {
             Self::Past(past_or_future.unsigned_abs())
@@ -17,20 +17,20 @@ impl ByDaysInTime {
 
 #[derive(new, CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
-pub struct DayOfYear {
+pub struct OpenByDayOfYear {
     year: u32,
     day_of_year: u32,
 }
 #[derive(new, CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
-pub struct DayMonthYear {
+pub struct OpenByDayMonthYear {
     year: u32,
     month: u32,
     day: u32,
 }
 
 #[derive(Debug)]
-pub enum MonthInYear {
+pub enum OpenByMonthInYear {
     CurrentMonth,
     InCurrentYear(u32),
     WithYear { month: u32, year: u32 },
@@ -38,15 +38,20 @@ pub enum MonthInYear {
 
 #[derive(CopyGetters, Debug)]
 #[getset(get_copy = "pub")]
-pub struct FilterParamsYmD {
+pub struct FindByYearMonthDay {
     year: Option<u32>,
     month: Option<u32>,
     day: Option<u32>,
 }
 
-pub type Optymd = Option<u32>;
-impl FilterParamsYmD {
-    pub fn new(y_opt: Optymd, m_opt: Optymd, d_opt: Optymd) -> AppResult<Self> {
+pub enum FindByMonthInYear {
+    All,
+    InCurrentYear(u32),
+    MonthYear { month: u32, year: u32 },
+}
+
+impl FindByYearMonthDay {
+    pub fn new(y_opt: Option<u32>, m_opt: Option<u32>, d_opt: Option<u32>) -> AppResult<Self> {
         match (y_opt, m_opt, d_opt) {
             (Some(y), Some(m), Some(d)) => {
                 if chrono::NaiveDate::from_ymd_opt(y as i32, m, d).is_none() {
@@ -68,11 +73,11 @@ impl FilterParamsYmD {
             _ => (),
         };
 
-        return Ok(Self {
+        Ok(Self {
             year: y_opt,
             month: m_opt,
             day: d_opt,
-        });
+        })
     }
 }
 

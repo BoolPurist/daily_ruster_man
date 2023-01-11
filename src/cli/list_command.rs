@@ -1,6 +1,6 @@
 use clap::Parser;
 use crate::AppResult;
-use crate::core::date_models::FilterParamsYmD;
+use crate::core::date_models::FindByYearMonthDay;
 
 #[derive(Parser)]
 pub struct ListCommand {
@@ -16,7 +16,7 @@ pub struct ListCommand {
 }
 
 impl ListCommand {
-    pub fn create_ymd_listing(&self) -> AppResult<FilterParamsYmD> {
-        FilterParamsYmD::new(self.year, self.month, self.day_of_month)
+    pub fn create_ymd_listing(&self) -> AppResult<FindByYearMonthDay> {
+        FindByYearMonthDay::new(self.year, self.month, self.day_of_month)
     }
 }

@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 
-use crate::core::{date_models::ByDaysInTime, DailyName, constants::MD_EXT};
-use super::daily_names::ParseDailyNameError;
+use crate::core::{date_models::OpenByDaysInTime, DailyName, constants::MD_EXT};
+use super::{daily_names::ParseDailyNameError, ToDateTuple};
 
 #[test]
 fn test_parse_error() {
@@ -41,15 +41,15 @@ fn test_parse() {
 
 #[test]
 fn test_create_daily_in_past() {
-    assert_daily_from_range(ByDaysInTime::Past(2), 2022, 2, 8, 2022, 2, 6);
-    assert_daily_from_range(ByDaysInTime::Past(40), 2022, 2, 7, 2021, 12, 29);
-    assert_daily_from_range(ByDaysInTime::Past(0), 1980, 1, 1, 1980, 1, 1);
+    assert_daily_from_range(OpenByDaysInTime::Past(2), 2022, 2, 8, 2022, 2, 6);
+    assert_daily_from_range(OpenByDaysInTime::Past(40), 2022, 2, 7, 2021, 12, 29);
+    assert_daily_from_range(OpenByDaysInTime::Past(0), 1980, 1, 1, 1980, 1, 1);
 }
 #[test]
 fn test_create_daily_in_future() {
-    assert_daily_from_range(ByDaysInTime::Future(2), 2022, 2, 8, 2022, 2, 10);
-    assert_daily_from_range(ByDaysInTime::Future(40), 2022, 2, 7, 2022, 3, 19);
-    assert_daily_from_range(ByDaysInTime::Future(0), 1980, 1, 1, 1980, 1, 1);
+    assert_daily_from_range(OpenByDaysInTime::Future(2), 2022, 2, 8, 2022, 2, 10);
+    assert_daily_from_range(OpenByDaysInTime::Future(40), 2022, 2, 7, 2022, 3, 19);
+    assert_daily_from_range(OpenByDaysInTime::Future(0), 1980, 1, 1, 1980, 1, 1);
 }
 
 #[test]
@@ -65,13 +65,13 @@ fn assert_turn_to_date_tuple(y: u32, m: u32, d: u32, expected: &str) {
         NaiveDate::from_ymd_opt(y as i32, m, d).expect("Invalid date format"),
         MD_EXT,
     )
-    .to_ymd_tuple();
+    .to_date_tuple();
 
     assert_eq!(expected, given);
 }
 
 fn assert_daily_from_range(
-    range: ByDaysInTime,
+    range: OpenByDaysInTime,
     g_year: u32,
     g_month: u32,
     g_day: u32,

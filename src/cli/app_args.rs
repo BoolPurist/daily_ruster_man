@@ -2,6 +2,7 @@ pub use crate::cli::{
     edit_command::{EditByDate, EditCommand},
     month_edit_command::EditByMonthCommand,
     list_command::ListCommand,
+    month_list_command::ListByMonthCommand,
 };
 pub use crate::core::date_models;
 pub use clap::Parser;
@@ -19,4 +20,7 @@ pub enum CliArgs {
     /// If given no month and year then the current month is created/opened.
     #[command(visible_alias = "me")]
     MonthEdit(EditByMonthCommand),
+    /// List month journals in a given year. If not further arguments given, all months are shown.
+    #[command(visible_alias = "ml")]
+    MonthList(ListByMonthCommand),
 }

@@ -1,6 +1,9 @@
 use daily_ruster_man::{
     cli::app_args::*,
-    core::{list_queries, open_actions, date_models::MonthInYear},
+    core::{
+        list_queries, open_actions,
+        date_models::{OpenByMonthInYear},
+    },
 };
 use daily_ruster_man::prelude::*;
 use env_logger::Env;
@@ -50,8 +53,15 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             }
         }
         CliArgs::MonthEdit(args) => {
-            let month_in_year: MonthInYear = args.create_month_in_year();
+            let month_in_year: OpenByMonthInYear = args.create_month_in_year();
             open_actions::open_by_month_in_year(month_in_year)
+        }
+        CliArgs::MonthList(args) => {
+            let month_in_year = args.create_find_month_in_year();
+            let monthly_names = list_queries::fetch_all_monthly_names(&month_in_year)?;
+            let lines = monthly_names.join("\n");
+            println!("{lines}");
+            Ok(())
         }
     };
 }

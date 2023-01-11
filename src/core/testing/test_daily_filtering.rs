@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use crate::core::date_models::FilterParamsYmD;
+use crate::core::date_models::FindByYearMonthDay;
 use super::*;
 use std::path::Path;
 #[test]
@@ -18,22 +18,6 @@ fn test_strip_expect_file_name() {
 }
 
 #[test]
-fn test_filter_out_non_daily() {
-    let given = ["text.txt", "2022_02_2_daily.md", "2001_2_22_daily.md"];
-    let actual: Vec<NaiveDate> = filter_out_non_daily(given.into_iter())
-        .map(|daily_name| daily_name.date())
-        .collect();
-
-    assert_eq!(
-        actual,
-        vec![
-            NaiveDate::from_ymd_opt(2022, 2, 2).unwrap(),
-            NaiveDate::from_ymd_opt(2001, 2, 22).unwrap()
-        ]
-    );
-}
-
-#[test]
 fn should_filter_by_ymd() {
     // Should match exactly one date
     assert_filter_is_correct(
@@ -44,7 +28,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 2, 13),
         ],
         vec![create_daily_name_from(2000, 1, 1)],
-        FilterParamsYmD::new(Some(2000), Some(1), Some(1)).unwrap(),
+        FindByYearMonthDay::new(Some(2000), Some(1), Some(1)).unwrap(),
     );
     // Should match serveral with given year
     assert_filter_is_correct(
@@ -59,7 +43,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1999, 1, 1),
             create_daily_name_from(1999, 2, 3),
         ],
-        FilterParamsYmD::new(Some(1999), None, None).unwrap(),
+        FindByYearMonthDay::new(Some(1999), None, None).unwrap(),
     );
     // Should match serveral with given month
     assert_filter_is_correct(
@@ -74,7 +58,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(2000, 1, 1),
             create_daily_name_from(1999, 1, 2),
         ],
-        FilterParamsYmD::new(None, Some(1), None).unwrap(),
+        FindByYearMonthDay::new(None, Some(1), None).unwrap(),
     );
     // Should match one with given day
     assert_filter_is_correct(
@@ -86,7 +70,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 4, 13),
         ],
         vec![create_daily_name_from(2001, 8, 11)],
-        FilterParamsYmD::new(None, None, Some(11)).unwrap(),
+        FindByYearMonthDay::new(None, None, Some(11)).unwrap(),
     );
     // Should math with given month and year
     assert_filter_is_correct(
@@ -101,7 +85,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1999, 4, 2),
             create_daily_name_from(1999, 4, 23),
         ],
-        FilterParamsYmD::new(Some(1999), Some(4), None).unwrap(),
+        FindByYearMonthDay::new(Some(1999), Some(4), None).unwrap(),
     );
     // Should math with given month and day
     assert_filter_is_correct(
@@ -118,7 +102,7 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1980, 4, 12),
             create_daily_name_from(1978, 4, 12),
         ],
-        FilterParamsYmD::new(None, Some(4), Some(12)).unwrap(),
+        FindByYearMonthDay::new(None, Some(4), Some(12)).unwrap(),
     );
     // Should math with given year and day
     assert_filter_is_correct(
@@ -131,14 +115,14 @@ fn should_filter_by_ymd() {
             create_daily_name_from(1978, 4, 12),
         ],
         vec![create_daily_name_from(2000, 7, 1)],
-        FilterParamsYmD::new(Some(2000), None, Some(1)).unwrap(),
+        FindByYearMonthDay::new(Some(2000), None, Some(1)).unwrap(),
     );
 }
 
 fn assert_filter_is_correct(
     given: Vec<DailyName>,
     expected: Vec<DailyName>,
-    filtering: FilterParamsYmD,
+    filtering: FindByYearMonthDay,
 ) {
     let actual = filter_dailies_by_ymd(given, &filtering);
     assert_eq!(expected, actual);
