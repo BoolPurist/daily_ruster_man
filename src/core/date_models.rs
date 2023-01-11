@@ -1,4 +1,7 @@
-use crate::prelude::*;
+use crate::{
+    prelude::*,
+    core::constants::{MONTH_LOWER_BOUND, MONTH_UPPER_BOUND, DAY_LOWER_BOUND, DAY_UPPER_BOUND},
+};
 #[derive(Debug)]
 pub enum OpenByDaysInTime {
     Past(u32),
@@ -82,22 +85,24 @@ impl FindByYearMonthDay {
 }
 
 pub fn check_for_month(m: u32) -> AppResult {
-    const LOWER_BOUND: u32 = 1;
-    const UPPER_BOUND: u32 = 12;
-
-    if !(LOWER_BOUND..=UPPER_BOUND).contains(&m) {
-        bail!("Month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
+    if !(MONTH_LOWER_BOUND..=MONTH_UPPER_BOUND).contains(&m) {
+        bail!(
+            "Month must be between {} and {}.",
+            MONTH_LOWER_BOUND,
+            MONTH_UPPER_BOUND
+        )
     }
 
     Ok(())
 }
 
 pub fn check_for_day(d: u32) -> AppResult {
-    const LOWER_BOUND: u32 = 1;
-    const UPPER_BOUND: u32 = 31;
-
-    if !(LOWER_BOUND..=UPPER_BOUND).contains(&d) {
-        bail!("Day of month must be between {LOWER_BOUND} and {UPPER_BOUND}.")
+    if !(DAY_LOWER_BOUND..=DAY_UPPER_BOUND).contains(&d) {
+        bail!(
+            "Day of month must be between {} and {}.",
+            DAY_LOWER_BOUND,
+            DAY_UPPER_BOUND
+        )
     }
 
     Ok(())

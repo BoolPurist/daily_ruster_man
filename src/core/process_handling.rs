@@ -1,14 +1,14 @@
-use crate::prelude::*;
+use crate::{prelude::*, core::constants::NVIM};
+
 use std::path::Path;
 use std::process::Command;
 
-const NVIM: &str = "nvim";
 pub fn start_process_with(path: &Path) -> AppResult {
     let path_as_str = path
         .to_str()
         .ok_or_else(|| anyhow!("Could not convert path to a text as argument for editor."))?;
 
-    debug!("Starting program {NVIM} with argument: {path_as_str}");
+    debug!("Starting program {} with argument: {}", NVIM, path_as_str);
 
     Command::new(NVIM)
         .arg(path_as_str)

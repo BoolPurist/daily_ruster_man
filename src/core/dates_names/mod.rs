@@ -6,8 +6,6 @@ pub mod test_daily_names;
 pub use daily_names::DailyName;
 pub use monthly_name::MonthlyName;
 
-const DIGIT_SEP: &str = "_";
-
 pub trait HasYear {
     fn year(&self) -> u32;
 

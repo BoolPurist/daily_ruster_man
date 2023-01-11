@@ -1,3 +1,5 @@
+#![allow(clippy::uninlined_format_args)]
+
 #[macro_use]
 extern crate derive_new;
 #[macro_use]

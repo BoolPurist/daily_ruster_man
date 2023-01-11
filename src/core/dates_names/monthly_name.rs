@@ -5,14 +5,13 @@ use chrono::{Local, Datelike};
 use crate::{
     prelude::*,
     core::{
-        constants::MD_EXT,
+        constants::*,
         date_models::{self, OpenByMonthInYear},
     },
 };
 
-use super::{DIGIT_SEP, HasYear, HasMonth, ToDateTuple};
+use super::{HasYear, HasMonth, ToDateTuple};
 
-const PREFIX_MONTH: &str = "monthly";
 #[derive(Getters, CopyGetters, PartialEq, Eq, Debug)]
 pub struct MonthlyName {
     #[getset(get = "pub")]
@@ -52,7 +51,10 @@ impl MonthlyName {
     }
 
     fn create_name(year: u32, month: u32, ext: &str) -> String {
-        format!("{year:04}{DIGIT_SEP}{month:02}{DIGIT_SEP}{PREFIX_MONTH}.{ext}")
+        format!(
+            "{year:04}{0}{month:02}{0}{1}.{ext}",
+            DIGIT_SEP, MONTHLY_LABEL_IN_NAME
+        )
     }
 }
 
@@ -115,9 +117,21 @@ mod testing {
     use super::*;
     #[test]
     fn should_produce_name_with_year_month() {
-        assert_if_name_with_month_year(2000, 8, &format!("2000_08_{PREFIX_MONTH}.{MD_EXT}"));
-        assert_if_name_with_month_year(1990, 11, &format!("1990_11_{PREFIX_MONTH}.{MD_EXT}"));
-        assert_if_name_with_month_year(800, 1, &format!("0800_01_{PREFIX_MONTH}.{MD_EXT}"));
+        assert_if_name_with_month_year(
+            2000,
+            8,
+            &format!("2000_08_{0}.{MD_EXT}", MONTHLY_LABEL_IN_NAME),
+        );
+        assert_if_name_with_month_year(
+            1990,
+            11,
+            &format!("1990_11_{0}.{MD_EXT}", MONTHLY_LABEL_IN_NAME),
+        );
+        assert_if_name_with_month_year(
+            800,
+            1,
+            &format!("0800_01_{0}.{MD_EXT}", MONTHLY_LABEL_IN_NAME),
+        );
     }
     #[test]
     fn should_parse_from_str() {

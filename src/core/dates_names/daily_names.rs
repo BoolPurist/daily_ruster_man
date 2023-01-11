@@ -1,5 +1,5 @@
-use crate::core::constants::MD_EXT;
-use super::{DIGIT_SEP, HasYear, HasMonth, ToDateTuple};
+use crate::core::constants::*;
+use super::{HasYear, HasMonth, ToDateTuple};
 use crate::prelude::*;
 use chrono::prelude::*;
 
@@ -8,8 +8,6 @@ use crate::core::date_models::*;
 use std::fmt::Display;
 use std::str::FromStr;
 use thiserror::Error;
-
-const DAILY_INFIX: &str = "daily";
 
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
@@ -47,9 +45,6 @@ impl DailyName {
         Self { name, date }
     }
 
-    const ORDINAL_DAY_SUGGESTION: &str = "
-Usual range for day is between 1 and 365 or 366 depending on the year and year shoud not be to big.";
-
     pub fn create_from_ordinal_day(day_of_year: &OpenByDayOfYear) -> AppResult<Self> {
         let (year, ordinal_day) = (day_of_year.year(), day_of_year.day_of_year());
         let ordinal_date = NaiveDate::from_yo_opt(year as i32, ordinal_day).ok_or_else(|| {
@@ -57,14 +52,11 @@ Usual range for day is between 1 and 365 or 366 depending on the year and year s
                 "Year ({}) or day of the year is ({}) not valid.{}",
                 year,
                 ordinal_day,
-                Self::ORDINAL_DAY_SUGGESTION
+                ORDINAL_DAY_SUGGESTION
             )
         })?;
         Ok(Self::new(ordinal_date, MD_EXT))
     }
-    const YEAR_MONTH_DAY_SUGGESTION: &str = "
-Year should not be too big. Month must be between 1 and 12.
-Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
     pub fn create_from_year_month_day(year_month_day: &OpenByDayMonthYear) -> AppResult<Self> {
         let (year, month, day) = (
             year_month_day.year() as i32,
@@ -74,7 +66,7 @@ Day must be between 1 and 28, 29, 30 or 31 depending on the month.";
         let ymd = NaiveDate::from_ymd_opt(year, month, day).ok_or_else(|| {
             anyhow!(
                 "Year, month or day are not valid.{}",
-                Self::YEAR_MONTH_DAY_SUGGESTION
+                YEAR_MONTH_DAY_SUGGESTION
             )
         })?;
         Ok(Self::new(ymd, MD_EXT))
