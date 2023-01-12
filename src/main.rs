@@ -1,6 +1,6 @@
 use daily_ruster_man::{
     cli::app_args::*,
-    core::{list_queries, open_actions, date_models::OpenByMonthInYear},
+    core::{list_queries, open_actions, date_models::open_by::OpenByMonthInYear},
 };
 use daily_ruster_man::prelude::*;
 use env_logger::Env;

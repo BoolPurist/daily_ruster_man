@@ -1,5 +1,6 @@
 use clap::Parser;
-use crate::core::date_models::OpenByMonthInYear;
+use crate::core::date_models::open_by::OpenByMonthInYear;
+
 #[derive(Parser)]
 pub struct EditByMonthCommand {
     /// month of current or given year.

@@ -1,4 +1,4 @@
-use crate::core::date_models::FindByMonthInYear;
+use crate::core::date_models::find_by::FindByMonthInYear;
 use clap::Parser;
 #[derive(Parser)]
 pub struct ListByMonthCommand {

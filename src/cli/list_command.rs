@@ -1,6 +1,6 @@
 use clap::Parser;
 use crate::AppResult;
-use crate::core::date_models::FindByYearMonthDay;
+use crate::core::date_models::find_by::FindByYearMonthDay;
 
 #[derive(Parser)]
 pub struct ListCommand {

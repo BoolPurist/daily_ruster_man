@@ -1,10 +1,8 @@
 use crate::core::{
     dates_names::{HasYear, DailyName, MonthlyName, HasMonth},
-    date_models::FindByYearMonthDay,
+    date_models::find_by::{FindByMonthInYear, FindByYearMonthDay},
 };
 use std::path::Path;
-
-use super::date_models::FindByMonthInYear;
 
 #[cfg(test)]
 #[path = "testing/test_daily_filtering.rs"]

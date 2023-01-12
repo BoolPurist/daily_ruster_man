@@ -1,4 +1,4 @@
-use crate::core::date_models;
+use crate::core::date_models::open_by::{OpenByDaysInTime, OpenByDayOfYear, OpenByDayMonthYear};
 use crate::AppResult;
 use clap::Parser;
 
@@ -25,14 +25,14 @@ impl EditCommand {
             self.day_of_year_or_month,
             self.day_of_month,
         ) {
-            (Some(past_future), None, None) => Ok(EditByDate::Range(
-                date_models::OpenByDaysInTime::new(past_future),
-            )),
+            (Some(past_future), None, None) => {
+                Ok(EditByDate::Range(OpenByDaysInTime::new(past_future)))
+            }
             (Some(year), Some(day_of_year), None) => {
                 if year < 0 {
                     Err(anyhow!("year must be positive with day of year"))
                 } else {
-                    Ok(EditByDate::DayOfYear(date_models::OpenByDayOfYear::new(
+                    Ok(EditByDate::DayOfYear(OpenByDayOfYear::new(
                         year as u32,
                         day_of_year,
                     )))
@@ -42,9 +42,11 @@ impl EditCommand {
                 if year < 0 {
                     Err(anyhow!("year must be positive with provided day and month"))
                 } else {
-                    Ok(EditByDate::DayMonthYear(
-                        date_models::OpenByDayMonthYear::new(year as u32, month, day),
-                    ))
+                    Ok(EditByDate::DayMonthYear(OpenByDayMonthYear::new(
+                        year as u32,
+                        month,
+                        day,
+                    )))
                 }
             }
             (None, None, None) => Ok(EditByDate::None),
@@ -55,7 +57,7 @@ impl EditCommand {
 
 pub enum EditByDate {
     None,
-    Range(date_models::OpenByDaysInTime),
-    DayOfYear(date_models::OpenByDayOfYear),
-    DayMonthYear(date_models::OpenByDayMonthYear),
+    Range(OpenByDaysInTime),
+    DayOfYear(OpenByDayOfYear),
+    DayMonthYear(OpenByDayMonthYear),
 }
