@@ -8,21 +8,21 @@ use crate::{
 use clap::Parser;
 #[derive(Parser)]
 pub struct ListByMonthCommand {
-    /// Month to search for in year.
-    month: Option<u32>,
-    /// year in which months to search for
+    /// If provided as the only argument then all created monthly entries of this given year are shown
     year: Option<u32>,
+    /// Will list the one month of a given year.
+    month: Option<u32>,
 }
 
 impl ListByMonthCommand {
     pub fn create_find_month_in_year(&self) -> AppResult<FindByMonthInYear> {
-        match (self.month, self.year) {
+        match (self.year, self.month) {
             (None, None) => Ok(FindByMonthInYear::All),
-            (Some(month), None) => {
-                let month: ValidatedMonth = month.try_into()?;
-                Ok(FindByMonthInYear::InCurrentYear(month))
+            (Some(year), None) => {
+                let year: ValidatedYear = year.try_into()?;
+                Ok(FindByMonthInYear::InCurrentYear(year))
             }
-            (Some(month), Some(year)) => {
+            (Some(year), Some(month)) => {
                 let month: ValidatedMonth = month.try_into()?;
                 let year: ValidatedYear = year.try_into()?;
                 Ok(FindByMonthInYear::MonthYear { month, year })

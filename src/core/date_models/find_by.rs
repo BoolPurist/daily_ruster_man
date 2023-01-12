@@ -12,7 +12,7 @@ pub struct FindByYearMonthDay {
 #[derive(Debug, PartialEq, Eq)]
 pub enum FindByMonthInYear {
     All,
-    InCurrentYear(ValidatedMonth),
+    InCurrentYear(ValidatedYear),
     MonthYear {
         month: ValidatedMonth,
         year: ValidatedYear,

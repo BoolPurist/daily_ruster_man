@@ -69,9 +69,9 @@ pub fn filter_monthly_by_ym(
 
     match ym_find_by {
         FindByMonthInYear::All => (),
-        FindByMonthInYear::InCurrentYear(month) => {
-            let month: u32 = (*month).into();
-            filters.push((filter_by_month, month))
+        FindByMonthInYear::InCurrentYear(year) => {
+            let year: u32 = (*year).into();
+            filters.push((filter_by_year, year))
         }
         FindByMonthInYear::MonthYear { month, year } => {
             filters.push((filter_by_month, (*month).into()));

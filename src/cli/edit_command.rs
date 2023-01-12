@@ -6,13 +6,14 @@ use clap::Parser;
 
 #[derive(Parser, Default)]
 pub struct EditCommand {
-    /// If given a single argument then it opens/creates the nth journal in the past, negative value,
-    /// or in the future, positive value. If not given as single argument then it represents the
-    /// year of a given date.
+    /// If given as a single negative argument then it opens/creates the n-times day entry in the past.
+    /// If given as a single positive argument then it opens/creates the n-times day entry in the
+    /// future. If more then one argument is given then this argument presents the year of a
+    /// date.
     #[arg(allow_negative_numbers = true)]
     range_or_year: Option<i32>,
     /// if given without the third argument then it represents the ordinal day of year between 1
-    /// and 366. If given with 3. argument then this argument serves as the month of given date
+    /// and 366. If 3. arguments are given then this argument serves as the month of given date
     /// between 1 and 12.
     day_of_year_or_month: Option<u32>,
     /// if given it serves as the day of month between 1 and 30 or 31 depenging on the month. For

@@ -8,23 +8,25 @@ pub use clap::Parser;
 #[derive(Parser)]
 #[command(author, version, about)]
 pub enum CliArgs {
-    /// Shows all created daily journals so far.
+    /// Shows created daily entries so far.
     #[command(visible_alias = "l")]
     List(ListCommand),
-    /// Opens or creates a journal for today or a given date via nvim
+    /// Opens or creates an entry for today or for a given date via your editor of choice.
+    /// Note: Options flags can be combined for filtering. Example: --year 2013 and --month 08
+    /// shows all created daily entries in year August in year 2013.
     #[command(visible_alias = "e")]
     Edit(EditCommand),
-    /// Opens or creates a journal for given month in a year
-    /// If given no month and year then the current month is created/opened.
+    /// Opens or creates an entry for given month in a year.
+    /// If given no month and year then the current month is created or opened.
     #[command(visible_alias = "me")]
     MonthEdit(EditByMonthCommand),
-    /// List month journals in a given year. If not further arguments given, all months are shown.
+    /// List months of a given year. If not further arguments are given, all months are shown.
     #[command(visible_alias = "ml")]
     MonthList(ListByMonthCommand),
-    /// Opens or creates given year.
+    /// Opens or creates given entry for a year.
     #[command(visible_alias = "ye")]
     YearEdit { year: Option<u32> },
+    /// List all created entries for a year.
     #[command(visible_alias = "yl")]
-    /// List all years
     YearList,
 }
