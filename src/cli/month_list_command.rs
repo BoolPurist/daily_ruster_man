@@ -51,7 +51,7 @@ mod testing {
         }
     }
     fn validate_in_month_year(
-        (expected_month, expected_year): (u32, u32),
+        (expected_year, expected_month): (u32, u32),
     ) -> impl Fn(FindByMonthInYear) {
         move |actual: FindByMonthInYear| {
             if let FindByMonthInYear::MonthYear { month, year } = actual {
@@ -69,15 +69,15 @@ mod testing {
     }
 
     #[test_case(None, None => FindByMonthInYear::All ; "Should filter nothing aka listing all months")]
-    #[test_case(Some(2), None => using validate_in_current_year(2) ; "Should filter by month in the current year")]
-    #[test_case(Some(4), Some(1970) => using validate_in_month_year((4, 1970)) ; "Should filter by month and year")]
+    #[test_case(Some(1970), None => using validate_in_current_year(1970) ; "Should filter by month in the current year")]
+    #[test_case(Some(1970), Some(2) => using validate_in_month_year((1970, 2)) ; "Should filter by month and year")]
     fn should_produces_correct_find_by_month_year(
-        month: Option<u32>,
         year: Option<u32>,
+        month: Option<u32>,
     ) -> FindByMonthInYear {
         let given = ListByMonthCommand { month, year };
         given
             .create_find_month_in_year()
-            .expect("Should produce error for valid month and year")
+            .expect("Should not produce error for valid month and year")
     }
 }
