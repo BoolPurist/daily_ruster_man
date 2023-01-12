@@ -110,7 +110,7 @@ impl From<ValidatedDate> for DailyName {
 
 impl From<NaiveDate> for DailyName {
     fn from(value: NaiveDate) -> Self {
-        let name = Self::create_name_from_date(value.into(), MD_EXT);
+        let name = Self::create_name_from_date(value, MD_EXT);
         Self {
             date: value.into(),
             name,

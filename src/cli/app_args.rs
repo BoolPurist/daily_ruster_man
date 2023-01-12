@@ -21,4 +21,10 @@ pub enum CliArgs {
     /// List month journals in a given year. If not further arguments given, all months are shown.
     #[command(visible_alias = "ml")]
     MonthList(ListByMonthCommand),
+    /// Opens or creates given year.
+    #[command(visible_alias = "ye")]
+    YearEdit { year: Option<u32> },
+    #[command(visible_alias = "yl")]
+    /// List all years
+    YearList,
 }

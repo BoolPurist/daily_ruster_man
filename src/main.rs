@@ -1,6 +1,9 @@
 use daily_ruster_man::{
     cli::app_args::*,
-    core::{list_queries, open_actions, date_models::open_by::OpenByMonthInYear},
+    core::{
+        list_queries, open_actions,
+        date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
+    },
 };
 use daily_ruster_man::prelude::*;
 use env_logger::Env;
@@ -47,6 +50,22 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             let monthly_names = list_queries::fetch_all_monthly_names(&month_in_year)?;
             let lines = monthly_names.join("\n");
             println!("{lines}");
+            Ok(())
+        }
+        CliArgs::YearList => {
+            let all_yearlies = list_queries::fetch_yearly_names()?;
+            let lines = all_yearlies.join("\n");
+            println!("{lines}");
+            Ok(())
+        }
+        CliArgs::YearEdit { year } => {
+            if let Some(year_given) = year {
+                let year_given: ValidatedYear = (*year_given).try_into()?;
+
+                open_actions::open_by_year(year_given)?;
+            } else {
+                open_actions::open_by_current_year()?;
+            }
             Ok(())
         }
     };

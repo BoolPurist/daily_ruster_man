@@ -69,15 +69,21 @@ impl FromStr for YearlyName {
         let name = s;
         let mut splits = name.split(DIGIT_SEP);
         match (splits.next(), splits.next()) {
-            (Some(year), Some(_)) => {
+            (Some(year), Some(maybe_digit)) => {
                 let year: u32 = year
                     .parse()
                     .map_err(|_| ParseErrorForYearName::MissingYear)?;
+
                 let year = year
                     .try_into()
                     .map_err(ParseErrorForYearName::InvalidYear)?;
 
-                Ok(Self::with_name(year, name))
+                if maybe_digit.parse::<u32>().is_ok() {
+                    // if here then is text is a monthly or daily
+                    Err(ParseErrorForYearName::InvalidFormat)
+                } else {
+                    Ok(Self::with_name(year, name))
+                }
             }
             _ => Err(ParseErrorForYearName::InvalidFormat),
         }
@@ -123,6 +129,8 @@ mod testing {
     #[test_case("222a_aa.md")]
     #[test_case("3332222_aa.md")]
     #[test_case("33")]
+    #[test_case("33_10")]
+    #[test_case("33_10_13")]
     fn should_fail_parsing(input: &str) {
         let daily_name: Result<YearlyName, _> = input.parse();
         assert!(daily_name.is_err())

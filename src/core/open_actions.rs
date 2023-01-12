@@ -1,9 +1,11 @@
+use chrono::{Local, Datelike};
+
 use crate::prelude::*;
 use crate::core::date_models::open_by::OpenByMonthInYear;
 use super::{
-    date_models::units_validated::ValidatedDate,
+    date_models::units_validated::{ValidatedDate, ValidatedYear},
     file_access, process_handling, DailyName,
-    dates_names::{MonthlyName, DateNameForFile},
+    dates_names::{MonthlyName, DateNameForFile, yearly_name::YearlyName},
 };
 
 pub fn open_by_date(to_open_by: ValidatedDate) -> AppResult {
@@ -15,6 +17,18 @@ pub fn open_by_month_year(month_year: OpenByMonthInYear) -> AppResult {
     let monthly = MonthlyName::from_month_in_year(&month_year)?;
 
     open_date_with_editor(monthly.name())
+}
+pub fn open_by_year(year: ValidatedYear) -> AppResult {
+    let yearly = YearlyName::new(year);
+
+    open_date_with_editor(yearly.name())
+}
+pub fn open_by_current_year() -> AppResult {
+    let now = Local::now().date_naive().year() as u32;
+    let year = now.try_into()?;
+    let yearly = YearlyName::new(year);
+
+    open_date_with_editor(yearly.name())
 }
 
 fn open_date_with_editor(name_journal: &str) -> AppResult {
