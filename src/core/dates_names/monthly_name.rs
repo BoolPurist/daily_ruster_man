@@ -7,7 +7,7 @@ use crate::{
     core::{constants::*, date_models::open_by::OpenByMonthInYear},
 };
 
-use super::{HasYear, HasMonth, ToDateTuple};
+use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile};
 
 #[derive(Getters, CopyGetters, PartialEq, Eq, Debug)]
 pub struct MonthlyName {
@@ -15,6 +15,11 @@ pub struct MonthlyName {
     name: String,
     year: ValidatedYear,
     month: ValidatedMonth,
+}
+impl DateNameForFile for MonthlyName {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 impl MonthlyName {

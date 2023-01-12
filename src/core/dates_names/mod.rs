@@ -2,9 +2,10 @@ pub mod daily_names;
 pub mod monthly_name;
 #[cfg(test)]
 pub mod test_daily_names;
-
+pub mod yearly_name;
 pub use daily_names::DailyName;
 pub use monthly_name::MonthlyName;
+use std::str::FromStr;
 
 pub trait HasYear {
     fn year(&self) -> u32;
@@ -23,4 +24,8 @@ pub trait HasMonth {
 
 pub trait ToDateTuple {
     fn to_date_tuple(&self) -> String;
+}
+
+pub trait DateNameForFile: ToDateTuple + FromStr + Ord {
+    fn name(&self) -> &str;
 }

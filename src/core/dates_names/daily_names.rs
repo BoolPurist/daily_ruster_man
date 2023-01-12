@@ -2,10 +2,9 @@ use crate::core::constants::*;
 use crate::core::date_models::units_validated::{
     ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth,
 };
-use super::{HasYear, HasMonth, ToDateTuple};
+use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile};
 use crate::prelude::*;
 use chrono::prelude::*;
-use std::fmt::Display;
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -13,41 +12,12 @@ use thiserror::Error;
 pub struct DailyName {
     #[getset(get_copy = "pub")]
     date: ValidatedDate,
-    #[getset(get = "pub")]
     name: String,
 }
 
-impl PartialOrd for DailyName {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.date.partial_cmp(&other.date)
-    }
-}
-
-impl Ord for DailyName {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.date.cmp(&other.date)
-    }
-}
-impl ToDateTuple for DailyName {
-    fn to_date_tuple(&self) -> String {
-        let date: NaiveDate = self.date.into();
-        format!("{0} {1:02} {2:02}", date.year(), date.month(), date.day(),)
-    }
-}
-
-impl From<ValidatedDate> for DailyName {
-    fn from(value: ValidatedDate) -> Self {
-        let name = Self::create_name_from_date(value.into(), MD_EXT);
-        Self { date: value, name }
-    }
-}
-impl From<NaiveDate> for DailyName {
-    fn from(value: NaiveDate) -> Self {
-        let name = Self::create_name_from_date(value.into(), MD_EXT);
-        Self {
-            date: value.into(),
-            name,
-        }
+impl DateNameForFile for DailyName {
+    fn name(&self) -> &str {
+        &self.name
     }
 }
 
@@ -75,6 +45,13 @@ impl DailyName {
     }
 }
 
+impl ToDateTuple for DailyName {
+    fn to_date_tuple(&self) -> String {
+        let date: NaiveDate = self.date.into();
+        format!("{0} {1:02} {2:02}", date.year(), date.month(), date.day(),)
+    }
+}
+
 impl HasYear for DailyName {
     fn year(&self) -> u32 {
         self.date.year()
@@ -86,9 +63,15 @@ impl HasMonth for DailyName {
     }
 }
 
-impl Display for DailyName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.name)
+impl PartialOrd for DailyName {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.date.partial_cmp(&other.date)
+    }
+}
+
+impl Ord for DailyName {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.date.cmp(&other.date)
     }
 }
 
@@ -115,6 +98,23 @@ impl FromStr for DailyName {
             .map_err(|_| ParseDailyNameError::InvalidDate)?;
 
         Ok(validated)
+    }
+}
+
+impl From<ValidatedDate> for DailyName {
+    fn from(value: ValidatedDate) -> Self {
+        let name = Self::create_name_from_date(value.into(), MD_EXT);
+        Self { date: value, name }
+    }
+}
+
+impl From<NaiveDate> for DailyName {
+    fn from(value: NaiveDate) -> Self {
+        let name = Self::create_name_from_date(value.into(), MD_EXT);
+        Self {
+            date: value.into(),
+            name,
+        }
     }
 }
 

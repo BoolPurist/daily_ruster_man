@@ -14,6 +14,7 @@ mod constants {
     pub const MD_EXT: &str = "md";
     pub const DAILY_INFIX: &str = "daily";
     pub const MONTHLY_LABEL_IN_NAME: &str = "monthly";
+    pub const YEARLY_LABEL_IN_NAME: &str = "yearly";
     pub const NVIM: &str = "nvim";
     pub const DIGIT_SEP: &str = "_";
 

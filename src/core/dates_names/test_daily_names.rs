@@ -5,7 +5,7 @@ use crate::core::{
     DailyName,
     constants::MD_EXT,
 };
-use super::{daily_names::ParseDailyNameError, ToDateTuple};
+use super::{daily_names::ParseDailyNameError, ToDateTuple, DateNameForFile};
 
 #[test]
 fn test_parse_error() {
