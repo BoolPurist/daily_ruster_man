@@ -9,6 +9,7 @@ pub struct FindByYearMonthDay {
     day: Option<ValidatedDay>,
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum FindByMonthInYear {
     All,
     InCurrentYear(ValidatedMonth),
@@ -42,5 +43,25 @@ impl FindByYearMonthDay {
             month: valid_m_opt,
             day: valid_d_opt,
         })
+    }
+}
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+
+    mod find_by_year_month_day {
+        use super::*;
+        use test_case::test_case;
+        type TestOpt = Option<u32>;
+
+        #[test_case(Some(2000), Some(13), Some(4))]
+        #[test_case(Some(2000), Some(11), Some(0))]
+        #[test_case(Some(2000), Some(11), Some(32))]
+        #[test_case(Some(2222222), Some(11), Some(32))]
+        fn should_deny_invalid_input(y_opt: TestOpt, m_opt: TestOpt, d_opt: TestOpt) {
+            let actual = FindByYearMonthDay::new(y_opt, m_opt, d_opt);
+            assert!(actual.is_err(), "Does not deny invalid date");
+        }
     }
 }

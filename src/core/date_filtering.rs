@@ -5,7 +5,7 @@ use crate::core::{
 use std::path::Path;
 
 #[cfg(test)]
-#[path = "testing/test_daily_filtering.rs"]
+#[path = "test_daily_filtering.rs"]
 mod testing;
 
 /// # Errors

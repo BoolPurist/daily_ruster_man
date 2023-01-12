@@ -35,7 +35,7 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             Ok(())
         }
         CliArgs::Edit(command_arg) => {
-            let edit_query = command_arg.to_validated_date()?;
+            let edit_query = command_arg.to_advance_now()?;
             open_actions::open_by_date(edit_query)
         }
         CliArgs::MonthEdit(args) => {

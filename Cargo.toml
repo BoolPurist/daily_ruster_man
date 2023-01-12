@@ -13,6 +13,7 @@ env_logger = "0.10.0"
 lazy_static = "1.4.0"
 log = "0.4.17"
 
+test-case = "2.2.2"
 derive-new = "0.5.9"
 thiserror = "1.0.38"
 getset = "0.1.2"

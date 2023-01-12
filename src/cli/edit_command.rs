@@ -4,7 +4,7 @@ use crate::core::date_models::units_validated::ValidatedDate;
 use chrono::Local;
 use clap::Parser;
 
-#[derive(Parser)]
+#[derive(Parser, Default)]
 pub struct EditCommand {
     /// If given a single argument then it opens/creates the nth journal in the past, negative value,
     /// or in the future, positive value. If not given as single argument then it represents the
@@ -21,7 +21,11 @@ pub struct EditCommand {
 }
 
 impl EditCommand {
-    pub fn to_validated_date(&self) -> AppResult<ValidatedDate> {
+    pub fn to_advance_now(&self) -> AppResult<ValidatedDate> {
+        self.to_advance_valid_date(Local::now().date_naive().into())
+    }
+
+    fn to_advance_valid_date(&self, now: ValidatedDate) -> AppResult<ValidatedDate> {
         match (
             self.range_or_year,
             self.day_of_year_or_month,
@@ -29,7 +33,6 @@ impl EditCommand {
         ) {
             (Some(past_future), None, None) => {
                 let range = OpenByDaysInTime::new(past_future);
-                let now: ValidatedDate = Local::now().date_naive().into();
                 let in_past_or_future = range.from_point_in_time(now)?;
 
                 Ok(in_past_or_future)
@@ -49,8 +52,44 @@ impl EditCommand {
                     ValidatedDate::from_ymd(year as u32, month, day)
                 }
             }
-            (None, None, None) => Ok(Local::now().date_naive().into()),
+            (None, None, None) => Ok(now),
             _ => unreachable!(),
         }
+    }
+}
+
+#[cfg(test)]
+mod testing {
+    use test_case::test_case;
+    use chrono::NaiveDate;
+
+    use super::*;
+
+    #[test_case(Some(2), None, None, 1999, 7, 14 => (1999, 7, 16)  ; "Should advance date by 2 days")]
+    #[test_case(Some(-3), None, None, 1662, 6, 2 => (1662, 5, 30)  ; "Should go back 3 days")]
+    #[test_case(Some(2222), Some(42), None, 1, 1, 1 => (2222, 2, 11)  ; "Should match given year and exact day of this year.")]
+    #[test_case(Some(2003), Some(8), Some(12), 1, 1, 1 => (2003, 8, 12)  ; "Should match extact date in year, month and day")]
+    fn should_produce_valid_date(
+        range_or_year: Option<i32>,
+        day_of_year_or_month: Option<u32>,
+        day_of_month: Option<u32>,
+        given_y: i32,
+        given_m: u32,
+        given_d: u32,
+    ) -> (u32, u32, u32) {
+        let given = EditCommand {
+            range_or_year,
+            day_of_year_or_month,
+            day_of_month,
+        };
+        let given_date: ValidatedDate = NaiveDate::from_ymd_opt(given_y, given_m, given_d)
+            .expect("given_date has invalid year,month or day for a date")
+            .into();
+
+        let actual = given
+            .to_advance_valid_date(given_date)
+            .expect("Actual should result in error");
+
+        (actual.year(), actual.month(), actual.day())
     }
 }
