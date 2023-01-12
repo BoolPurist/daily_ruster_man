@@ -1,4 +1,10 @@
-use crate::core::date_models::find_by::FindByMonthInYear;
+use crate::{
+    core::date_models::{
+        find_by::FindByMonthInYear,
+        units_validated::{ValidatedMonth, ValidatedYear},
+    },
+    AppResult,
+};
 use clap::Parser;
 #[derive(Parser)]
 pub struct ListByMonthCommand {
@@ -9,11 +15,18 @@ pub struct ListByMonthCommand {
 }
 
 impl ListByMonthCommand {
-    pub fn create_find_month_in_year(&self) -> FindByMonthInYear {
+    pub fn create_find_month_in_year(&self) -> AppResult<FindByMonthInYear> {
         match (self.month, self.year) {
-            (None, None) => FindByMonthInYear::All,
-            (Some(month), None) => FindByMonthInYear::InCurrentYear(month),
-            (Some(month), Some(year)) => FindByMonthInYear::MonthYear { month, year },
+            (None, None) => Ok(FindByMonthInYear::All),
+            (Some(month), None) => {
+                let month: ValidatedMonth = month.try_into()?;
+                Ok(FindByMonthInYear::InCurrentYear(month))
+            }
+            (Some(month), Some(year)) => {
+                let month: ValidatedMonth = month.try_into()?;
+                let year: ValidatedYear = year.try_into()?;
+                Ok(FindByMonthInYear::MonthYear { month, year })
+            }
             _ => unreachable!(),
         }
     }

@@ -1,5 +1,11 @@
 use clap::Parser;
-use crate::core::date_models::open_by::OpenByMonthInYear;
+use crate::{
+    core::date_models::{
+        open_by::OpenByMonthInYear,
+        units_validated::{ValidatedMonth, ValidatedYear},
+    },
+    AppResult,
+};
 
 #[derive(Parser)]
 pub struct EditByMonthCommand {
@@ -11,11 +17,18 @@ pub struct EditByMonthCommand {
 }
 
 impl EditByMonthCommand {
-    pub fn create_month_in_year(&self) -> OpenByMonthInYear {
+    pub fn to_valid_ym_pair(&self) -> AppResult<OpenByMonthInYear> {
         match (self.month, self.year) {
-            (None, None) => OpenByMonthInYear::CurrentMonth,
-            (Some(month), None) => OpenByMonthInYear::InCurrentYear(month),
-            (Some(month), Some(year)) => OpenByMonthInYear::WithYear { month, year },
+            (None, None) => Ok(OpenByMonthInYear::CurrentMonth),
+            (Some(month), None) => {
+                let month: ValidatedMonth = month.try_into()?;
+                Ok(OpenByMonthInYear::InCurrentYear(month))
+            }
+            (Some(month), Some(year)) => {
+                let month: ValidatedMonth = month.try_into()?;
+                let year: ValidatedYear = year.try_into()?;
+                Ok(OpenByMonthInYear::WithYear { month, year })
+            }
             _ => unreachable!(),
         }
     }

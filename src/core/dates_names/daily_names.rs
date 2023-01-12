@@ -1,9 +1,10 @@
 use crate::core::constants::*;
-use crate::core::date_models::open_by::{OpenByDaysInTime, OpenByDayOfYear, OpenByDayMonthYear};
+use crate::core::date_models::units_validated::{
+    ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth,
+};
 use super::{HasYear, HasMonth, ToDateTuple};
 use crate::prelude::*;
 use chrono::prelude::*;
-
 use std::fmt::Display;
 use std::str::FromStr;
 use thiserror::Error;
@@ -11,7 +12,7 @@ use thiserror::Error;
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
     #[getset(get_copy = "pub")]
-    date: NaiveDate,
+    date: ValidatedDate,
     #[getset(get = "pub")]
     name: String,
 }
@@ -29,92 +30,59 @@ impl Ord for DailyName {
 }
 impl ToDateTuple for DailyName {
     fn to_date_tuple(&self) -> String {
-        let date = self.date;
+        let date: NaiveDate = self.date.into();
         format!("{0} {1:02} {2:02}", date.year(), date.month(), date.day(),)
     }
 }
 
+impl From<ValidatedDate> for DailyName {
+    fn from(value: ValidatedDate) -> Self {
+        let name = Self::create_name_from_date(value.into(), MD_EXT);
+        Self { date: value, name }
+    }
+}
+impl From<NaiveDate> for DailyName {
+    fn from(value: NaiveDate) -> Self {
+        let name = Self::create_name_from_date(value.into(), MD_EXT);
+        Self {
+            date: value.into(),
+            name,
+        }
+    }
+}
+
 impl DailyName {
-    pub fn new(date: NaiveDate, ext: &str) -> Self {
-        let year = date.year();
-        let month = date.month();
-        let day = date.day();
-        let name = Self::to_format(year, month, day, ext);
+    pub fn new(year: u32, month: u32, day: u32, ext: &str) -> AppResult<Self> {
+        let year: ValidatedYear = year.try_into()?;
+        let month: ValidatedMonth = month.try_into()?;
+        let day: ValidatedDay = day.try_into()?;
+        let name = Self::to_format(year.into(), month.into(), day.into(), ext);
+        let date: ValidatedDate = ValidatedDate::new(year, month, day)?;
 
-        Self { name, date }
-    }
-
-    pub fn create_from_ordinal_day(day_of_year: &OpenByDayOfYear) -> AppResult<Self> {
-        let (year, ordinal_day) = (day_of_year.year(), day_of_year.day_of_year());
-        let ordinal_date = NaiveDate::from_yo_opt(year as i32, ordinal_day).ok_or_else(|| {
-            anyhow!(
-                "Year ({}) or day of the year is ({}) not valid.{}",
-                year,
-                ordinal_day,
-                ORDINAL_DAY_SUGGESTION
-            )
-        })?;
-        Ok(Self::new(ordinal_date, MD_EXT))
-    }
-    pub fn create_from_year_month_day(year_month_day: &OpenByDayMonthYear) -> AppResult<Self> {
-        let (year, month, day) = (
-            year_month_day.year() as i32,
-            year_month_day.month(),
-            year_month_day.day(),
-        );
-        let ymd = NaiveDate::from_ymd_opt(year, month, day).ok_or_else(|| {
-            anyhow!(
-                "Year, month or day are not valid.{}",
-                YEAR_MONTH_DAY_SUGGESTION
-            )
-        })?;
-        Ok(Self::new(ymd, MD_EXT))
-    }
-
-    pub fn create_from_range(range: &OpenByDaysInTime) -> Self {
-        let wanted_date = chrono::Local::now().date_naive();
-        Self::create_from_point_and_range(range, wanted_date)
-    }
-
-    pub fn create_daily_name_from(date: NaiveDate) -> Self {
-        Self::new(date, MD_EXT)
-    }
-    pub fn create_today_name() -> DailyName {
-        let now = chrono::Local::now();
-        let date_now = now.date_naive();
-
-        Self::create_daily_name_from(date_now)
+        Ok(Self { name, date })
     }
 
     pub fn is_in_day(&self, day: u32) -> bool {
         self.date.day() == day
     }
 
-    pub fn create_from_point_and_range(
-        range: &OpenByDaysInTime,
-        mut wanted_date: NaiveDate,
-    ) -> Self {
-        match range {
-            OpenByDaysInTime::Past(days) => wanted_date -= chrono::Duration::days(*days as i64),
-            OpenByDaysInTime::Future(days) => wanted_date += chrono::Duration::days(*days as i64),
-        };
-
-        Self::create_daily_name_from(wanted_date)
+    fn create_name_from_date(date: NaiveDate, ext: &str) -> String {
+        Self::to_format(date.year() as u32, date.month(), date.day(), ext)
     }
 
-    fn to_format(year: i32, month: u32, day: u32, ext: &str) -> String {
+    fn to_format(year: u32, month: u32, day: u32, ext: &str) -> String {
         format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
     }
 }
 
 impl HasYear for DailyName {
     fn year(&self) -> u32 {
-        self.date().year() as u32
+        self.date.year()
     }
 }
 impl HasMonth for DailyName {
     fn month(&self) -> u32 {
-        self.date().month()
+        self.date.month()
     }
 }
 
@@ -131,9 +99,11 @@ impl FromStr for DailyName {
 
         let (y_parsed, m_parsed, d_parsed) = match (splits.next(), splits.next(), splits.next()) {
             (Some(year), Some(month), Some(day)) => {
-                let parsed_year: i32 = year.parse().or(Err(ParseDailyNameError::YearInvalid))?;
-                let parsed_month: u32 = month.parse().or(Err(ParseDailyNameError::MonthInvalid))?;
-                let parsed_daiy: u32 = day.parse().or(Err(ParseDailyNameError::DayInvalid))?;
+                let parsed_year: u32 = year.parse().or(Err(ParseDailyNameError::YearNotANumber))?;
+                let parsed_month: u32 = month
+                    .parse()
+                    .or(Err(ParseDailyNameError::MonthNotANumber))?;
+                let parsed_daiy: u32 = day.parse().or(Err(ParseDailyNameError::DayNotANumber))?;
 
                 Ok((parsed_year, parsed_month, parsed_daiy))
             }
@@ -141,34 +111,25 @@ impl FromStr for DailyName {
             (Some(_), None, None) => Err(ParseDailyNameError::MissingYear),
             _ => unreachable!(),
         }?;
+        let validated = Self::new(y_parsed, m_parsed, d_parsed, MD_EXT)
+            .map_err(|_| ParseDailyNameError::InvalidDate)?;
 
-        if y_parsed < 0 {
-            return Err(ParseDailyNameError::YearInvalid);
-        }
-
-        let date = NaiveDate::from_ymd_opt(y_parsed, m_parsed, d_parsed)
-            .ok_or(ParseDailyNameError::InvalidDate)?;
-
-        let new_self = Self {
-            name: s.to_owned(),
-            date,
-        };
-        Ok(new_self)
+        Ok(validated)
     }
 }
 
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum ParseDailyNameError {
-    #[error("Invalid format for year")]
-    YearInvalid,
-    #[error("Invalid format for month")]
-    MonthInvalid,
-    #[error("Invalid format for day")]
-    DayInvalid,
+    #[error("Year is not a number")]
+    YearNotANumber,
+    #[error("Month is not a number")]
+    MonthNotANumber,
+    #[error("Day is not a number")]
+    DayNotANumber,
     #[error("No year provided for the name of daily")]
     MissingYear,
     #[error("No month provided for the name of daily")]
     MissingMonth,
-    #[error("Date is not valid")]
+    #[error("Year, month and day form a invalid date")]
     InvalidDate,
 }

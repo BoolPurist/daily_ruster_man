@@ -1,5 +1,6 @@
 use crate::prelude::*;
-use chrono::NaiveDate;
+
+use chrono::{NaiveDate, Datelike};
 use crate::core::constants::{
     YEAR_UPPER_BOUND, DAY_LOWER_BOUND, DAY_UPPER_BOUND, MONTH_LOWER_BOUND, MONTH_UPPER_BOUND,
 };
@@ -88,11 +89,43 @@ impl ValidatedDate {
 
         Ok(Self(date))
     }
+
+    pub fn from_ymd(year: u32, month: u32, day: u32) -> AppResult<Self> {
+        let validated_year: ValidatedYear = year.try_into()?;
+        let validated_month: ValidatedMonth = month.try_into()?;
+        let validated_day: ValidatedDay = day.try_into()?;
+
+        Self::new(validated_year, validated_month, validated_day)
+    }
+
+    pub fn from_ordinal(year: u32, day_of_year: u32) -> AppResult<Self> {
+        let year: ValidatedYear = year.try_into()?;
+        let ordianal_date: NaiveDate = NaiveDate::from_yo_opt(year.0 as i32, day_of_year)
+            .ok_or_else(|| anyhow!("Year: {}  day {} do not form valid date", year, day_of_year))?;
+
+        Ok(Self(ordianal_date))
+    }
+
+    pub fn day(&self) -> u32 {
+        self.0.day()
+    }
+    pub fn month(&self) -> u32 {
+        self.0.month()
+    }
+    pub fn year(&self) -> u32 {
+        self.0.year() as u32
+    }
 }
 
 impl From<ValidatedDate> for NaiveDate {
     fn from(value: ValidatedDate) -> Self {
         value.0
+    }
+}
+
+impl From<NaiveDate> for ValidatedDate {
+    fn from(value: NaiveDate) -> Self {
+        Self(value)
     }
 }
 

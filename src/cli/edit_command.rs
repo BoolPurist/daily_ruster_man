@@ -1,5 +1,7 @@
-use crate::core::date_models::open_by::{OpenByDaysInTime, OpenByDayOfYear, OpenByDayMonthYear};
+use crate::core::date_models::open_by::OpenByDaysInTime;
 use crate::AppResult;
+use crate::core::date_models::units_validated::ValidatedDate;
+use chrono::Local;
 use clap::Parser;
 
 #[derive(Parser)]
@@ -19,45 +21,36 @@ pub struct EditCommand {
 }
 
 impl EditCommand {
-    pub fn get_date_query(&self) -> AppResult<EditByDate> {
+    pub fn to_validated_date(&self) -> AppResult<ValidatedDate> {
         match (
             self.range_or_year,
             self.day_of_year_or_month,
             self.day_of_month,
         ) {
             (Some(past_future), None, None) => {
-                Ok(EditByDate::Range(OpenByDaysInTime::new(past_future)))
+                let range = OpenByDaysInTime::new(past_future);
+                let now: ValidatedDate = Local::now().date_naive().into();
+                let in_past_or_future = range.from_point_in_time(now)?;
+
+                Ok(in_past_or_future)
             }
             (Some(year), Some(day_of_year), None) => {
                 if year < 0 {
                     Err(anyhow!("year must be positive with day of year"))
                 } else {
-                    Ok(EditByDate::DayOfYear(OpenByDayOfYear::new(
-                        year as u32,
-                        day_of_year,
-                    )))
+                    let ordinal_date = ValidatedDate::from_ordinal(year as u32, day_of_year)?;
+                    Ok(ordinal_date)
                 }
             }
             (Some(year), Some(month), Some(day)) => {
                 if year < 0 {
                     Err(anyhow!("year must be positive with provided day and month"))
                 } else {
-                    Ok(EditByDate::DayMonthYear(OpenByDayMonthYear::new(
-                        year as u32,
-                        month,
-                        day,
-                    )))
+                    ValidatedDate::from_ymd(year as u32, month, day)
                 }
             }
-            (None, None, None) => Ok(EditByDate::None),
+            (None, None, None) => Ok(Local::now().date_naive().into()),
             _ => unreachable!(),
         }
     }
-}
-
-pub enum EditByDate {
-    None,
-    Range(OpenByDaysInTime),
-    DayOfYear(OpenByDayOfYear),
-    DayMonthYear(OpenByDayMonthYear),
 }

@@ -48,13 +48,13 @@ pub fn filter_dailies_by_ymd(
     let mut filters: Vec<FilterDate> = Vec::with_capacity(3);
 
     if let Some(year) = ymd_listing.year() {
-        filters.push((filter_by_year, year));
+        filters.push((filter_by_year, year.into()));
     }
     if let Some(month) = ymd_listing.month() {
-        filters.push((filter_by_month, month));
+        filters.push((filter_by_month, month.into()));
     }
     if let Some(day) = ymd_listing.day() {
-        filters.push((filter_by_day, day));
+        filters.push((filter_by_day, day.into()));
     }
 
     filter_date_entries_by(to_filter, filters)
@@ -69,10 +69,13 @@ pub fn filter_monthly_by_ym(
 
     match ym_find_by {
         FindByMonthInYear::All => (),
-        FindByMonthInYear::InCurrentYear(month) => filters.push((filter_by_month, *month)),
+        FindByMonthInYear::InCurrentYear(month) => {
+            let month: u32 = (*month).into();
+            filters.push((filter_by_month, month))
+        }
         FindByMonthInYear::MonthYear { month, year } => {
-            filters.push((filter_by_month, *month));
-            filters.push((filter_by_year, *year));
+            filters.push((filter_by_month, (*month).into()));
+            filters.push((filter_by_year, (*year).into()));
         }
     }
 

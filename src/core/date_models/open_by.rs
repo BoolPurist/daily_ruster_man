@@ -1,3 +1,9 @@
+use chrono::{NaiveDate, Days};
+
+use crate::AppResult;
+
+use super::units_validated::{ValidatedDate, ValidatedMonth, ValidatedYear};
+
 #[derive(Debug)]
 pub enum OpenByDaysInTime {
     Past(u32),
@@ -14,23 +20,43 @@ impl OpenByDaysInTime {
     }
 }
 
-#[derive(new, CopyGetters, Debug)]
-#[getset(get_copy = "pub")]
-pub struct OpenByDayOfYear {
-    year: u32,
-    day_of_year: u32,
-}
-#[derive(new, CopyGetters, Debug)]
-#[getset(get_copy = "pub")]
-pub struct OpenByDayMonthYear {
-    year: u32,
-    month: u32,
-    day: u32,
+impl OpenByDaysInTime {
+    pub fn from_point_in_time(&self, date: ValidatedDate) -> AppResult<ValidatedDate> {
+        let date = match self {
+            Self::Past(past) => {
+                let date: NaiveDate = date.into();
+                date.checked_sub_days(Days::new(*past as u64))
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "No valid date if date {1} would be {0} days in the past",
+                            past,
+                            date
+                        )
+                    })
+            }
+            Self::Future(future) => {
+                let date: NaiveDate = date.into();
+                date.checked_add_days(Days::new(*future as u64))
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "No valid date if date {1} would be {0} days in the future",
+                            future,
+                            date
+                        )
+                    })
+            }
+        }?;
+
+        Ok(date.into())
+    }
 }
 
 #[derive(Debug)]
 pub enum OpenByMonthInYear {
     CurrentMonth,
-    InCurrentYear(u32),
-    WithYear { month: u32, year: u32 },
+    InCurrentYear(ValidatedMonth),
+    WithYear {
+        month: ValidatedMonth,
+        year: ValidatedYear,
+    },
 }

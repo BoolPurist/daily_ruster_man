@@ -16,7 +16,7 @@ pub struct ListCommand {
 }
 
 impl ListCommand {
-    pub fn create_ymd_listing(&self) -> AppResult<FindByYearMonthDay> {
+    pub fn to_date_filter(&self) -> AppResult<FindByYearMonthDay> {
         FindByYearMonthDay::new(self.year, self.month, self.day_of_month)
     }
 }

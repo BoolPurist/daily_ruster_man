@@ -1,13 +1,10 @@
 use std::str::FromStr;
-
+use crate::core::date_models::units_validated::{ValidatedYear, ValidatedMonth};
 use chrono::{Local, Datelike};
 
 use crate::{
     prelude::*,
-    core::{
-        constants::*,
-        date_models::{self, open_by::OpenByMonthInYear},
-    },
+    core::{constants::*, date_models::open_by::OpenByMonthInYear},
 };
 
 use super::{HasYear, HasMonth, ToDateTuple};
@@ -16,37 +13,41 @@ use super::{HasYear, HasMonth, ToDateTuple};
 pub struct MonthlyName {
     #[getset(get = "pub")]
     name: String,
-    year: u32,
-    month: u32,
+    year: ValidatedYear,
+    month: ValidatedMonth,
 }
 
 impl MonthlyName {
-    pub fn new(year: u32, month: u32, ext: &str) -> AppResult<Self> {
+    pub fn from_ym(year: u32, month: u32, ext: &str) -> AppResult<Self> {
         let name = Self::create_name(year, month, ext);
-
-        date_models::check_for_month(month)?;
-        Ok(Self { name, year, month })
+        Self::with_name(year, month, name)
     }
-    fn with_name(year: u32, month: u32, name: &str) -> AppResult<Self> {
-        date_models::check_for_month(month)?;
-        Ok(Self {
-            name: name.to_owned(),
-            year,
-            month,
-        })
+
+    fn new(year: ValidatedYear, month: ValidatedMonth) -> Self {
+        let year_u32 = year.into();
+        let month_u32 = month.into();
+        let name = Self::create_name(year_u32, month_u32, MD_EXT);
+        Self { year, month, name }
+    }
+
+    pub fn with_name(year: u32, month: u32, name: String) -> AppResult<Self> {
+        let year: ValidatedYear = year.try_into()?;
+        let month: ValidatedMonth = month.try_into()?;
+        Ok(Self { year, month, name })
     }
 
     pub fn from_month_in_year(month_in_year: &OpenByMonthInYear) -> AppResult<Self> {
         match month_in_year {
             OpenByMonthInYear::CurrentMonth => {
                 let now = Local::now().date_naive();
-                Self::new(now.year() as u32, now.month(), MD_EXT)
+                Self::from_ym(now.year() as u32, now.month(), MD_EXT)
             }
             OpenByMonthInYear::InCurrentYear(month) => {
                 let now = Local::now().date_naive();
-                Self::new(now.year() as u32, *month, MD_EXT)
+                let year: ValidatedYear = (now.year() as u32).try_into()?;
+                Ok(Self::new(year, *month))
             }
-            OpenByMonthInYear::WithYear { month, year } => Self::new(*year, *month, MD_EXT),
+            OpenByMonthInYear::WithYear { month, year } => Ok(Self::new(*year, *month)),
         }
     }
 
@@ -78,13 +79,13 @@ impl Ord for MonthlyName {
 
 impl HasYear for MonthlyName {
     fn year(&self) -> u32 {
-        self.year
+        self.year.into()
     }
 }
 
 impl HasMonth for MonthlyName {
     fn month(&self) -> u32 {
-        self.month
+        self.month.into()
     }
 }
 
@@ -105,7 +106,7 @@ impl FromStr for MonthlyName {
                     .map_err(AppError::new)
                     .context("Month not parseable")?;
 
-                Self::with_name(parsed_year, parsed_month, s)
+                Self::with_name(parsed_year, parsed_month, s.to_owned())
             }
             _ => bail!("Invalid format"),
         }
@@ -139,7 +140,7 @@ mod testing {
         let actual: MonthlyName = given
             .parse()
             .expect("Parsing should not fail in this test.");
-        let expected = MonthlyName::new(2000, 8, MD_EXT).expect("Invalid month given.");
+        let expected = MonthlyName::from_ym(2000, 8, MD_EXT).expect("Invalid month given.");
 
         assert_eq!(expected, actual);
     }
@@ -153,7 +154,7 @@ mod testing {
 
     #[test]
     fn should_return_month_year_pair() {
-        let given = MonthlyName::new(2000, 11, MD_EXT).expect("Invalid month given.");
+        let given = MonthlyName::from_ym(2000, 11, MD_EXT).expect("Invalid month given.");
         let actual = given.to_date_tuple();
         let expected = "2000 11";
 
@@ -161,7 +162,7 @@ mod testing {
     }
 
     fn assert_if_name_with_month_year(y: u32, m: u32, expected: &str) {
-        let given = MonthlyName::new(y, m, MD_EXT).expect("Invalid month name");
+        let given = MonthlyName::from_ym(y, m, MD_EXT).expect("Invalid month name");
 
         let actual = given.name();
         assert_eq!(expected, actual);

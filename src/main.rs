@@ -28,33 +28,22 @@ fn init_logger() {
 fn handle_commands(args: &CliArgs) -> AppResult {
     return match args {
         CliArgs::List(list_queries) => {
-            let filter = list_queries.create_ymd_listing()?;
+            let filter = list_queries.to_date_filter()?;
             let all = list_queries::fetch_all_daily_names(&filter)?;
             let in_lines = all.join("\n");
             println!("{in_lines}");
             Ok(())
         }
         CliArgs::Edit(command_arg) => {
-            let edit_query = command_arg.get_date_query()?;
-            match edit_query {
-                EditByDate::None => open_actions::open_today(),
-                EditByDate::Range(past_or_future) => {
-                    open_actions::open_by_future_past_range(&past_or_future)
-                }
-                EditByDate::DayOfYear(day_of_year) => {
-                    open_actions::open_by_day_of_year(&day_of_year)
-                }
-                EditByDate::DayMonthYear(day_month_year) => {
-                    open_actions::open_by_year_month_day(&day_month_year)
-                }
-            }
+            let edit_query = command_arg.to_validated_date()?;
+            open_actions::open_by_date(edit_query)
         }
         CliArgs::MonthEdit(args) => {
-            let month_in_year: OpenByMonthInYear = args.create_month_in_year();
-            open_actions::open_by_month_in_year(month_in_year)
+            let month_in_year: OpenByMonthInYear = args.to_valid_ym_pair()?;
+            open_actions::open_by_month_year(month_in_year)
         }
         CliArgs::MonthList(args) => {
-            let month_in_year = args.create_find_month_in_year();
+            let month_in_year = args.create_find_month_in_year()?;
             let monthly_names = list_queries::fetch_all_monthly_names(&month_in_year)?;
             let lines = monthly_names.join("\n");
             println!("{lines}");
