@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::core::{date_models::OpenByDaysInTime, DailyName, constants::MD_EXT};
+use crate::core::{date_models::open_by::OpenByDaysInTime, DailyName, constants::MD_EXT};
 use super::{daily_names::ParseDailyNameError, ToDateTuple};
 
 #[test]

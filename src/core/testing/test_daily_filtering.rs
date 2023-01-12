@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use crate::core::date_models::FindByYearMonthDay;
+use crate::core::date_models::find_by::FindByYearMonthDay;
 use super::*;
 use std::path::Path;
 #[test]
