@@ -93,15 +93,31 @@ fn get_and_ensure_path_to_daily() -> AppResult<PathBuf> {
 
 mod fetch_paths_names {
 
+    use project_root::get_project_root;
+
     use super::*;
 
-    pub fn fetch_path_with_dailys() -> AppResult<PathBuf> {
+    fn fetch_dev_data_folder_dir() -> AppResult<PathBuf> {
+        let project_root = get_project_folder()?;
+
+        let dev_data_folder = project_root.join(crate::core::constants::DEV_DATA_FOLDER.clone());
+
+        Ok(dev_data_folder)
+    }
+
+    fn fetch_prod_data_dir() -> AppResult<PathBuf> {
         let app_name = Path::new(get_app_name());
-        let data_folder = dirs::data_dir()
-            .context("Could find a data folder for dailies under the current user")?;
+        let data_folder = dirs::data_dir().ok_or_else(|| {
+            anyhow!("Could find a data folder for dailies under the current user")
+        })?;
 
-        debug!("Using {data_folder:?} as general data folder");
+        check_if_data_folder_exits(&data_folder)?;
+        let app_data_folder = data_folder.join(app_name);
 
+        Ok(app_data_folder)
+    }
+
+    fn check_if_data_folder_exits(data_folder: &Path) -> AppResult {
         let exits = data_folder.try_exists()?;
         if !exits {
             bail!(
@@ -110,10 +126,24 @@ mod fetch_paths_names {
             )
         }
 
-        let app_data_folder = data_folder.join(app_name);
+        Ok(())
+    }
+
+    pub fn fetch_path_with_dailys() -> AppResult<PathBuf> {
+        let app_data_folder = if cfg!(debug_assertions) {
+            fetch_dev_data_folder_dir()
+        } else {
+            fetch_prod_data_dir()
+        }?;
+
         debug!("Using {app_data_folder:?} as data folder for app.");
 
         Ok(app_data_folder)
+    }
+    pub fn get_project_folder() -> AppResult<PathBuf> {
+        get_project_root()
+            .map_err(AppError::new)
+            .context("Could get the project folder from rust project")
     }
 
     pub fn get_app_name() -> &'static str {

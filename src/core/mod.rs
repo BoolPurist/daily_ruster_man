@@ -10,6 +10,8 @@ mod process_handling;
 use self::dates_names::daily_names::DailyName;
 
 mod constants {
+    use std::path::{Path, PathBuf};
+
     use chrono::Datelike;
     pub const MD_EXT: &str = "md";
     pub const DAILY_INFIX: &str = "daily";
@@ -26,5 +28,7 @@ mod constants {
 
     lazy_static! {
         pub static ref YEAR_UPPER_BOUND: u32 = chrono::NaiveDate::MAX.year() as u32;
+        pub static ref DEV_APP_FOLDER: PathBuf = PathBuf::from(".dev_data");
+        pub static ref DEV_DATA_FOLDER: PathBuf = DEV_APP_FOLDER.join(PathBuf::from("share"));
     }
 }
