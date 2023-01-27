@@ -97,7 +97,7 @@ impl HasMonth for MonthlyName {
 impl FromStr for MonthlyName {
     type Err = AppError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut splits = s.split(DIGIT_SEP);
+        let mut splits = s.trim().split(DIGIT_SEP);
 
         match (splits.next(), splits.next(), splits.next(), splits.next()) {
             (Some(year), Some(month), Some(_), None) => {

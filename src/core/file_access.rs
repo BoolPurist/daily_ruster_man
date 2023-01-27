@@ -93,37 +93,75 @@ fn get_and_ensure_path_to_daily() -> AppResult<PathBuf> {
 
 mod fetch_paths_names {
 
-    use project_root::get_project_root;
-
     use super::*;
+    use crate::core::constants::{DEV_DATA_FOLDER, DEV_CONF_FOLDER};
 
-    fn fetch_dev_data_folder_dir() -> AppResult<PathBuf> {
+    fn fetch_dev_data_dir() -> AppResult<PathBuf> {
+        fetch_dev_dir_for(&*DEV_DATA_FOLDER)
+    }
+
+    fn fetch_dev_conf_dir() -> AppResult<PathBuf> {
+        fetch_dev_dir_for(&*DEV_CONF_FOLDER)
+    }
+
+    fn fetch_dev_dir_for(dir: &Path) -> AppResult<PathBuf> {
         let project_root = get_project_folder()?;
 
-        let dev_data_folder = project_root.join(crate::core::constants::DEV_DATA_FOLDER.clone());
+        let dev_data_folder = project_root.join(dir);
 
         Ok(dev_data_folder)
     }
 
-    fn fetch_prod_data_dir() -> AppResult<PathBuf> {
-        let app_name = Path::new(get_app_name());
-        let data_folder = dirs::data_dir().ok_or_else(|| {
-            anyhow!("Could find a data folder for dailies under the current user")
-        })?;
+    fn fetch_some_app_dir(
+        dir_access: impl Fn() -> AppResult<PathBuf>,
 
-        check_if_data_folder_exits(&data_folder)?;
-        let app_data_folder = data_folder.join(app_name);
+        on_error_existing_check: impl Fn(&Path) -> String,
+    ) -> AppResult<PathBuf> {
+        let app_name = Path::new(get_app_name());
+        let app_folder = dir_access()?;
+
+        check_if_dir_exits(&app_folder, on_error_existing_check)?;
+        let app_data_folder = app_folder.join(app_name);
 
         Ok(app_data_folder)
     }
 
-    fn check_if_data_folder_exits(data_folder: &Path) -> AppResult {
-        let exits = data_folder.try_exists()?;
+    fn fetch_prod_data_dir() -> AppResult<PathBuf> {
+        fetch_some_app_dir(
+            || {
+                dirs::data_dir().ok_or_else(|| {
+                    anyhow!("Could find a data folder for dailies under the current user")
+                })
+            },
+            |data_folder| {
+                format!(
+                    "Designated path for app data {:?} does not exits",
+                    data_folder
+                )
+            },
+        )
+    }
+    fn fetch_prod_conf_dir() -> AppResult<PathBuf> {
+        fetch_some_app_dir(
+            || {
+                dirs::config_dir().ok_or_else(|| {
+                    anyhow!("Could find a conf folder for dailies under the current user",)
+                })
+            },
+            |conf_folder| {
+                format!(
+                    "Designated path for app conf {:?} does not exits",
+                    conf_folder
+                )
+            },
+        )
+    }
+
+    fn check_if_dir_exits(folder: &Path, on_error_exits: impl Fn(&Path) -> String) -> AppResult {
+        let exits = folder.try_exists()?;
+
         if !exits {
-            bail!(
-                "Designated path for app data {:?} does not exits",
-                data_folder
-            )
+            bail!(on_error_exits(folder))
         }
 
         Ok(())
@@ -131,7 +169,7 @@ mod fetch_paths_names {
 
     pub fn fetch_path_with_dailys() -> AppResult<PathBuf> {
         let app_data_folder = if cfg!(debug_assertions) {
-            fetch_dev_data_folder_dir()
+            fetch_dev_data_dir()
         } else {
             fetch_prod_data_dir()
         }?;
@@ -140,8 +178,21 @@ mod fetch_paths_names {
 
         Ok(app_data_folder)
     }
+
+    pub fn fetch_path_with_conf() -> AppResult<PathBuf> {
+        let conf_dir = if cfg!(debug_assertions) {
+            fetch_dev_conf_dir()
+        } else {
+            fetch_prod_conf_dir()
+        }?;
+
+        debug!("Using {conf_dir:?} as conf folder for app.");
+
+        Ok(conf_dir)
+    }
+
     pub fn get_project_folder() -> AppResult<PathBuf> {
-        get_project_root()
+        project_root::get_project_root()
             .map_err(AppError::new)
             .context("Could get the project folder from rust project")
     }

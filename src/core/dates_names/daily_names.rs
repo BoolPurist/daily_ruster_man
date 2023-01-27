@@ -78,7 +78,7 @@ impl Ord for DailyName {
 impl FromStr for DailyName {
     type Err = ParseDailyNameError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut splits = s.split(DIGIT_SEP);
+        let mut splits = s.trim().split(DIGIT_SEP);
 
         let (y_parsed, m_parsed, d_parsed) = match (splits.next(), splits.next(), splits.next()) {
             (Some(year), Some(month), Some(day)) => {

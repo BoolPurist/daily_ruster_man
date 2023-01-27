@@ -67,7 +67,7 @@ impl FromStr for YearlyName {
     type Err = ParseErrorForYearName;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let name = s;
-        let mut splits = name.split(DIGIT_SEP);
+        let mut splits = name.trim().split(DIGIT_SEP);
         match (splits.next(), splits.next()) {
             (Some(year), Some(maybe_digit)) => {
                 let year: u32 = year

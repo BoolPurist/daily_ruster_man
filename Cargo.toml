@@ -4,19 +4,26 @@ version = "0.4.0"
 edition = "2021"
 
 [dependencies]
-anyhow ={version = "1.0.68", features = ["backtrace"]} 
 
-chrono = {version = "0.4.23", features = ["clock"]} 
+anyhow = { version = "1.0.68", features = ["backtrace"] } 
+chrono = { version = "0.4.23", features = ["clock"] } 
 clap = { version = "4.0.32", features = ["derive"] }
 dirs = "4.0.0"
+
 env_logger = "0.10.0"
-lazy_static = "1.4.0"
 log = "0.4.17"
 
-test-case = "2.2.2"
+lazy_static = "1.4.0"
+
 derive-new = "0.5.9"
 thiserror = "1.0.38"
 getset = "0.1.2"
 parse-display= "0.8.0"
 
 project-root = "0.2.2"
+serde = {version = "1.0.152", features = ["derive"]} 
+toml = "0.6.0"
+
+[dev-dependencies]
+test-case = "2.2.2"
+

@@ -13,7 +13,6 @@ extern crate parse_display;
 
 pub mod cli;
 pub mod core;
-
 pub type AppResult<T = ()> = anyhow::Result<T>;
 pub type AppError = anyhow::Error;
 
