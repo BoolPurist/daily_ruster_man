@@ -5,11 +5,36 @@ use std::{
 };
 
 use dirs;
-
+use crate::core::{constants::*, conf::app_config::AppConfig};
 use crate::prelude::*;
-
+use derive_new::new;
 use super::date_filtering;
 
+#[derive(new, Getters)]
+pub struct LoadedAppConfig {
+    #[getset(get = "pub")]
+    config_content: Option<AppConfig>,
+    #[getset(get = "pub")]
+    root: PathBuf,
+}
+
+pub fn fetch_path_conf_file_content() -> AppResult<LoadedAppConfig> {
+    let conf_root = fetch_paths_names::fetch_path_with_conf()?;
+    let path_to_file = conf_root.join(CONF_FILE_NAME);
+    if path_to_file.exists() {
+        let content = fs::read_to_string(path_to_file)?;
+        match toml::from_str(&content) {
+            Ok(parsed_content) => Ok(LoadedAppConfig::new(Some(parsed_content), conf_root)),
+            Err(error) => {
+                warn!("App config file is not in valid format.\n Error: {}", error);
+                Ok(LoadedAppConfig::new(None, conf_root))
+            }
+        }
+    } else {
+        info!("No config file found at {:?}", path_to_file);
+        Ok(LoadedAppConfig::new(None, conf_root))
+    }
+}
 pub fn fetch_valid_date_entries<R>() -> AppResult<Vec<R>>
 where
     R: FromStr,
@@ -23,7 +48,6 @@ where
 
     Ok(filtered)
 }
-
 pub fn create_new_path_for(file_name: &str) -> AppResult<PathBuf> {
     let data_folder_root = get_and_ensure_path_to_daily()?;
 
@@ -97,11 +121,11 @@ mod fetch_paths_names {
     use crate::core::constants::{DEV_DATA_FOLDER, DEV_CONF_FOLDER};
 
     fn fetch_dev_data_dir() -> AppResult<PathBuf> {
-        fetch_dev_dir_for(&*DEV_DATA_FOLDER)
+        fetch_dev_dir_for(&DEV_DATA_FOLDER)
     }
 
     fn fetch_dev_conf_dir() -> AppResult<PathBuf> {
-        fetch_dev_dir_for(&*DEV_CONF_FOLDER)
+        fetch_dev_dir_for(&DEV_CONF_FOLDER)
     }
 
     fn fetch_dev_dir_for(dir: &Path) -> AppResult<PathBuf> {

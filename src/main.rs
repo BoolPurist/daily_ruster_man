@@ -29,7 +29,7 @@ fn init_logger() {
 }
 
 fn handle_commands(args: &CliArgs) -> AppResult {
-    return match args {
+    match args {
         CliArgs::List(list_queries) => {
             let filter = list_queries.to_date_filter()?;
             let all = list_queries::fetch_all_daily_names(&filter)?;
@@ -68,7 +68,7 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             }
             Ok(())
         }
-    };
+    }
 }
 
 fn exit_with_error(error: &AppError) {
