@@ -5,25 +5,37 @@ edition = "2021"
 
 [dependencies]
 
+# quality of life
 anyhow = { version = "1.0.68", features = ["backtrace"] } 
+lazy_static = "1.4.0"
+
+# needed for other app features
 chrono = { version = "0.4.23", features = ["clock"] } 
 clap = { version = "4.0.32", features = ["derive"] }
+shellwords = "1.1.0"
 dirs = "4.0.0"
 
+# logging
 env_logger = "0.10.0"
 log = "0.4.17"
 
-lazy_static = "1.4.0"
+# data from files
+serde = {version = "1.0.152", features = ["derive"]} 
+toml = "0.6.0"
 
+# Macros
 derive-new = "0.5.9"
 thiserror = "1.0.38"
 getset = "0.1.2"
 parse-display= "0.8.0"
 
+# Used during development target
 project-root = "0.2.2"
-serde = {version = "1.0.152", features = ["derive"]} 
-toml = "0.6.0"
+
+# testing
+mockall = "0.11.3"
 
 [dev-dependencies]
+insta = { version = "1.26.0", features = ["yaml"] }
 test-case = "2.2.2"
 

@@ -1,19 +1,52 @@
+use crate::core::placeholder::CommandToExecute;
 use serde::Deserialize;
 use crate::prelude::*;
-use std::path::PathBuf;
+use crate::core::placeholder::OsCommandProcossor;
+use std::{path::PathBuf, collections::HashMap};
 
-use super::{file_access, constants::CONF_FILE_NAME};
+use super::{file_access, constants::CONF_FILE_NAME, placeholder::PlaceholderTemplate};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default, Debug)]
 pub struct AppConfig {
     yearly_template: Option<String>,
     monthly_template: Option<String>,
     daily_template: Option<String>,
-    // TODO: Implement place hodlers
-    _placeholders: Option<Vec<PlaceHolder>>,
+    placeholders: Option<Vec<PlaceHolder>>,
     #[serde(skip)]
     /// Path to folder where the config file loaded from
     root_path: PathBuf,
+}
+
+impl AppConfig {
+    pub fn create_placeholder_for_template<'a>(
+        &'a self,
+    ) -> HashMap<&'_ str, PlaceholderTemplate<'_, OsCommandProcossor>> {
+        match &self.placeholders {
+            None => HashMap::new(),
+            Some(read_placeholders_from_config) => {
+                let mut output: HashMap<&str, PlaceholderTemplate<'a, OsCommandProcossor>> =
+                    HashMap::with_capacity(read_placeholders_from_config.len());
+                for to_convert in read_placeholders_from_config {
+                    let value = match to_convert.is_command() {
+                        Some(is) => {
+                            if *is {
+                                PlaceholderTemplate::Commmand(CommandToExecute::new(
+                                    to_convert.value(),
+                                ))
+                            } else {
+                                PlaceholderTemplate::DirectValue(to_convert.value().as_str())
+                            }
+                        }
+
+                        None => PlaceholderTemplate::DirectValue(to_convert.value()),
+                    };
+                    output.insert(to_convert.key().as_str(), value);
+                }
+
+                output
+            }
+        }
+    }
 }
 
 impl AppConfig {
@@ -77,4 +110,31 @@ pub struct PlaceHolder {
     key: String,
     value: String,
     is_command: Option<bool>,
+}
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+    #[test]
+    fn should_transform_to_empty() {
+        const input: &str = r#"
+[[placeholders]]
+key = "hello"
+value = "world"
+[[placeholders]]
+key = "no_command"
+value = "pls_no_execute"
+is_command=false 
+[[placeholders]]
+key = "command"
+value = "echo hello"
+is_command=true
+"#;
+        let config: AppConfig = toml::from_str(input).expect("Invalid input from test input");
+        let actual = config.create_placeholder_for_template();
+        let mut actual_as_vec: Vec<(&str, PlaceholderTemplate<'_, OsCommandProcossor>)> =
+            actual.into_iter().collect();
+        actual_as_vec.sort_by_key(|key_value| key_value.0);
+        insta::assert_debug_snapshot!(actual_as_vec);
+    }
 }

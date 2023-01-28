@@ -1,0 +1,29 @@
+---
+source: src/core/app_config.rs
+expression: actual_as_vec
+---
+[
+    (
+        "command",
+        Commmand(
+            CommandToExecute {
+                provided_command: "echo hello",
+                stdout_command: None,
+                error_output: None,
+                command_processor: OsCommandProcossor,
+            },
+        ),
+    ),
+    (
+        "hello",
+        DirectValue(
+            "world",
+        ),
+    ),
+    (
+        "no_command",
+        DirectValue(
+            "pls_no_execute",
+        ),
+    ),
+]
