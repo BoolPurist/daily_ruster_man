@@ -1,8 +1,8 @@
-use crate::core::constants::*;
 use crate::core::date_models::units_validated::{
     ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth,
 };
-use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile};
+use crate::core::constants::*;
+use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile, InitialabeFromTemplate};
 use crate::prelude::*;
 use chrono::prelude::*;
 use std::str::FromStr;
@@ -42,6 +42,12 @@ impl DailyName {
 
     fn to_format(year: u32, month: u32, day: u32, ext: &str) -> String {
         format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
+    }
+}
+
+impl InitialabeFromTemplate for DailyName {
+    fn try_get_template(&self) -> AppResult<Option<String>> {
+        super::try_load_and_choose_template(|conf| conf.try_get_daily_template())
     }
 }
 

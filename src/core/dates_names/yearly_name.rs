@@ -3,7 +3,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 use crate::core::constants::{DIGIT_SEP, MD_EXT, YEARLY_LABEL_IN_NAME};
-use super::{HasYear, ToDateTuple, DateNameForFile};
+use super::{HasYear, ToDateTuple, DateNameForFile, InitialabeFromTemplate};
 use crate::core::date_models::units_validated::ValidatedYear;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -34,6 +34,11 @@ impl YearlyName {
             "{0:04}{1}{2}.{3}",
             year, DIGIT_SEP, YEARLY_LABEL_IN_NAME, MD_EXT
         )
+    }
+}
+impl InitialabeFromTemplate for YearlyName {
+    fn try_get_template(&self) -> AppResult<Option<String>> {
+        super::try_load_and_choose_template(|conf| conf.try_get_yearly_template())
     }
 }
 

@@ -5,36 +5,21 @@ use std::{
 };
 
 use dirs;
-use crate::core::{constants::*, conf::app_config::AppConfig};
 use crate::prelude::*;
-use derive_new::new;
 use super::date_filtering;
 
-#[derive(new, Getters)]
-pub struct LoadedAppConfig {
-    #[getset(get = "pub")]
-    config_content: Option<AppConfig>,
-    #[getset(get = "pub")]
-    root: PathBuf,
+pub fn fetch_path_conf() -> AppResult<PathBuf> {
+    let conf_dir = if cfg!(debug_assertions) {
+        fetch_paths_names::fetch_dev_conf_dir()
+    } else {
+        fetch_paths_names::fetch_prod_conf_dir()
+    }?;
+
+    debug!("Using {conf_dir:?} as conf folder for app.");
+
+    Ok(conf_dir)
 }
 
-pub fn fetch_path_conf_file_content() -> AppResult<LoadedAppConfig> {
-    let conf_root = fetch_paths_names::fetch_path_with_conf()?;
-    let path_to_file = conf_root.join(CONF_FILE_NAME);
-    if path_to_file.exists() {
-        let content = fs::read_to_string(path_to_file)?;
-        match toml::from_str(&content) {
-            Ok(parsed_content) => Ok(LoadedAppConfig::new(Some(parsed_content), conf_root)),
-            Err(error) => {
-                warn!("App config file is not in valid format.\n Error: {}", error);
-                Ok(LoadedAppConfig::new(None, conf_root))
-            }
-        }
-    } else {
-        info!("No config file found at {:?}", path_to_file);
-        Ok(LoadedAppConfig::new(None, conf_root))
-    }
-}
 pub fn fetch_valid_date_entries<R>() -> AppResult<Vec<R>>
 where
     R: FromStr,
@@ -49,13 +34,13 @@ where
     Ok(filtered)
 }
 pub fn create_new_path_for(file_name: &str) -> AppResult<PathBuf> {
-    let data_folder_root = get_and_ensure_path_to_daily()?;
+    let data_folder_root = fetch_paths_names::fetch_path_with_dailys()?;
 
     Ok(data_folder_root.join(file_name))
 }
 
 pub fn get_all_journal_paths() -> AppResult<Vec<PathBuf>> {
-    let data_folder = get_and_ensure_path_to_daily()?;
+    let data_folder = fetch_paths_names::fetch_path_with_dailys()?;
 
     let gathered_dailies = fs::read_dir(&data_folder)
         .map_err(AppError::new)?
@@ -96,25 +81,6 @@ fn fetch_file_names_from_dates() -> AppResult<Vec<String>> {
     Ok(file_names.map(|slice| slice.to_owned()).collect())
 }
 
-/// # Summary
-///
-/// It provides the path where the dailies are stored.
-/// This returned path is ensured to be created already in case of no error.
-///
-/// # Error
-///
-/// - If no path to the app data directory of user can be retrieved.
-/// - If the path to the app data directory was not created so far.
-fn get_and_ensure_path_to_daily() -> AppResult<PathBuf> {
-    let data_dir = fetch_paths_names::fetch_path_with_dailys()?;
-
-    // Sure: with data_dir the existence of general data path is unsured.
-    // Now we ensure that a folder within this existing data_dir named after this app is there.
-    fs::create_dir_all(&data_dir)?;
-
-    Ok(data_dir)
-}
-
 mod fetch_paths_names {
 
     use super::*;
@@ -124,7 +90,7 @@ mod fetch_paths_names {
         fetch_dev_dir_for(&DEV_DATA_FOLDER)
     }
 
-    fn fetch_dev_conf_dir() -> AppResult<PathBuf> {
+    pub fn fetch_dev_conf_dir() -> AppResult<PathBuf> {
         fetch_dev_dir_for(&DEV_CONF_FOLDER)
     }
 
@@ -136,22 +102,25 @@ mod fetch_paths_names {
         Ok(dev_data_folder)
     }
 
-    fn fetch_some_app_dir(
+    fn fetch_some_prod_app_dir(
         dir_access: impl Fn() -> AppResult<PathBuf>,
-
         on_error_existing_check: impl Fn(&Path) -> String,
     ) -> AppResult<PathBuf> {
         let app_name = Path::new(get_app_name());
         let app_folder = dir_access()?;
 
         check_if_dir_exits(&app_folder, on_error_existing_check)?;
-        let app_data_folder = app_folder.join(app_name);
 
-        Ok(app_data_folder)
+        // We have checked the generall data, conf, et cetra exits
+        // Makre sure the folder with app name exits.
+        let app_folder = app_folder.join(app_name);
+        fs::create_dir_all(&app_folder)?;
+
+        Ok(app_folder)
     }
 
-    fn fetch_prod_data_dir() -> AppResult<PathBuf> {
-        fetch_some_app_dir(
+    pub fn fetch_prod_data_dir() -> AppResult<PathBuf> {
+        fetch_some_prod_app_dir(
             || {
                 dirs::data_dir().ok_or_else(|| {
                     anyhow!("Could find a data folder for dailies under the current user")
@@ -165,8 +134,8 @@ mod fetch_paths_names {
             },
         )
     }
-    fn fetch_prod_conf_dir() -> AppResult<PathBuf> {
-        fetch_some_app_dir(
+    pub fn fetch_prod_conf_dir() -> AppResult<PathBuf> {
+        fetch_some_prod_app_dir(
             || {
                 dirs::config_dir().ok_or_else(|| {
                     anyhow!("Could find a conf folder for dailies under the current user",)
@@ -203,19 +172,7 @@ mod fetch_paths_names {
         Ok(app_data_folder)
     }
 
-    pub fn fetch_path_with_conf() -> AppResult<PathBuf> {
-        let conf_dir = if cfg!(debug_assertions) {
-            fetch_dev_conf_dir()
-        } else {
-            fetch_prod_conf_dir()
-        }?;
-
-        debug!("Using {conf_dir:?} as conf folder for app.");
-
-        Ok(conf_dir)
-    }
-
-    pub fn get_project_folder() -> AppResult<PathBuf> {
+    fn get_project_folder() -> AppResult<PathBuf> {
         project_root::get_project_root()
             .map_err(AppError::new)
             .context("Could get the project folder from rust project")

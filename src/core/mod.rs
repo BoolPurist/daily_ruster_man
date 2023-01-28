@@ -1,4 +1,4 @@
-pub mod conf;
+pub mod app_config;
 mod date_filtering;
 pub mod date_models;
 mod dates_names;
