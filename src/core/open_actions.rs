@@ -1,7 +1,6 @@
 use std::fs;
 
 use chrono::{Local, Datelike};
-use crate::core::app_config::AppConfig;
 use crate::prelude::*;
 
 use crate::core::date_models::open_by::OpenByMonthInYear;
@@ -38,7 +37,7 @@ fn open_date_with_editor<T>(journal: T) -> AppResult
 where
     T: DateNameForFile + InitialabeFromTemplate,
 {
-    let to_open = file_access::create_new_path_for(&journal.name())?;
+    let to_open = file_access::create_new_path_for(journal.name())?;
 
     if !to_open.exists() {
         let template_content = journal.try_get_template()?;
