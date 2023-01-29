@@ -1,8 +1,13 @@
 pub mod command_processor;
-use std::{borrow::Cow, collections::HashMap};
+
 pub use command_processor::{CommandToExecute, OsCommandProcossor};
+
+use std::{borrow::Cow, collections::HashMap};
+
 use regex::{Regex, Replacer};
+
 use self::command_processor::CommandProcessor;
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub enum PlaceholderTemplate<'a, T> {
@@ -106,11 +111,23 @@ where
     }
 }
 
+fn parse_commmand_text(to_parse: &str) -> AppResult<Vec<String>> {
+    shellwords::split(to_parse).map_err(AppError::new)
+}
+
+#[cfg(test)]
+pub fn return_dummy_processed_command(input: &str) -> String {
+    let splitted = parse_commmand_text(input).expect("Invalid command text given");
+    let mut output = String::from("Executed_");
+    output.push_str(&splitted.join("_"));
+    output
+}
+
 #[cfg(test)]
 mod testing {
     use std::collections::HashMap;
     use super::{replace_template_placeholders, CommandToExecute};
-    use crate::core::template::command_processor::testing::return_dummy_processed_command;
+    use super::return_dummy_processed_command;
     use crate::core::template::PlaceholderTemplate;
 
     use super::command_processor::{MockCommandProcessor, CommandOutput};

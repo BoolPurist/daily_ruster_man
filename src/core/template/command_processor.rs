@@ -1,10 +1,27 @@
-use mockall::*;
-use crate::prelude::*;
-
 use std::process::Command;
-fn parse_commmand_text(to_parse: &str) -> AppResult<Vec<String>> {
-    shellwords::split(to_parse).map_err(AppError::new)
+
+use mockall::*;
+use derive_new::new;
+
+use crate::core::template;
+
+#[automock]
+pub trait CommandProcessor {
+    /// Executes a processs according to a given command with args as text
+    /// and returns the output
+    fn process(&self, command_text: &str) -> CommandOutput;
 }
+
+#[derive(Debug, new, Getters)]
+#[getset(get = "pub")]
+pub struct CommandOutput {
+    /// Output of program as if written to the terminal
+    stdout: String,
+    /// If there, the program was executed with an error. It is gurantted that the inner string is not
+    /// empty and not only whitespaces
+    stderr: Option<String>,
+}
+
 #[derive(Debug)]
 pub struct CommandToExecute<'a, T> {
     provided_command: &'a str,
@@ -59,25 +76,11 @@ where
     }
 }
 
-use derive_new::new;
-#[derive(Debug, new, Getters)]
-#[getset(get = "pub")]
-pub struct CommandOutput {
-    stdout: String,
-    stderr: Option<String>,
-}
-
-#[automock]
-pub trait CommandProcessor {
-    /// Returns
-    fn process(&self, command_text: &str) -> CommandOutput;
-}
-
 #[derive(Default, Debug)]
 pub struct OsCommandProcossor;
 impl CommandProcessor for OsCommandProcossor {
     fn process(&self, command_text: &str) -> CommandOutput {
-        return match parse_commmand_text(command_text) {
+        return match template::parse_commmand_text(command_text) {
             Err(error) => return_error(error.to_string()),
             Ok(command_args) => {
                 let mut iter_command_args = command_args.iter();
@@ -114,17 +117,13 @@ impl CommandProcessor for OsCommandProcossor {
         }
     }
 }
+
 #[cfg(test)]
 pub mod testing {
 
-    use super::*;
-    use mockall::predicate::*;
-    pub fn return_dummy_processed_command(input: &str) -> String {
-        let splitted = super::parse_commmand_text(input).expect("Invalid command text given");
-        let mut output = String::from("Executed_");
-        output.push_str(&splitted.join("_"));
-        output
-    }
+    use mockall::predicate;
+    use crate::core::template;
+    use super::{CommandOutput, MockCommandProcessor, CommandToExecute};
 
     #[test]
     fn should_invoke_only_once_command() {
@@ -140,7 +139,7 @@ pub mod testing {
             .times(1)
             .returning(move |to_process| {
                 CommandOutput::new(
-                    return_dummy_processed_command(to_process),
+                    template::return_dummy_processed_command(to_process),
                     expected_error_cloned.clone(),
                 )
             });
