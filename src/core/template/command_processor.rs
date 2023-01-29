@@ -66,6 +66,7 @@ pub struct CommandOutput {
     stdout: String,
     stderr: Option<String>,
 }
+
 #[automock]
 pub trait CommandProcessor {
     /// Returns
@@ -90,9 +91,14 @@ impl CommandProcessor for OsCommandProcossor {
                             Err(error) => return_error(error.to_string()),
                             Ok(out_err) => {
                                 let (out, err) = (out_err.stdout, out_err.stderr);
+                                let stderr = String::from_utf8_lossy(&err).to_string();
                                 CommandOutput::new(
                                     String::from_utf8_lossy(&out).to_string(),
-                                    Some(String::from_utf8_lossy(&err).to_string()),
+                                    if stderr.trim().is_empty() {
+                                        None
+                                    } else {
+                                        Some(stderr)
+                                    },
                                 )
                             }
                         }
