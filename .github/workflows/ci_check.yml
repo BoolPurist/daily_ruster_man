@@ -10,4 +10,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rust-lang/setup-rust-toolchain@v1
-      - run: ./ci_check.yml
+      - run: ./ci_check.sh
