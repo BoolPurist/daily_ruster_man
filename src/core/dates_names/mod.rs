@@ -8,13 +8,22 @@ use crate::core::app_config::AppConfig;
 pub use monthly_name::MonthlyName;
 use std::str::FromStr;
 use crate::prelude::*;
-
+use crate::core::template;
 fn try_load_and_choose_template(
     on_choose_template: impl Fn(&AppConfig) -> AppResult<Option<String>>,
 ) -> AppResult<Option<String>> {
     let app_config = AppConfig::try_from_file_system()?;
     if let Some(config) = app_config {
-        on_choose_template(&config)
+        let template = on_choose_template(&config)?;
+        if let Some(to_insert_into) = template {
+            debug!("Augmenting template with placeholders from config file");
+            let mut placeholders = config.create_placeholder_for_template();
+            let augmented_with_placeholders =
+                template::replace_template_placeholders(&to_insert_into, &mut placeholders);
+            Ok(Some(augmented_with_placeholders.to_string()))
+        } else {
+            Ok(None)
+        }
     } else {
         Ok(None)
     }

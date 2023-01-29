@@ -4,8 +4,6 @@ pub use command_processor::{CommandToExecute, OsCommandProcossor};
 use regex::{Regex, Replacer};
 use self::command_processor::CommandProcessor;
 
-use super::app_config::AppConfig;
-
 #[derive(Debug)]
 pub enum PlaceholderTemplate<'a, T> {
     DirectValue(&'a str),
@@ -34,7 +32,7 @@ where
 
     for error in found_errors_for_commmand.into_iter() {
         error!(
-            "For key {0} the command could be executed without errors.\n Error: {1}",
+            "For key {0} the command could not be executed without errors.\n Error: {1}",
             error.0, error.1,
         )
     }
@@ -73,21 +71,40 @@ where
             "Unexpexted: no innner capture group found for matching placholders in a template",
         );
 
-        match self.map.get_mut(inner_match.as_str()) {
+        let key = inner_match.as_str();
+
+        match self.map.get_mut(key) {
             Some(to_insert) => match to_insert {
                 PlaceholderTemplate::DirectValue(direct_insert) => {
+                    debug!(
+                        "Inserted for placeholder key {} direct value {}",
+                        key, direct_insert
+                    );
                     dst.push_str(&direct_insert);
                 }
                 PlaceholderTemplate::Commmand(command_to_insert) => {
                     let command_output = command_to_insert.get_std_out();
-                    dst.push_str(command_output);
+                    if command_output.is_empty() {
+                        warn!("Command output is empty for the key placeholder {}", key);
+                        dst.push_str(full_match.as_str());
+                    } else {
+                        dst.push_str(command_output);
+
+                        debug!(
+                            "Inserted for placeholder key {} the output {}",
+                            key, command_output,
+                        );
+                    }
+
                     let command_error = command_to_insert.get_std_err();
-                    if command_error.is_empty() {
-                        let key = inner_match.as_str();
-                        if self.errors.contains_key(key) {
+                    if !command_error.is_empty() {
+                        if !self.errors.contains_key(key) {
+                            debug!(
+                                "Found error output for key {}. Output: {}",
+                                key, command_error
+                            );
                             self.errors.insert(key.to_owned(), command_error.to_owned());
                         }
-                    } else {
                     }
                 }
             },
@@ -103,7 +120,6 @@ mod testing {
     use crate::core::template::command_processor::testing::return_dummy_processed_command;
     use crate::core::template::PlaceholderTemplate;
 
-    use mockall::*;
     use super::command_processor::MockCommandProcessor;
     type FakeCommandOutput<'l> = PlaceholderTemplate<'l, MockCommandProcessor>;
     fn create_dummmy_command_processor<'a>(

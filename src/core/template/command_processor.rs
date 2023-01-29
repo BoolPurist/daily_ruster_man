@@ -38,6 +38,7 @@ where
             error_output: None,
         }
     }
+
     pub fn get_std_out(&mut self) -> &str {
         self.ensure_execution_only_once();
         self.stdout_command.as_ref().unwrap()
@@ -91,6 +92,7 @@ impl CommandProcessor for OsCommandProcossor {
         };
 
         fn return_error(error: String) -> (String, String) {
+            println!("asdfas");
             (String::new(), error)
         }
     }
