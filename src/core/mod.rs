@@ -6,8 +6,8 @@ mod dates_names;
 mod file_access;
 pub mod list_queries;
 pub mod open_actions;
-mod placeholder;
 mod process_handling;
+mod template;
 use self::dates_names::daily_names::DailyName;
 
 mod constants {

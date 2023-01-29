@@ -1,10 +1,9 @@
-use crate::core::placeholder::CommandToExecute;
+use crate::core::template::{CommandToExecute, OsCommandProcossor};
 use serde::Deserialize;
 use crate::prelude::*;
-use crate::core::placeholder::OsCommandProcossor;
 use std::{path::PathBuf, collections::HashMap};
 
-use super::{file_access, constants::CONF_FILE_NAME, placeholder::PlaceholderTemplate};
+use super::{file_access, constants::CONF_FILE_NAME, template::PlaceholderTemplate};
 
 #[derive(Deserialize, Default, Debug)]
 pub struct AppConfig {

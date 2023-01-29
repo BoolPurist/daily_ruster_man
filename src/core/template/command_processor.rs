@@ -1,13 +1,10 @@
 use mockall::*;
+use crate::prelude::*;
 
 use std::process::Command;
-use crate::{AppResult, AppError};
-#[derive(Debug)]
-pub enum PlaceholderTemplate<'a, T> {
-    DirectValue(&'a str),
-    Commmand(CommandToExecute<'a, T>),
+fn parse_commmand_text(to_parse: &str) -> AppResult<Vec<String>> {
+    shellwords::split(to_parse).map_err(AppError::new)
 }
-
 #[derive(Debug)]
 pub struct CommandToExecute<'a, T> {
     provided_command: &'a str,
@@ -17,47 +14,6 @@ pub struct CommandToExecute<'a, T> {
     /// produced output in stderr
     error_output: Option<String>,
     command_processor: T,
-}
-
-#[automock]
-pub trait CommandProcessor {
-    fn process(&self, command_text: &str) -> (String, String);
-}
-
-#[derive(Default, Debug)]
-pub struct OsCommandProcossor;
-impl CommandProcessor for OsCommandProcossor {
-    fn process(&self, command_text: &str) -> (String, String) {
-        return match parse_commmand_text(command_text) {
-            Err(error) => return_error(error.to_string()),
-            Ok(command_args) => {
-                let mut iter_command_args = command_args.iter();
-                let first = iter_command_args.next();
-                match (first, iter_command_args) {
-                    (Some(command), rest) => {
-                        let mut program = Command::new(command);
-                        program.args(rest);
-
-                        match program.output() {
-                            Err(error) => return_error(error.to_string()),
-                            Ok(out_err) => {
-                                let (out, err) = (out_err.stdout, out_err.stderr);
-                                (
-                                    String::from_utf8_lossy(&out).to_string(),
-                                    String::from_utf8_lossy(&err).to_string(),
-                                )
-                            }
-                        }
-                    }
-                    _ => return_error("No command provided".to_string()),
-                }
-            }
-        };
-
-        fn return_error(error: String) -> (String, String) {
-            (String::new(), error)
-        }
-    }
 }
 
 impl<'a> CommandToExecute<'a, OsCommandProcossor> {
@@ -99,11 +55,46 @@ where
         }
     }
 }
-
-fn parse_commmand_text(to_parse: &str) -> AppResult<Vec<String>> {
-    shellwords::split(to_parse).map_err(AppError::new)
+#[automock]
+pub trait CommandProcessor {
+    fn process(&self, command_text: &str) -> (String, String);
 }
 
+#[derive(Default, Debug)]
+pub struct OsCommandProcossor;
+impl CommandProcessor for OsCommandProcossor {
+    fn process(&self, command_text: &str) -> (String, String) {
+        return match parse_commmand_text(command_text) {
+            Err(error) => return_error(error.to_string()),
+            Ok(command_args) => {
+                let mut iter_command_args = command_args.iter();
+                let first = iter_command_args.next();
+                match (first, iter_command_args) {
+                    (Some(command), rest) => {
+                        let mut program = Command::new(command);
+                        program.args(rest);
+
+                        match program.output() {
+                            Err(error) => return_error(error.to_string()),
+                            Ok(out_err) => {
+                                let (out, err) = (out_err.stdout, out_err.stderr);
+                                (
+                                    String::from_utf8_lossy(&out).to_string(),
+                                    String::from_utf8_lossy(&err).to_string(),
+                                )
+                            }
+                        }
+                    }
+                    _ => return_error("No command provided".to_string()),
+                }
+            }
+        };
+
+        fn return_error(error: String) -> (String, String) {
+            (String::new(), error)
+        }
+    }
+}
 #[cfg(test)]
 mod testing {
     use crate::core::app_config::AppConfig;
