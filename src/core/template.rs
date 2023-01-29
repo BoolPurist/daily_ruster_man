@@ -14,10 +14,23 @@ pub enum PlaceholderTemplate<'a, T> {
     DirectValue(&'a str),
     Commmand(CommandToExecute<'a, T>),
 }
+use derive_new::new;
+#[derive(Debug, new, Getters)]
+pub struct TemplateReplacement<'t> {
+    replacement: Cow<'t, str>,
+    #[getset(get = "pub")]
+    errors: HashMap<String, String>,
+}
+
+impl<'t> TemplateReplacement<'t> {
+    pub fn replacement(&self) -> &str {
+        &self.replacement
+    }
+}
 pub fn replace_template_placeholders<'m, 't, T>(
     template: &'t str,
     placeholders: &'m mut HashMap<&'t str, PlaceholderTemplate<'t, T>>,
-) -> Cow<'m, str>
+) -> TemplateReplacement<'m>
 where
     T: CommandProcessor,
 {
@@ -35,13 +48,7 @@ where
 
     let replacement = REGEX_PLACE_HOLDERS.replace_all(template, replacer);
 
-    for error in found_errors_for_commmand.into_iter() {
-        error!(
-            "For key {0} the command could not be executed without errors.\n Error: {1}",
-            error.0, error.1,
-        )
-    }
-    replacement
+    TemplateReplacement::new(replacement, found_errors_for_commmand)
 }
 
 pub struct PlaceHolderReplacer<'m, 'kv, T>
@@ -126,6 +133,7 @@ pub fn return_dummy_processed_command(input: &str) -> String {
 #[cfg(test)]
 mod testing {
     use std::collections::HashMap;
+
     use super::{replace_template_placeholders, CommandToExecute};
     use super::return_dummy_processed_command;
     use crate::core::template::PlaceholderTemplate;
@@ -150,12 +158,13 @@ mod testing {
 
         PlaceholderTemplate::Commmand(CommandToExecute::new_with(command_text, mock))
     }
+
     #[test]
     fn should_complement_template_with_command_processor() {
         let given_templa = r#"
 # for {hello}
 ## Uptime is {how_long}
-- Uptime is now {how_long_now}
+- Uptime is now {how_long_now} and {echo_error}
 ## Uptime is {how_long} again
 more {hello}
 ### Not {found}
@@ -178,6 +187,14 @@ Should inserted {how_long_error} even with errors
                     create_dummmy_command_processor("uptime xxx", Some("error".to_string()), 1),
                 ),
                 (
+                    "echo_error",
+                    create_dummmy_command_processor(
+                        "echo",
+                        Some("mistake: did something wrong".to_string()),
+                        1,
+                    ),
+                ),
+                (
                     "how_long_now",
                     create_dummmy_command_processor("uptime now", None, 1),
                 ),
@@ -187,6 +204,19 @@ Should inserted {how_long_error} even with errors
 
         // Act
         let actual = replace_template_placeholders(given_templa, &mut map);
-        insta::assert_display_snapshot!(actual);
+        let output = actual.replacement();
+
+        let mut errors: Vec<(String, String)> = actual
+            .errors()
+            .iter()
+            .map(|key_value| {
+                let (key, value) = key_value;
+                (key.to_owned(), value.to_owned())
+            })
+            .collect();
+        errors.sort_by(|left, right| left.0.cmp(&right.0));
+
+        insta::assert_display_snapshot!(output);
+        insta::assert_yaml_snapshot!(errors);
     }
 }

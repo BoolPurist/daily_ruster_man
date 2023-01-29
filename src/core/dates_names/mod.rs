@@ -20,7 +20,15 @@ fn try_load_and_choose_template(
             let mut placeholders = config.create_placeholder_for_template();
             let augmented_with_placeholders =
                 template::replace_template_placeholders(&to_insert_into, &mut placeholders);
-            Ok(Some(augmented_with_placeholders.to_string()))
+
+            for (key, error_msg) in augmented_with_placeholders.errors().iter() {
+                error!(
+                    "For key {} the command was executed with errors.\nError: {}",
+                    key, error_msg
+                );
+            }
+
+            Ok(Some(augmented_with_placeholders.replacement().to_owned()))
         } else {
             Ok(None)
         }

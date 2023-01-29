@@ -1,0 +1,9 @@
+---
+source: src/core/template.rs
+expression: errors
+---
+- - echo_error
+  - "mistake: did something wrong"
+- - how_long_error
+  - error
+

@@ -1,11 +1,11 @@
 ---
 source: src/core/template.rs
-expression: actual
+expression: output
 ---
 
 # for world
 ## Uptime is Executed_uptime
-- Uptime is now Executed_uptime_now
+- Uptime is now Executed_uptime_now and Executed_echo
 ## Uptime is Executed_uptime again
 more world
 ### Not {found}
