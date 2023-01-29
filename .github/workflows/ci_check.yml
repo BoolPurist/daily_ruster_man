@@ -1,0 +1,13 @@
+name: "Format check, Clippy and unit tests in rust" 
+on: 
+  push: 
+  pull_request:  
+    
+jobs:
+  rust_check_lint_format_tests:
+    name: "cargo fmt check, clippy, test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: ./ci_check.yml
