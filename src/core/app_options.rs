@@ -5,22 +5,23 @@ pub struct AppOptions {
     /// During development, this will have some value.
     debug: Option<DebugArgs>,
     #[getset(get = "pub")]
-    generell: GenerellArgs,
+    general: GenerellArgs,
 }
 
 impl AppOptions {
+    #[cfg(debug_assertions)]
     pub fn new(args: &CliArgs) -> Self {
-        let generell = args.args().clone();
-        if cfg!(debug_assertions) {
-            Self {
-                generell,
-                debug: Some(args.debug_args().clone()),
-            }
-        } else {
-            Self {
-                generell,
-                debug: None,
-            }
+        Self {
+            general: args.args().clone(),
+            debug: Some(args.debug_args().clone()),
+        }
+    }
+
+    #[cfg(not(debug_assertions))]
+    pub fn new(args: &CliArgs) -> Self {
+        Self {
+            general: args.args().clone(),
+            debug: None,
         }
     }
 
