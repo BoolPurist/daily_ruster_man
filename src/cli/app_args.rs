@@ -50,6 +50,8 @@ pub enum AppCommands {
 pub struct DebugArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
+    /// If true then the journal files and config files are loaded and saved from the users folders
+    /// instead of the throw away dev data folders in the project root.
     user_local_share: bool,
 }
 
@@ -57,5 +59,6 @@ pub struct DebugArgs {
 pub struct GenerellArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
+    /// If true, then the backtrace for errors are active and even debug logs are shown
     debug: bool,
 }
