@@ -12,7 +12,7 @@ pub enum PlaceholderTemplate<'a, T> {
 pub fn replace_template_placeholders<'m, 't, T>(
     template: &'t str,
     placeholders: &'m mut HashMap<&'t str, PlaceholderTemplate<'t, T>>,
-) -> Cow<'t, str>
+) -> Cow<'m, str>
 where
     T: CommandProcessor,
 {
@@ -28,7 +28,7 @@ where
     let mut found_errors_for_commmand: HashMap<String, String> = HashMap::new();
     let replacer = PlaceHolderReplacer::new(placeholders, &mut found_errors_for_commmand);
 
-    let replacement = REGEX_PLACE_HOLDERS.replace_all(&template, replacer);
+    let replacement = REGEX_PLACE_HOLDERS.replace_all(template, replacer);
 
     for error in found_errors_for_commmand.into_iter() {
         error!(
@@ -80,7 +80,7 @@ where
                         "Inserted for placeholder key {} direct value {}",
                         key, direct_insert
                     );
-                    dst.push_str(&direct_insert);
+                    dst.push_str(direct_insert);
                 }
                 PlaceholderTemplate::Commmand(command_to_insert) => {
                     let command_output = command_to_insert.get_std_out();
@@ -97,14 +97,12 @@ where
                     }
 
                     let command_error = command_to_insert.get_std_err();
-                    if !command_error.is_empty() {
-                        if !self.errors.contains_key(key) {
-                            debug!(
-                                "Found error output for key {}. Output: {}",
-                                key, command_error
-                            );
-                            self.errors.insert(key.to_owned(), command_error.to_owned());
-                        }
+                    if !command_error.is_empty() && !self.errors.contains_key(key) {
+                        debug!(
+                            "Found error output for key {}. Output: {}",
+                            key, command_error
+                        );
+                        self.errors.insert(key.to_owned(), command_error.to_owned());
                     }
                 }
             },
