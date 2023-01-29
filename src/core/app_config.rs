@@ -47,10 +47,10 @@ impl AppConfig {
         }
     }
 }
-
+use crate::core::app_options::AppOptions;
 impl AppConfig {
-    pub fn try_from_file_system() -> AppResult<Option<Self>> {
-        let path_to_configs = file_access::fetch_path_conf()?;
+    pub fn try_from_file_system(options: &AppOptions) -> AppResult<Option<Self>> {
+        let path_to_configs = file_access::fetch_path_conf(options)?;
         let path_to_conf_file = path_to_configs.join(CONF_FILE_NAME);
 
         if path_to_conf_file.exists() {

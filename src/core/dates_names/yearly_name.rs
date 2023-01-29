@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{prelude::*, core::app_options::AppOptions};
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -36,9 +36,10 @@ impl YearlyName {
         )
     }
 }
+
 impl InitialabeFromTemplate for YearlyName {
-    fn try_get_template(&self) -> AppResult<Option<String>> {
-        super::try_load_and_choose_template(|conf| conf.try_get_yearly_template())
+    fn try_get_template(&self, app_options: &AppOptions) -> AppResult<Option<String>> {
+        super::try_load_and_choose_template(app_options, |conf| conf.try_get_yearly_template())
     }
 }
 

@@ -1,13 +1,15 @@
 pub mod app_config;
-mod date_filtering;
+pub mod app_options;
 pub mod date_models;
-mod dates_names;
-
-mod file_access;
 pub mod list_queries;
 pub mod open_actions;
+
+mod date_filtering;
+mod dates_names;
+mod file_access;
 mod process_handling;
 mod template;
+
 use self::dates_names::daily_names::DailyName;
 
 mod constants {

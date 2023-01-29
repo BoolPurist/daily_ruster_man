@@ -1,13 +1,28 @@
+use clap::Subcommand;
+pub use clap::{Parser, Args};
+
+pub use crate::core::date_models;
 pub use crate::cli::{
     edit_command::EditCommand, month_edit_command::EditByMonthCommand, list_command::ListCommand,
     month_list_command::ListByMonthCommand,
 };
-pub use crate::core::date_models;
-pub use clap::Parser;
 
-#[derive(Parser)]
+#[derive(Parser, Getters)]
 #[command(author, version, about)]
-pub enum CliArgs {
+#[getset(get = "pub")]
+pub struct CliArgs {
+    #[cfg(debug_assertions)]
+    #[command(flatten)]
+    debug_args: DebugArgs,
+    #[command(flatten)]
+    args: GenerellArgs,
+    #[command(subcommand)]
+    commands: AppCommands,
+}
+
+#[derive(Subcommand)]
+#[command(author, version, about)]
+pub enum AppCommands {
     /// Shows created daily entries so far.
     #[command(visible_alias = "l")]
     List(ListCommand),
@@ -29,4 +44,18 @@ pub enum CliArgs {
     /// List all created entries for a year.
     #[command(visible_alias = "yl")]
     YearList,
+}
+
+#[derive(Args, CopyGetters, Clone)]
+pub struct DebugArgs {
+    #[getset(get_copy = "pub")]
+    #[arg(short, long)]
+    user_local_share: bool,
+}
+
+#[derive(Args, CopyGetters, Clone)]
+pub struct GenerellArgs {
+    #[getset(get_copy = "pub")]
+    #[arg(short, long)]
+    debug: bool,
 }

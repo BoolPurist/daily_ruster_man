@@ -9,10 +9,13 @@ pub use monthly_name::MonthlyName;
 use std::str::FromStr;
 use crate::prelude::*;
 use crate::core::template;
+
+use super::app_options::AppOptions;
 fn try_load_and_choose_template(
+    app_options: &AppOptions,
     on_choose_template: impl Fn(&AppConfig) -> AppResult<Option<String>>,
 ) -> AppResult<Option<String>> {
-    let app_config = AppConfig::try_from_file_system()?;
+    let app_config = AppConfig::try_from_file_system(app_options)?;
     if let Some(config) = app_config {
         let template = on_choose_template(&config)?;
         if let Some(to_insert_into) = template {
@@ -61,5 +64,5 @@ pub trait DateNameForFile: ToDateTuple + FromStr + Ord {
 }
 
 pub trait InitialabeFromTemplate {
-    fn try_get_template(&self) -> AppResult<Option<String>>;
+    fn try_get_template(&self, app_options: &AppOptions) -> AppResult<Option<String>>;
 }

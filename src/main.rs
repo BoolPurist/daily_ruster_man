@@ -2,6 +2,7 @@ use daily_ruster_man::{
     cli::app_args::*,
     core::{
         list_queries, open_actions,
+        app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
     },
 };
@@ -9,18 +10,26 @@ use daily_ruster_man::prelude::*;
 use env_logger::Env;
 
 fn main() {
-    init_logger();
+    let cli_args = CliArgs::parse();
 
-    let args = CliArgs::parse();
-    if let Err(error) = handle_commands(&args) {
-        exit_with_error(&error);
+    init_logger(cli_args.args());
+    set_up_env(cli_args.args());
+
+    if let Err(error) = handle_commands(&cli_args) {
+        exit_with_error(&error, cli_args.args());
     }
 }
 
-fn init_logger() {
+fn set_up_env(generell_args: &GenerellArgs) {
+    if generell_args.debug() {
+        std::env::set_var("RUST_BACKTRACE", "1");
+    }
+}
+
+fn init_logger(generell_args: &GenerellArgs) {
     let mut logger_level = "warning";
 
-    if cfg!(debug_assertions) {
+    if cfg!(debug_assertions) || generell_args.debug() {
         logger_level = "debug";
     }
 
@@ -29,50 +38,52 @@ fn init_logger() {
 }
 
 fn handle_commands(args: &CliArgs) -> AppResult {
-    match args {
-        CliArgs::List(list_queries) => {
+    let app_options = AppOptions::new(args);
+    match args.commands() {
+        AppCommands::List(list_queries) => {
             let filter = list_queries.to_date_filter()?;
-            let all = list_queries::fetch_all_daily_names(&filter)?;
+            let all = list_queries::fetch_all_daily_names(&filter, &app_options)?;
             let in_lines = all.join("\n");
             println!("{in_lines}");
             Ok(())
         }
-        CliArgs::Edit(command_arg) => {
+        AppCommands::Edit(command_arg) => {
             let edit_query = command_arg.to_advance_now()?;
-            open_actions::open_by_date(edit_query)
+            open_actions::open_by_date(edit_query, &app_options)
         }
-        CliArgs::MonthEdit(args) => {
+        AppCommands::MonthEdit(args) => {
             let month_in_year: OpenByMonthInYear = args.to_valid_ym_pair()?;
-            open_actions::open_by_month_year(month_in_year)
+            open_actions::open_by_month_year(month_in_year, &app_options)
         }
-        CliArgs::MonthList(args) => {
+        AppCommands::MonthList(args) => {
             let month_in_year = args.create_find_month_in_year()?;
-            let monthly_names = list_queries::fetch_all_monthly_names(&month_in_year)?;
+            let monthly_names =
+                list_queries::fetch_all_monthly_names(&month_in_year, &app_options)?;
             let lines = monthly_names.join("\n");
             println!("{lines}");
             Ok(())
         }
-        CliArgs::YearList => {
-            let all_yearlies = list_queries::fetch_yearly_names()?;
+        AppCommands::YearList => {
+            let all_yearlies = list_queries::fetch_yearly_names(&app_options)?;
             let lines = all_yearlies.join("\n");
             println!("{lines}");
             Ok(())
         }
-        CliArgs::YearEdit { year } => {
+        AppCommands::YearEdit { year } => {
             if let Some(year_given) = year {
                 let year_given: ValidatedYear = (*year_given).try_into()?;
 
-                open_actions::open_by_year(year_given)?;
+                open_actions::open_by_year(year_given, &app_options)?;
             } else {
-                open_actions::open_by_current_year()?;
+                open_actions::open_by_current_year(&app_options)?;
             }
             Ok(())
         }
     }
 }
 
-fn exit_with_error(error: &AppError) {
-    if cfg!(debug_assertions) {
+fn exit_with_error(error: &AppError, generell_args: &GenerellArgs) {
+    if cfg!(debug_assertions) || generell_args.debug() {
         eprintln!("Error debug: {error:?}");
     } else {
         eprintln!("Error: {error}");

@@ -4,12 +4,13 @@ use std::{
     fs::{self, DirEntry},
 };
 
+use crate::core::app_options::AppOptions;
 use dirs;
 use crate::prelude::*;
 use super::date_filtering;
 
-pub fn fetch_path_conf() -> AppResult<PathBuf> {
-    let conf_dir = if cfg!(debug_assertions) {
+pub fn fetch_path_conf(option: &AppOptions) -> AppResult<PathBuf> {
+    let conf_dir = if cfg!(debug_assertions) && !option.use_prod_local_share() {
         fetch_paths_names::fetch_dev_conf_dir()
     } else {
         fetch_paths_names::fetch_prod_conf_dir()
@@ -20,11 +21,11 @@ pub fn fetch_path_conf() -> AppResult<PathBuf> {
     Ok(conf_dir)
 }
 
-pub fn fetch_valid_date_entries<R>() -> AppResult<Vec<R>>
+pub fn fetch_valid_date_entries<R>(option: &AppOptions) -> AppResult<Vec<R>>
 where
     R: FromStr,
 {
-    let file_names = fetch_file_names_from_dates()?;
+    let file_names = fetch_file_names_from_dates(option)?;
 
     let filtered = file_names
         .into_iter()
@@ -33,14 +34,14 @@ where
 
     Ok(filtered)
 }
-pub fn create_new_path_for(file_name: &str) -> AppResult<PathBuf> {
-    let data_folder_root = fetch_paths_names::fetch_path_with_dailys()?;
+pub fn create_new_path_for(file_name: &str, option: &AppOptions) -> AppResult<PathBuf> {
+    let data_folder_root = fetch_paths_names::fetch_path_with_dailys(option)?;
 
     Ok(data_folder_root.join(file_name))
 }
 
-pub fn get_all_journal_paths() -> AppResult<Vec<PathBuf>> {
-    let data_folder = fetch_paths_names::fetch_path_with_dailys()?;
+pub fn get_all_journal_paths(option: &AppOptions) -> AppResult<Vec<PathBuf>> {
+    let data_folder = fetch_paths_names::fetch_path_with_dailys(option)?;
 
     let gathered_dailies = fs::read_dir(&data_folder)
         .map_err(AppError::new)?
@@ -73,8 +74,8 @@ pub fn get_all_journal_paths() -> AppResult<Vec<PathBuf>> {
     }
 }
 
-fn fetch_file_names_from_dates() -> AppResult<Vec<String>> {
-    let journal_paths = get_all_journal_paths()?;
+fn fetch_file_names_from_dates(option: &AppOptions) -> AppResult<Vec<String>> {
+    let journal_paths = get_all_journal_paths(option)?;
 
     let file_names = date_filtering::strip_expect_file_name(&journal_paths);
 
@@ -160,8 +161,8 @@ mod fetch_paths_names {
         Ok(())
     }
 
-    pub fn fetch_path_with_dailys() -> AppResult<PathBuf> {
-        let app_data_folder = if cfg!(debug_assertions) {
+    pub fn fetch_path_with_dailys(option: &AppOptions) -> AppResult<PathBuf> {
+        let app_data_folder = if cfg!(debug_assertions) && !option.use_prod_local_share() {
             fetch_dev_data_dir()
         } else {
             fetch_prod_data_dir()
