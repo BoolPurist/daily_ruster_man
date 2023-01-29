@@ -8,8 +8,7 @@ expression: actual_as_vec
         Commmand(
             CommandToExecute {
                 provided_command: "echo hello",
-                stdout_command: None,
-                error_output: None,
+                output_of_executed: None,
                 command_processor: OsCommandProcossor,
             },
         ),

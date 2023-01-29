@@ -8,11 +8,7 @@ fn parse_commmand_text(to_parse: &str) -> AppResult<Vec<String>> {
 #[derive(Debug)]
 pub struct CommandToExecute<'a, T> {
     provided_command: &'a str,
-    stdout_command: Option<String>,
-    /// If none the command was not yet executed or an error happened executing the command.
-    /// An error counts for either a not valid command text or the execution of the command
-    /// produced output in stderr
-    error_output: Option<String>,
+    output_of_executed: Option<CommandOutput>,
     command_processor: T,
 }
 
@@ -34,37 +30,52 @@ where
         Self {
             provided_command,
             command_processor,
-            stdout_command: None,
-            error_output: None,
+            output_of_executed: None,
         }
     }
 
     pub fn get_std_out(&mut self) -> &str {
         self.ensure_execution_only_once();
-        self.stdout_command.as_ref().unwrap()
+        self.output_of_executed
+            .as_ref()
+            .expect("Unexpected: No command output found even if commmand was executed")
+            .stdout()
+            .as_str()
     }
-    pub fn get_std_err(&mut self) -> &str {
+    pub fn get_std_err(&mut self) -> Option<&str> {
         self.ensure_execution_only_once();
-        self.error_output.as_ref().unwrap().trim()
+        let std_err = self
+            .output_of_executed
+            .as_ref()
+            .expect("Unexpected: No command output found even if commmand was executed");
+        std_err.stderr().as_deref()
     }
 
     fn ensure_execution_only_once(&mut self) {
-        if self.stdout_command.is_none() {
-            let (out, err) = self.command_processor.process(self.provided_command);
-            self.stdout_command = Some(out);
-            self.error_output = Some(err);
+        if self.output_of_executed.is_none() {
+            let output = self.command_processor.process(self.provided_command);
+            self.output_of_executed = Some(output);
         }
     }
 }
+
+use derive_new::new;
+#[derive(Debug, new, Getters)]
+#[getset(get = "pub")]
+pub struct CommandOutput {
+    stdout: String,
+    stderr: Option<String>,
+}
 #[automock]
 pub trait CommandProcessor {
-    fn process(&self, command_text: &str) -> (String, String);
+    /// Returns
+    fn process(&self, command_text: &str) -> CommandOutput;
 }
 
 #[derive(Default, Debug)]
 pub struct OsCommandProcossor;
 impl CommandProcessor for OsCommandProcossor {
-    fn process(&self, command_text: &str) -> (String, String) {
+    fn process(&self, command_text: &str) -> CommandOutput {
         return match parse_commmand_text(command_text) {
             Err(error) => return_error(error.to_string()),
             Ok(command_args) => {
@@ -79,9 +90,9 @@ impl CommandProcessor for OsCommandProcossor {
                             Err(error) => return_error(error.to_string()),
                             Ok(out_err) => {
                                 let (out, err) = (out_err.stdout, out_err.stderr);
-                                (
+                                CommandOutput::new(
                                     String::from_utf8_lossy(&out).to_string(),
-                                    String::from_utf8_lossy(&err).to_string(),
+                                    Some(String::from_utf8_lossy(&err).to_string()),
                                 )
                             }
                         }
@@ -91,9 +102,9 @@ impl CommandProcessor for OsCommandProcossor {
             }
         };
 
-        fn return_error(error: String) -> (String, String) {
+        fn return_error(error: String) -> CommandOutput {
             println!("asdfas");
-            (String::new(), error)
+            CommandOutput::new(String::new(), Some(error))
         }
     }
 }
@@ -113,17 +124,18 @@ pub mod testing {
     fn should_invoke_only_once_command() {
         let command_text = "echo 'hello world'";
 
-        let expected_error = "Some error";
+        let expected_error = Some("Some error".to_owned());
         let expected_stdout = "Executed_echo_hello world";
 
         let mut mock = MockCommandProcessor::new();
+        let expected_error_cloned = expected_error.clone();
         mock.expect_process()
             .with(predicate::eq(command_text))
             .times(1)
-            .returning(|to_process| {
-                (
+            .returning(move |to_process| {
+                CommandOutput::new(
                     return_dummy_processed_command(to_process),
-                    expected_error.to_owned(),
+                    expected_error_cloned.clone(),
                 )
             });
         // Act
@@ -137,6 +149,9 @@ pub mod testing {
         assert_eq!(expected_stdout, actual_stdout);
 
         let actual_strerr = actual.get_std_err();
-        assert_eq!(expected_error, actual_strerr);
+        assert_eq!(
+            expected_error.expect("Unexpected: actual stderr should not be none"),
+            actual_strerr.expect("Unexpected: expected stderr should not be none")
+        );
     }
 }

@@ -84,25 +84,20 @@ where
                 }
                 PlaceholderTemplate::Commmand(command_to_insert) => {
                     let command_output = command_to_insert.get_std_out();
-                    if command_output.is_empty() {
-                        warn!("Command output is empty for the key placeholder {}", key);
-                        dst.push_str(full_match.as_str());
-                    } else {
-                        dst.push_str(command_output);
 
-                        debug!(
-                            "Inserted for placeholder key {} the output {}",
-                            key, command_output,
-                        );
-                    }
+                    dst.push_str(command_output);
+
+                    debug!(
+                        "Inserted for placeholder key {} the output {}",
+                        key, command_output,
+                    );
 
                     let command_error = command_to_insert.get_std_err();
-                    if !command_error.is_empty() && !self.errors.contains_key(key) {
-                        debug!(
-                            "Found error output for key {}. Output: {}",
-                            key, command_error
-                        );
-                        self.errors.insert(key.to_owned(), command_error.to_owned());
+                    if let Some(stderr) = command_error {
+                        if !self.errors.contains_key(key) {
+                            debug!("Found error output for key {}. Output: {}", key, stderr);
+                            self.errors.insert(key.to_owned(), stderr.to_owned());
+                        }
                     }
                 }
             },
@@ -118,21 +113,21 @@ mod testing {
     use crate::core::template::command_processor::testing::return_dummy_processed_command;
     use crate::core::template::PlaceholderTemplate;
 
-    use super::command_processor::MockCommandProcessor;
+    use super::command_processor::{MockCommandProcessor, CommandOutput};
     type FakeCommandOutput<'l> = PlaceholderTemplate<'l, MockCommandProcessor>;
     fn create_dummmy_command_processor<'a>(
         command_text: &'a str,
-        expected_error: &'a str,
+        expected_error: Option<String>,
         times: usize,
     ) -> FakeCommandOutput<'a> {
         let mut mock = MockCommandProcessor::new();
-        let expected_error = expected_error.to_owned();
+        let expected_error = expected_error.clone();
         mock.expect_process()
             .times(times)
             .returning(move |to_process| {
-                (
+                CommandOutput::new(
                     return_dummy_processed_command(to_process),
-                    expected_error.to_owned(),
+                    expected_error.clone(),
                 )
             });
 
@@ -153,18 +148,21 @@ Should inserted {how_long_error} even with errors
         let mut map: HashMap<&str, FakeCommandOutput> = HashMap::from_iter(
             vec![
                 ("hello", PlaceholderTemplate::DirectValue("world")),
-                ("how_long", create_dummmy_command_processor("uptime", "", 1)),
+                (
+                    "how_long",
+                    create_dummmy_command_processor("uptime", None, 1),
+                ),
                 (
                     "not_to_be_inserted",
-                    create_dummmy_command_processor("oh_oh", "", 0),
+                    create_dummmy_command_processor("oh_oh", None, 0),
                 ),
                 (
                     "how_long_error",
-                    create_dummmy_command_processor("uptime xxx", "error", 1),
+                    create_dummmy_command_processor("uptime xxx", Some("error".to_string()), 1),
                 ),
                 (
                     "how_long_now",
-                    create_dummmy_command_processor("uptime now", "", 1),
+                    create_dummmy_command_processor("uptime now", None, 1),
                 ),
             ]
             .into_iter(),
