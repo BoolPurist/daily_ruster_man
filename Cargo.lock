@@ -230,6 +230,7 @@ dependencies = [
  "mockall",
  "parse-display",
  "project-root",
+ "regex",
  "serde",
  "shellwords",
  "test-case",

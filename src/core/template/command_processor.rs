@@ -44,7 +44,7 @@ where
     }
     pub fn get_std_err(&mut self) -> &str {
         self.ensure_execution_only_once();
-        self.error_output.as_ref().unwrap()
+        self.error_output.as_ref().unwrap().trim()
     }
 
     fn ensure_execution_only_once(&mut self) {
@@ -96,12 +96,11 @@ impl CommandProcessor for OsCommandProcossor {
     }
 }
 #[cfg(test)]
-mod testing {
-    use crate::core::app_config::AppConfig;
+pub mod testing {
 
     use super::*;
     use mockall::predicate::*;
-    fn return_dummy_processed_command(input: &str) -> String {
+    pub fn return_dummy_processed_command(input: &str) -> String {
         let splitted = super::parse_commmand_text(input).expect("Invalid command text given");
         let mut output = String::from("Executed_");
         output.push_str(&splitted.join("_"));
@@ -110,12 +109,12 @@ mod testing {
 
     #[test]
     fn should_invoke_only_once_command() {
-        let mut mock = MockCommandProcessor::new();
         let command_text = "echo 'hello world'";
 
         let expected_error = "Some error";
         let expected_stdout = "Executed_echo_hello world";
 
+        let mut mock = MockCommandProcessor::new();
         mock.expect_process()
             .with(predicate::eq(command_text))
             .times(1)
@@ -125,11 +124,13 @@ mod testing {
                     expected_error.to_owned(),
                 )
             });
-
+        // Act
         let mut actual = CommandToExecute::new_with(command_text, mock);
+
         // Testing if command is executed only once
         let _ = actual.get_std_out();
 
+        // Assertion
         let actual_stdout = actual.get_std_out();
         assert_eq!(expected_stdout, actual_stdout);
 

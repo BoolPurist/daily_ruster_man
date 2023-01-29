@@ -1,0 +1,14 @@
+---
+source: src/core/template.rs
+expression: actual
+---
+
+# for world
+## Uptime is Executed_uptime
+- Uptime is now Executed_uptime_now
+## Uptime is Executed_uptime again
+more world
+### Not {found}
+
+Should inserted Executed_uptime_xxx even with errors
+

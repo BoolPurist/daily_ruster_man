@@ -116,7 +116,7 @@ mod testing {
     use super::*;
     #[test]
     fn should_transform_to_empty() {
-        const input: &str = r#"
+        const TEST_INPUT: &str = r#"
 [[placeholders]]
 key = "hello"
 value = "world"
@@ -129,11 +129,18 @@ key = "command"
 value = "echo hello"
 is_command=true
 "#;
-        let config: AppConfig = toml::from_str(input).expect("Invalid input from test input");
+        // Set up
+        let config: AppConfig = toml::from_str(TEST_INPUT).expect("Invalid input from test input");
+
+        // Act
         let actual = config.create_placeholder_for_template();
+
+        // Prepare for assert
         let mut actual_as_vec: Vec<(&str, PlaceholderTemplate<'_, OsCommandProcossor>)> =
             actual.into_iter().collect();
         actual_as_vec.sort_by_key(|key_value| key_value.0);
+
+        // Assert
         insta::assert_debug_snapshot!(actual_as_vec);
     }
 }
