@@ -27,6 +27,12 @@ impl AppOptions {
 
     /// If true is return then the user local files are to be used even during development
     pub fn use_prod_local_share(&self) -> bool {
+        // In production always use local files of user.
+        if !cfg!(debug_assertions) {
+            return true;
+        }
+
+        // In debug the local files of user should only be used if the option was given.
         if let Some(use_it) = &self.debug {
             use_it.user_local_share()
         } else {

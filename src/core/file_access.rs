@@ -10,10 +10,10 @@ use crate::prelude::*;
 use super::date_filtering;
 
 pub fn fetch_path_conf(option: &AppOptions) -> AppResult<PathBuf> {
-    let conf_dir = if cfg!(debug_assertions) && !option.use_prod_local_share() {
-        fetch_paths_names::fetch_dev_conf_dir()
-    } else {
+    let conf_dir = if option.use_prod_local_share() {
         fetch_paths_names::fetch_prod_conf_dir()
+    } else {
+        fetch_paths_names::fetch_dev_conf_dir()
     }?;
 
     debug!("Using {conf_dir:?} as conf folder for app.");
@@ -162,10 +162,10 @@ mod fetch_paths_names {
     }
 
     pub fn fetch_path_with_dailys(option: &AppOptions) -> AppResult<PathBuf> {
-        let app_data_folder = if cfg!(debug_assertions) && !option.use_prod_local_share() {
-            fetch_dev_data_dir()
-        } else {
+        let app_data_folder = if option.use_prod_local_share() {
             fetch_prod_data_dir()
+        } else {
+            fetch_dev_data_dir()
         }?;
 
         debug!("Using {app_data_folder:?} as data folder for app.");
