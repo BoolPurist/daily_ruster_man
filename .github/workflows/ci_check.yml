@@ -1,8 +1,12 @@
 name: "Format check, Clippy and unit tests in rust" 
 on: 
   push: 
+    paths-ignore:
+      - '**.md'
   pull_request:  
-    
+    paths-ignore:
+      - '**.md'
+        
 jobs:
   rust_check_lint_format_tests:
     name: "cargo fmt check, clippy, test"
