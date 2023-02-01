@@ -7,38 +7,6 @@ pub use daily_names::DailyName;
 use crate::core::app_config::AppConfig;
 pub use monthly_name::MonthlyName;
 use std::str::FromStr;
-use crate::prelude::*;
-use crate::core::template;
-
-use super::app_options::AppOptions;
-fn try_load_and_choose_template(
-    app_options: &AppOptions,
-    on_choose_template: impl Fn(&AppConfig) -> AppResult<Option<String>>,
-) -> AppResult<Option<String>> {
-    let app_config = AppConfig::try_from_file_system(app_options)?;
-    if let Some(config) = app_config {
-        let template = on_choose_template(&config)?;
-        if let Some(to_insert_into) = template {
-            debug!("Augmenting template with placeholders from config file");
-            let mut placeholders = config.create_placeholder_for_template();
-            let augmented_with_placeholders =
-                template::replace_template_placeholders(&to_insert_into, &mut placeholders);
-
-            for (key, error_msg) in augmented_with_placeholders.errors().iter() {
-                error!(
-                    "For key {} the command was executed with errors.\nError: {}",
-                    key, error_msg
-                );
-            }
-
-            Ok(Some(augmented_with_placeholders.replacement().to_owned()))
-        } else {
-            Ok(None)
-        }
-    } else {
-        Ok(None)
-    }
-}
 
 pub trait HasYear {
     fn year(&self) -> u32;
@@ -64,5 +32,5 @@ pub trait DateNameForFile: ToDateTuple + FromStr + Ord {
 }
 
 pub trait InitialabeFromTemplate {
-    fn try_get_template(&self, app_options: &AppOptions) -> AppResult<Option<String>>;
+    fn choose_template<'a>(&self, app_options: &'a AppConfig) -> Option<&'a str>;
 }

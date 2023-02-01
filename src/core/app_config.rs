@@ -1,14 +1,20 @@
 use crate::core::template::{CommandToExecute, OsCommandProcossor};
 use serde::Deserialize;
 use crate::prelude::*;
-use std::{path::PathBuf, collections::HashMap};
+use std::{
+    path::{PathBuf, Path},
+    collections::HashMap,
+};
 
 use super::{file_access, constants::CONF_FILE_NAME, template::PlaceholderTemplate};
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug, Getters)]
 pub struct AppConfig {
+    #[getset(get = "pub")]
     yearly_template: Option<String>,
+    #[getset(get = "pub")]
     monthly_template: Option<String>,
+    #[getset(get = "pub")]
     daily_template: Option<String>,
     placeholders: Option<Vec<PlaceHolder>>,
     #[serde(skip)]
@@ -72,32 +78,15 @@ impl AppConfig {
         }
     }
 
-    pub fn try_get_daily_template(&self) -> AppResult<Option<String>> {
-        self.try_get_template_file_content(|conf| conf.daily_template.as_deref())
-    }
-    pub fn try_get_monthly_template(&self) -> AppResult<Option<String>> {
-        self.try_get_template_file_content(|conf| conf.monthly_template.as_deref())
-    }
-    pub fn try_get_yearly_template(&self) -> AppResult<Option<String>> {
-        self.try_get_template_file_content(|conf| conf.yearly_template.as_deref())
-    }
-
-    fn try_get_template_file_content(
-        &self,
-        on_get_template: impl Fn(&AppConfig) -> Option<&str>,
-    ) -> AppResult<Option<String>> {
-        if let Some(template_path) = on_get_template(self) {
-            let path = self.root_path.join(template_path);
-            if path.exists() {
-                let template_content = std::fs::read_to_string(&path)?;
-                info!("Template path found at {:?}", path);
-                Ok(Some(template_content))
-            } else {
-                info!("No template found at {:?}", path);
-                Ok(None)
-            }
+    /// Returns none if there is no template file at the given parameter.
+    pub fn try_get_template_file_content(&self, template_path: &Path) -> AppResult<Option<String>> {
+        let path = self.root_path.join(template_path);
+        if path.exists() {
+            let template_content = std::fs::read_to_string(&path)?;
+            info!("Template path found at {:?}", path);
+            Ok(Some(template_content))
         } else {
-            info!("No template path found in config");
+            info!("No template found at {:?}", path);
             Ok(None)
         }
     }
