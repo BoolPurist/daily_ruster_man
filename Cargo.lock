@@ -228,6 +228,7 @@ dependencies = [
  "lazy_static",
  "log",
  "mockall",
+ "once_cell",
  "parse-display",
  "project-root",
  "regex",
