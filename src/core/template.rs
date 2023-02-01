@@ -6,7 +6,6 @@ pub use command_processor::{CommandToExecute, OsCommandProcossor};
 use std::{borrow::Cow, collections::HashMap};
 
 use derive_new::new;
-use regex::Regex;
 
 use place_holder_replacer::PlaceHolderReplacer;
 use self::command_processor::CommandProcessor;
@@ -38,19 +37,12 @@ pub fn replace_template_placeholders<'m, 't, T>(
 where
     T: CommandProcessor,
 {
-    lazy_static! {
-        static ref REGEX_PLACE_HOLDERS: Regex = Regex::new(r"(?mi)\{\s*(\S+?)\s*\}")
-            .unwrap_or_else(|error| panic!(
-                "Invalid expression inside function: {}\n. Reason: {:?}",
-                stringify!(replace_template_placeholders),
-                error
-            ));
-    }
+    let regex_place_holders = crate::regex! {r"(?mi)\{\s*(\S+?)\s*\}"};
 
     let mut found_errors_for_commmand: HashMap<String, String> = HashMap::new();
     let replacer = PlaceHolderReplacer::new(placeholders, &mut found_errors_for_commmand);
 
-    let replacement = REGEX_PLACE_HOLDERS.replace_all(template, replacer);
+    let replacement = regex_place_holders.replace_all(template, replacer);
 
     TemplateReplacement::new(replacement, found_errors_for_commmand)
 }

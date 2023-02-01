@@ -14,6 +14,7 @@ use self::dates_names::daily_names::DailyName;
 
 mod constants {
 
+    use crate::prelude::*;
     use std::path::PathBuf;
     use chrono::Datelike;
 
@@ -34,10 +35,10 @@ mod constants {
 
     const DEV_DATA_INFIX: &str = ".dev_data";
 
-    lazy_static! {
-        pub static ref YEAR_UPPER_BOUND: u32 = chrono::NaiveDate::MAX.year() as u32;
-        pub static ref DEV_APP_FOLDER: PathBuf = PathBuf::from(DEV_DATA_INFIX);
-        pub static ref DEV_DATA_FOLDER: PathBuf = PathBuf::from(DEV_DATA_INFIX).join("share");
-        pub static ref DEV_CONF_FOLDER: PathBuf = PathBuf::from(DEV_DATA_INFIX).join("conf");
-    }
+    pub static YEAR_UPPER_BOUND: SyncLazy<u32> =
+        SyncLazy::new(|| chrono::NaiveDate::MAX.year() as u32);
+    pub static DEV_DATA_FOLDER: SyncLazy<PathBuf> =
+        SyncLazy::new(|| PathBuf::from(DEV_DATA_INFIX).join("share"));
+    pub static DEV_CONF_FOLDER: SyncLazy<PathBuf> =
+        SyncLazy::new(|| PathBuf::from(DEV_DATA_INFIX).join("conf"));
 }

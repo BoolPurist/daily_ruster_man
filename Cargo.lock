@@ -225,7 +225,6 @@ dependencies = [
  "env_logger",
  "getset",
  "insta",
- "lazy_static",
  "log",
  "mockall",
  "once_cell",
