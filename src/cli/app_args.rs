@@ -55,7 +55,7 @@ pub struct DebugArgs {
     user_local_share: bool,
 }
 
-#[derive(Args, CopyGetters, Clone)]
+#[derive(Args, CopyGetters, Clone, Default)]
 pub struct GenerellArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]

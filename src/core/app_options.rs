@@ -1,5 +1,11 @@
-/// Used in the core modules to alter certain behaviors of app
+pub mod option_sources;
 use crate::cli::app_args::{DebugArgs, GenerellArgs, CliArgs};
+
+pub fn get_from_env(name: &str) -> Option<String> {
+    std::env::var(name).ok()
+}
+
+/// Used in the core modules to alter certain behaviors of app
 #[derive(Getters)]
 pub struct AppOptions {
     /// During development, this will have some value.
