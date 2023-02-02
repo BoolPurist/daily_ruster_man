@@ -1,4 +1,5 @@
 #![allow(clippy::uninlined_format_args)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 #[macro_use]
 extern crate getset;

@@ -1,37 +1,31 @@
-use crate::core::template::{CommandToExecute, OsCommandProcossor};
-use serde::Deserialize;
-use crate::prelude::*;
+pub mod path_from_config;
+pub use path_from_config::PatchFromConfig;
+
 use std::{
     path::{PathBuf, Path},
     collections::HashMap,
 };
 
+use serde::Deserialize;
+
+use crate::core::template::{CommandToExecute, OsCommandProcossor};
+use crate::prelude::*;
+
 use super::{
     constants::CONF_FILE_NAME, template::PlaceholderTemplate, file_access, app_options::AppOptions,
 };
-use crate::core::constants::SIGN_FOR_FROM_CONF_FOLDER;
 
-pub struct PatchFromConfig(Option<String>);
-
-impl PatchFromConfig {
-    pub fn new(path: Option<String>) -> Self {
-        Self(path)
-    }
-    pub fn try_to_resolved_path(&self, option: &AppConfig) -> Option<PathBuf> {
-        self.0.as_ref().map(|path| {
-            if path.starts_with(SIGN_FOR_FROM_CONF_FOLDER) {
-                let without_plus = path
-                    .strip_prefix(SIGN_FOR_FROM_CONF_FOLDER)
-                    .expect("Unexpexted: check before ensured there is + to remove from the left");
-                option.root_path().join(without_plus)
-            } else {
-                file_access::resolve_str_as_path(path)
-            }
-        })
-    }
+macro_rules! path_from_conf_getter {
+    ($field:ident) => {
+        pub fn $field(&self) -> PatchFromConfig {
+            PatchFromConfig::new(self.$field.clone())
+        }
+    };
 }
 
 #[derive(Deserialize, Default, Debug, Getters)]
+/// Contains access to data which is provided by the conf file of app located at the app conf
+/// folder
 pub struct AppConfig {
     yearly_template: Option<String>,
     monthly_template: Option<String>,
@@ -45,21 +39,11 @@ pub struct AppConfig {
     root_path: PathBuf,
 }
 
-macro_rules! path_from_conf_getter {
-    ($field:ident) => {
-        pub fn $field(&self) -> PatchFromConfig {
-            PatchFromConfig::new(self.$field.clone())
-        }
-    };
-}
 impl AppConfig {
     path_from_conf_getter! {monthly_template}
     path_from_conf_getter! {yearly_template}
     path_from_conf_getter! {daily_template}
 
-    // pub fn daily_template(&self) -> PatchFromConfig {
-    //     PatchFromConfig::new(self.daily_template.clone())
-    // }
     pub fn create_placeholder_for_template<'a>(
         &'a self,
     ) -> HashMap<&'_ str, PlaceholderTemplate<'_, OsCommandProcossor>> {
@@ -89,8 +73,7 @@ impl AppConfig {
             }
         }
     }
-}
-impl AppConfig {
+
     pub fn try_from_file_system(option: &AppOptions) -> AppResult<Option<Self>> {
         let resolved_path = if let Some(path) = option.general().config_path() {
             debug!("Using  conf path provided by cli or env.");
@@ -140,9 +123,15 @@ impl AppConfig {
 
 #[derive(Deserialize, Getters, Debug)]
 #[getset(get = "pub")]
+/// Represents a given placeholder from the user to augment a template with costum values or output
+/// of a given command.
+/// Placeholder are currrenlty retrieved from the config file.
 pub struct PlaceHolder {
+    /// which is searched for in the template
     key: String,
+    /// by which the key in the template is replaced
     value: String,
+    /// If true instead treat `value` as command to execute and use its output in the template
     is_command: Option<bool>,
 }
 
