@@ -28,7 +28,7 @@ script before a push.
 ## License
 Licensed is under either of Apache License, Version 2.0 or MIT license at your option. 
 
-[Cargo File]: "./Cargo.toml"
-[Changelog]: "./Changelog.toml"
-[Rust Cli File]: "./src/cli/app_args.rs"
+[Cargo File]:Cargo.toml
+[Changelog]:CHANGELOG.md
+[Rust Cli File]:/src/cli/app_args.rs
 
