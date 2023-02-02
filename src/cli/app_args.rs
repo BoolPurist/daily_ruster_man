@@ -8,7 +8,7 @@ pub use crate::cli::{
 };
 
 #[derive(Parser, Getters)]
-#[command(author, version, about)]
+#[command(author, version = "0.5.1", about)]
 #[getset(get = "pub")]
 pub struct CliArgs {
     #[cfg(debug_assertions)]

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] 
 
+## [0.5.1] - 2023.02.02
+
 ### Added
 - paths in configuration can be given relative to configuration folder path via "+" at the front of path.
 - paths in configuration can be given relative to home folder via "~" at the front of path.
@@ -16,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2023.02.01
 
-[unreleased]: https://github.com/BoolPurist/daily_ruster_man/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/BoolPurist/daily_ruster_man/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/BoolPurist/daily_ruster_man/releases/tag/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/BoolPurist/daily_ruster_man/releases/tag/v0.5.0
 
