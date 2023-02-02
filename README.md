@@ -2,6 +2,15 @@
 
 ## Development
 
+### Bumping version
+
+If a significant version bump happens or a release is approaching then do the following things
+
+- Bump the version in the [Cargo File]
+- Adjust changelog file [Changelog]
+- Bump version in the [Rust Cli File] 
+
+### CI
 This respo runs github workflow ci for validation of formatting, linting and unit test 
 on pushes and pull requests.
 The workflow currently uses a bash [script](./ci_check.sh).
@@ -10,4 +19,8 @@ script before a push.
 
 ## License
 Licensed is under either of Apache License, Version 2.0 or MIT license at your option. 
+
+[Cargo File]: "./Cargo.toml"
+[Changelog]: "./Changelog.toml"
+[Rust Cli File]: "./src/cli/app_args.rs"
 
