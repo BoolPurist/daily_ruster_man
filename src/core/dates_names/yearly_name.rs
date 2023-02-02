@@ -1,9 +1,9 @@
-use crate::{prelude::*, core::app_options::AppOptions};
+use super::*;
+
+use crate::{prelude::*, core::app_config::AppConfig};
 use std::str::FromStr;
 use thiserror::Error;
-
 use crate::core::constants::{DIGIT_SEP, MD_EXT, YEARLY_LABEL_IN_NAME};
-use super::{HasYear, ToDateTuple, DateNameForFile, InitialabeFromTemplate};
 use crate::core::date_models::units_validated::ValidatedYear;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -38,8 +38,8 @@ impl YearlyName {
 }
 
 impl InitialabeFromTemplate for YearlyName {
-    fn try_get_template(&self, app_options: &AppOptions) -> AppResult<Option<String>> {
-        super::try_load_and_choose_template(app_options, |conf| conf.try_get_yearly_template())
+    fn choose_template(&self, to_choose_from: &AppConfig) -> PatchFromConfig {
+        to_choose_from.yearly_template()
     }
 }
 

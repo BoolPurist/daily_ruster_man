@@ -3,11 +3,45 @@ use std::{
     path::{Path, PathBuf},
     fs::{self, DirEntry},
 };
-
 use crate::core::app_options::AppOptions;
 use dirs;
 use crate::prelude::*;
 use super::date_filtering;
+
+pub fn resolve_str_as_path(to_resolve: &str) -> PathBuf {
+    let expanded_path = shellexpand::full_with_context_no_errors(
+        to_resolve,
+        || dirs::home_dir().map(|home_dir| home_dir.to_string_lossy().to_string()),
+        |env_var| std::env::var(env_var).ok(),
+    );
+
+    let path = PathBuf::from(expanded_path.as_ref());
+
+    match fs::canonicalize(&path) {
+        Ok(absolute) => absolute,
+        Err(_) => {
+            warn!("Path {:?} can not be resolved to absolute path. So it will be used as not a absolute path", &path);
+            path
+        }
+    }
+}
+
+pub fn resolve_path(to_resolve: &Path) -> PathBuf {
+    let as_string = to_resolve.to_string_lossy();
+    resolve_str_as_path(&as_string)
+}
+
+pub fn fetch_data_path(option: &AppOptions) -> AppResult<PathBuf> {
+    let app_data_folder = if option.use_prod_local_share() {
+        fetch_paths_names::fetch_prod_data_dir()
+    } else {
+        fetch_paths_names::fetch_dev_data_dir()
+    }?;
+
+    debug!("Using {app_data_folder:?} as data folder for app.");
+
+    Ok(app_data_folder)
+}
 
 pub fn fetch_path_conf(option: &AppOptions) -> AppResult<PathBuf> {
     let conf_dir = if option.use_prod_local_share() {
@@ -15,8 +49,6 @@ pub fn fetch_path_conf(option: &AppOptions) -> AppResult<PathBuf> {
     } else {
         fetch_paths_names::fetch_dev_conf_dir()
     }?;
-
-    debug!("Using {conf_dir:?} as conf folder for app.");
 
     Ok(conf_dir)
 }
@@ -35,16 +67,24 @@ where
     Ok(filtered)
 }
 pub fn create_new_path_for(file_name: &str, option: &AppOptions) -> AppResult<PathBuf> {
-    let data_folder_root = fetch_paths_names::fetch_path_with_dailys(option)?;
+    let data_folder_root = option.get_data_path()?;
 
     Ok(data_folder_root.join(file_name))
 }
 
 pub fn get_all_journal_paths(option: &AppOptions) -> AppResult<Vec<PathBuf>> {
-    let data_folder = fetch_paths_names::fetch_path_with_dailys(option)?;
+    let data_folder = option
+        .get_data_path()
+        .context("Failed to get path to data/journals")?;
 
     let gathered_dailies = fs::read_dir(&data_folder)
-        .map_err(AppError::new)?
+        .map_err(AppError::new)
+        .with_context(|| {
+            format!(
+                "At path {:?} there is no directory which can contain journals to find",
+                &data_folder
+            )
+        })?
         .filter_map(|entry| match entry {
             Ok(resolved) => {
                 if is_file(&resolved) {
@@ -87,7 +127,7 @@ mod fetch_paths_names {
     use super::*;
     use crate::core::constants::{DEV_DATA_FOLDER, DEV_CONF_FOLDER};
 
-    fn fetch_dev_data_dir() -> AppResult<PathBuf> {
+    pub fn fetch_dev_data_dir() -> AppResult<PathBuf> {
         fetch_dev_dir_for(&DEV_DATA_FOLDER)
     }
 
@@ -159,18 +199,6 @@ mod fetch_paths_names {
         }
 
         Ok(())
-    }
-
-    pub fn fetch_path_with_dailys(option: &AppOptions) -> AppResult<PathBuf> {
-        let app_data_folder = if option.use_prod_local_share() {
-            fetch_prod_data_dir()
-        } else {
-            fetch_dev_data_dir()
-        }?;
-
-        debug!("Using {app_data_folder:?} as data folder for app.");
-
-        Ok(app_data_folder)
     }
 
     fn get_project_folder() -> AppResult<PathBuf> {

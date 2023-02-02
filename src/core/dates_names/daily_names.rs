@@ -1,5 +1,8 @@
+use super::*;
+
 use std::str::FromStr;
 
+use crate::core::app_config::AppConfig;
 use crate::core::constants::*;
 use chrono::prelude::*;
 use thiserror::Error;
@@ -8,8 +11,6 @@ use crate::prelude::*;
 use crate::core::date_models::units_validated::{
     ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth,
 };
-use crate::core::app_options::AppOptions;
-use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile, InitialabeFromTemplate};
 
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
@@ -49,8 +50,8 @@ impl DailyName {
 }
 
 impl InitialabeFromTemplate for DailyName {
-    fn try_get_template(&self, app_options: &AppOptions) -> AppResult<Option<String>> {
-        super::try_load_and_choose_template(app_options, |conf| conf.try_get_daily_template())
+    fn choose_template(&self, to_choose_from: &AppConfig) -> PatchFromConfig {
+        to_choose_from.daily_template()
     }
 }
 

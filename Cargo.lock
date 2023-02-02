@@ -225,13 +225,14 @@ dependencies = [
  "env_logger",
  "getset",
  "insta",
- "lazy_static",
  "log",
  "mockall",
+ "once_cell",
  "parse-display",
  "project-root",
  "regex",
  "serde",
+ "shellexpand",
  "shellwords",
  "test-case",
  "thiserror",
@@ -819,6 +820,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c68e921cef53841b8925c2abadd27c9b891d9613bdc43d6b823062866df38e8"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "shellexpand"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd1c7ddea665294d484c39fd0c0d2b7e35bbfe10035c5fe1854741a57f6880e1"
+dependencies = [
+ "dirs",
 ]
 
 [[package]]

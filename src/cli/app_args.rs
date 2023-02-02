@@ -52,13 +52,27 @@ pub struct DebugArgs {
     #[arg(short, long)]
     /// If true then the journal files and config files are loaded and saved from the users folders
     /// instead of the throw away dev data folders in the project root.
-    user_local_share: bool,
+    user_local_share_data: bool,
+    #[getset(get_copy = "pub")]
+    #[arg(short, long)]
+    run_editor_dry: bool,
 }
 
-#[derive(Args, CopyGetters, Clone)]
+macro_rules! build_env_name {
+    ($field:ident) => {{
+        concat!("RUSTER_JOURNAL", concat!("_", stringify!($field)))
+    }};
+}
+#[derive(Args, CopyGetters, Getters, Clone, Default)]
 pub struct GenerellArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
     /// If true, then the backtrace for errors are active and even debug logs are shown
     debug: bool,
+    #[arg(long, env = build_env_name!(CONFIG_PATH))]
+    #[getset(get = "pub")]
+    config_path: Option<String>,
+    #[arg(long, env = build_env_name!(DATA_PATH))]
+    #[getset(get = "pub")]
+    data_path: Option<String>,
 }
