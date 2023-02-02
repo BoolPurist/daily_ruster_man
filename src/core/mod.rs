@@ -12,7 +12,7 @@ mod template;
 
 use self::dates_names::daily_names::DailyName;
 
-mod constants {
+pub mod constants {
 
     use crate::prelude::*;
     use std::path::PathBuf;
@@ -24,6 +24,7 @@ mod constants {
     pub const YEARLY_LABEL_IN_NAME: &str = "yearly";
     pub const NVIM: &str = "nvim";
     pub const DIGIT_SEP: &str = "_";
+    pub const SIGN_FOR_FROM_CONF_FOLDER: char = '+';
 
     pub const MONTH_LOWER_BOUND: u32 = 1;
     pub const MONTH_UPPER_BOUND: u32 = 12;
@@ -32,6 +33,8 @@ mod constants {
     pub const DAY_UPPER_BOUND: u32 = 31;
 
     pub const CONF_FILE_NAME: &str = "config.toml";
+
+    pub const ENV_PREFIX: &str = "JOURNAL_RUSTER";
 
     const DEV_DATA_INFIX: &str = ".dev_data";
 

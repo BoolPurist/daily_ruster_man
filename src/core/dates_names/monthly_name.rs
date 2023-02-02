@@ -1,15 +1,13 @@
 use std::str::FromStr;
 
+use super::*;
 use chrono::{Local, Datelike};
 
-use crate::core::app_config::AppConfig;
 use crate::core::date_models::units_validated::{ValidatedYear, ValidatedMonth};
 use crate::{
     prelude::*,
     core::{constants::*, date_models::open_by::OpenByMonthInYear},
 };
-use super::InitialabeFromTemplate;
-use super::{HasYear, HasMonth, ToDateTuple, DateNameForFile};
 
 #[derive(Getters, CopyGetters, PartialEq, Eq, Debug)]
 pub struct MonthlyName {
@@ -67,8 +65,8 @@ impl MonthlyName {
 }
 
 impl InitialabeFromTemplate for MonthlyName {
-    fn choose_template<'a>(&self, to_choose_from: &'a AppConfig) -> Option<&'a str> {
-        to_choose_from.monthly_template().as_deref()
+    fn choose_template(&self, to_choose_from: &AppConfig) -> PatchFromConfig {
+        to_choose_from.monthly_template()
     }
 }
 impl ToDateTuple for MonthlyName {

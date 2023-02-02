@@ -8,6 +8,8 @@ use crate::core::app_config::AppConfig;
 pub use monthly_name::MonthlyName;
 use std::str::FromStr;
 
+pub use crate::core::app_config::PatchFromConfig;
+
 pub trait HasYear {
     fn year(&self) -> u32;
 
@@ -32,5 +34,5 @@ pub trait DateNameForFile: ToDateTuple + FromStr + Ord {
 }
 
 pub trait InitialabeFromTemplate {
-    fn choose_template<'a>(&self, app_options: &'a AppConfig) -> Option<&'a str>;
+    fn choose_template(&self, app_options: &AppConfig) -> PatchFromConfig;
 }

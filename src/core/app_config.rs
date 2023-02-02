@@ -6,23 +6,60 @@ use std::{
     collections::HashMap,
 };
 
-use super::{file_access, constants::CONF_FILE_NAME, template::PlaceholderTemplate};
+use super::{
+    constants::CONF_FILE_NAME, template::PlaceholderTemplate, file_access, app_options::AppOptions,
+};
+use crate::core::constants::SIGN_FOR_FROM_CONF_FOLDER;
+
+pub struct PatchFromConfig(Option<String>);
+
+impl PatchFromConfig {
+    pub fn new(path: Option<String>) -> Self {
+        Self(path)
+    }
+    pub fn try_to_resolved_path(&self, option: &AppConfig) -> Option<PathBuf> {
+        self.0.as_ref().map(|path| {
+            if path.starts_with(SIGN_FOR_FROM_CONF_FOLDER) {
+                let without_plus = path
+                    .strip_prefix(SIGN_FOR_FROM_CONF_FOLDER)
+                    .expect("Unexpexted: check before ensured there is + to remove from the left");
+                option.root_path().join(without_plus)
+            } else {
+                file_access::resolve_str_as_path(path)
+            }
+        })
+    }
+}
 
 #[derive(Deserialize, Default, Debug, Getters)]
 pub struct AppConfig {
-    #[getset(get = "pub")]
     yearly_template: Option<String>,
-    #[getset(get = "pub")]
     monthly_template: Option<String>,
-    #[getset(get = "pub")]
     daily_template: Option<String>,
+    #[getset(get = "pub")]
+    data_foler: Option<String>,
     placeholders: Option<Vec<PlaceHolder>>,
     #[serde(skip)]
+    #[getset(get = "pub")]
     /// Path to folder where the config file loaded from
     root_path: PathBuf,
 }
 
+macro_rules! path_from_conf_getter {
+    ($field:ident) => {
+        pub fn $field(&self) -> PatchFromConfig {
+            PatchFromConfig::new(self.$field.clone())
+        }
+    };
+}
 impl AppConfig {
+    path_from_conf_getter! {monthly_template}
+    path_from_conf_getter! {yearly_template}
+    path_from_conf_getter! {daily_template}
+
+    // pub fn daily_template(&self) -> PatchFromConfig {
+    //     PatchFromConfig::new(self.daily_template.clone())
+    // }
     pub fn create_placeholder_for_template<'a>(
         &'a self,
     ) -> HashMap<&'_ str, PlaceholderTemplate<'_, OsCommandProcossor>> {
@@ -53,18 +90,28 @@ impl AppConfig {
         }
     }
 }
-use crate::core::app_options::AppOptions;
 impl AppConfig {
-    pub fn try_from_file_system(options: &AppOptions) -> AppResult<Option<Self>> {
-        let path_to_configs = file_access::fetch_path_conf(options)?;
-        let path_to_conf_file = path_to_configs.join(CONF_FILE_NAME);
+    pub fn try_from_file_system(option: &AppOptions) -> AppResult<Option<Self>> {
+        let resolved_path = if let Some(path) = option.general().config_path() {
+            debug!("Using  conf path provided by cli or env.");
+            file_access::resolve_str_as_path(path)
+        } else {
+            debug!("Using conf path provided by os.");
+            let path = file_access::fetch_path_conf(option)?;
+            file_access::resolve_path(&path)
+        };
+        debug!("Using {:?} as conf folder for app.", &resolved_path);
 
+        let path_to_conf_file = resolved_path.join(CONF_FILE_NAME);
+
+        debug!("Using {:?} as conf file for app.", &path_to_conf_file);
         if path_to_conf_file.exists() {
-            let content = std::fs::read_to_string(&path_to_conf_file)?;
+            let content = std::fs::read_to_string(&path_to_conf_file)
+                .context("could not read config file by given path")?;
 
             match toml::from_str::<AppConfig>(&content) {
                 Ok(mut parsed_content) => {
-                    parsed_content.root_path = path_to_configs;
+                    parsed_content.root_path = resolved_path;
                     Ok(Some(parsed_content))
                 }
                 Err(error) => {
@@ -79,10 +126,9 @@ impl AppConfig {
     }
 
     /// Returns none if there is no template file at the given parameter.
-    pub fn try_get_template_file_content(&self, template_path: &Path) -> AppResult<Option<String>> {
-        let path = self.root_path.join(template_path);
+    pub fn try_get_template_file_content(&self, path: &Path) -> AppResult<Option<String>> {
         if path.exists() {
-            let template_content = std::fs::read_to_string(&path)?;
+            let template_content = std::fs::read_to_string(path)?;
             info!("Template path found at {:?}", path);
             Ok(Some(template_content))
         } else {

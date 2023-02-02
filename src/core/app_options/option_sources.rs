@@ -1,5 +1,8 @@
 use std::{borrow::Cow, str::FromStr};
 
+pub fn use_env(env_name: &str) -> Option<String> {
+    std::env::var(env_name).ok()
+}
 pub fn get_from_cli_env<'a, T>(
     from_cli: Option<&'a T>,
     env_name: &str,

@@ -1,8 +1,11 @@
 pub mod option_sources;
+use std::path::PathBuf;
+
 use crate::prelude::*;
 use crate::cli::app_args::{DebugArgs, GenerellArgs, CliArgs};
 
 use super::app_config::AppConfig;
+use super::file_access;
 
 pub fn get_from_env(name: &str) -> Option<String> {
     std::env::var(name).ok()
@@ -42,16 +45,39 @@ impl AppOptions {
             .map(|to_ref| to_ref.as_ref())
     }
 
+    pub fn get_data_path(&self) -> AppResult<PathBuf> {
+        let data_path = if let Some(from_cli_env) = self.general().data_path() {
+            debug!("Using path from cli or env var as data path");
+            Ok(file_access::resolve_str_as_path(from_cli_env))
+        } else {
+            debug!("Using local data path from os");
+            file_access::fetch_data_path(self)
+        }?;
+
+        info!("Using {:?} as data path", &data_path);
+
+        Ok(data_path)
+    }
+
     /// If true is return then the user local files are to be used even during development
     pub fn use_prod_local_share(&self) -> bool {
-        // In production always use local files of user.
+        self.get_debug_flag(|debug_args| debug_args.user_local_share_data())
+            || cfg!(not(debug_assertions))
+    }
+
+    pub fn run_editor_dry(&self) -> bool {
+        self.get_debug_flag(|debug_args| debug_args.run_editor_dry())
+    }
+
+    fn get_debug_flag(&self, getter: impl Fn(&DebugArgs) -> bool) -> bool {
+        // In production never use it.
         if !cfg!(debug_assertions) {
-            return true;
+            return false;
         }
 
-        // In debug the local files of user should only be used if the option was given.
+        // In debug check if this alternative is desired.
         if let Some(use_it) = &self.debug {
-            use_it.user_local_share()
+            getter(use_it)
         } else {
             false
         }

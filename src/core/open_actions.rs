@@ -42,9 +42,10 @@ where
     let to_open = file_access::create_new_path_for(journal.name(), option)?;
 
     if !to_open.exists() {
+        info!("No journal created so far at {:?}", &to_open);
         try_write_template_from_config(&to_open, journal, option)?;
     }
-    process_handling::start_process_with(&to_open)?;
+    process_handling::start_process_with(option, &to_open)?;
 
     Ok(())
 }
@@ -56,11 +57,13 @@ fn try_write_template_from_config(
 ) -> AppResult {
     let config = option.load_config()?;
     if let Some(loaded) = config {
-        if let Some(path) = journal.choose_template(loaded) {
-            let template_content = try_create_template(loaded, Path::new(path))?;
+        if let Some(path) = journal.choose_template(loaded).try_to_resolved_path(loaded) {
+            let template_content = try_create_template(loaded, &path)?;
             if let Some(content) = template_content {
                 debug!("Used template content:\n{}", content);
-                fs::write(to_open, content)?;
+                if !option.run_editor_dry() {
+                    fs::write(to_open, content)?;
+                }
                 return Ok(());
             }
         }
