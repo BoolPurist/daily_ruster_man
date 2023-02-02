@@ -19,6 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2023.02.01
 
 [unreleased]: https://github.com/BoolPurist/daily_ruster_man/compare/v0.5.1...HEAD
-[0.5.1]: https://github.com/BoolPurist/daily_ruster_man/releases/tag/v0.5.0...v0.5.1
+[0.5.1]: https://github.com/BoolPurist/daily_ruster_man/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/BoolPurist/daily_ruster_man/releases/tag/v0.5.0
 
