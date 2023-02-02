@@ -1,5 +1,12 @@
 # README
 
+## Roadmap
+
+- Editor should be adjustable via CLI, configuration file and environment variable.
+- Create configuration file with defaults and comments
+- Commands to delete created journals.
+- Option to reset journal with empty content or with template 
+
 ## Development
 
 ### Bumping version
@@ -11,6 +18,7 @@ If a significant version bump happens or a release is approaching then do the fo
 - Bump version in the [Rust Cli File] 
 
 ### CI
+
 This respo runs github workflow ci for validation of formatting, linting and unit test 
 on pushes and pull requests.
 The workflow currently uses a bash [script](./ci_check.sh).
