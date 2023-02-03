@@ -55,6 +55,8 @@ pub struct DebugArgs {
     user_local_share_data: bool,
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
+    /// If true then selected journals will not be opened by editor nor created if not present
+    /// already.
     run_editor_dry: bool,
 }
 
@@ -71,8 +73,10 @@ pub struct GenerellArgs {
     debug: bool,
     #[arg(long, env = build_env_name!(CONFIG_PATH))]
     #[getset(get = "pub")]
+    /// Uses instead provided path to find config.toml file as configuration
     config_path: Option<String>,
     #[arg(long, env = build_env_name!(DATA_PATH))]
     #[getset(get = "pub")]
+    /// Uses instead provided path to read/write journal files
     data_path: Option<String>,
 }

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] 
 
+### Added 
+
+- Added example template file for documentation
+- Added example configuration file for documentation
+- Added usage file which describes configuration, templates and placeholders for documentation
+
 ## [0.5.1] - 2023.02.02
 
 ### Added

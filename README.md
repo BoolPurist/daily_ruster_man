@@ -7,6 +7,10 @@
 - Commands to delete created journals.
 - Option to reset journal with empty content or with template 
 
+## Usage
+
+See [usage] for more details for how to use this application.
+
 ## Development
 
 ### Bumping version
@@ -31,4 +35,4 @@ Licensed is under either of Apache License, Version 2.0 or MIT license at your o
 [Cargo File]:Cargo.toml
 [Changelog]:CHANGELOG.md
 [Rust Cli File]:/src/cli/app_args.rs
-
+[usage]:/doc/usage.md

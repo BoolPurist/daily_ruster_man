@@ -1,0 +1,10 @@
+# An example of template file with placeholders
+
+If provided as monthly template. Every new created monthly journal will start with content 
+of this template.
+
+## A {heading} 
+
+the "{heading}" as key is replaced with its respective value given in the config.toml file
+
+some more content
