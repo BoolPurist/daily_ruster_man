@@ -1,0 +1,49 @@
+# this file can be used to alter the way how the app works
+# All available options can be found here 
+# every option is commented out
+# You can enable a option with your own custom value by removing the hash before it.
+
+# Every line like the next one below
+# ===============================================
+# this mean the incoming lines contain a option you can comment out
+
+# options which specify a location to file like a template file
+# can be given as absolute path, with tilde, with environment variables within
+# if path is prepended with a "+" sign then the location is relative to path of this configuration file
+
+# location to read a template for journals of a day
+# ===============================================
+# yearly_template="+yearly.template"
+
+# location to read a template for journals of a month 
+# ===============================================
+# monthly_template="+monthly.template"
+
+# location to read a template for journals of a year
+# ===============================================
+# daily_template="+daily.template"
+
+# Templates can be augmented via placeholders. 
+# Each placeholder has a key and a value. The key is replaced with value in template
+# If is_command is given as true then the value is interpreted 
+# As command to execute and use its output as value
+
+# Examples for placeholders
+
+# ===============================================
+# [[placeholders]]
+# key = "hello"
+# value = "world"
+
+# ===============================================
+# [[placeholders]]
+# key = "hello"
+# value = "world"
+# is_command=false 
+
+# ===============================================
+# [[placeholders]]
+# key = "today"
+# value = "date +%Y_%m_%d"
+# is_command=true 
+
