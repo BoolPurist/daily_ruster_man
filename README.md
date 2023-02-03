@@ -3,8 +3,9 @@
 ## Roadmap
 
 - Editor should be adjustable via CLI, configuration file and environment variable.
-- Create configuration file with defaults and comments
 - Commands to delete created journals.
+- Add option to only show content of created journal 
+  or content open first opening journal aka templates
 - Option to reset journal with empty content or with template 
 
 ## Usage
