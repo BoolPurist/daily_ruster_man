@@ -48,3 +48,4 @@ The output of the command is then used as replacement for the key.
 
 [config.toml]:config.toml
 [example template file]:example.template
+[examples deletion]:examples.md##Deletion
