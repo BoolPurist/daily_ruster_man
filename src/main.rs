@@ -79,6 +79,15 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             }
             Ok(())
         }
+        AppCommands::Delete(_) => {
+            todo!("deletion for a selected day")
+        }
+        AppCommands::DeleteMonth(_) => {
+            todo!("deletion for a selected month")
+        }
+        AppCommands::DeleteYear { .. } => {
+            todo!("deletion for a selected year")
+        }
     }
 }
 
