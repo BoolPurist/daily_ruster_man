@@ -3,6 +3,7 @@ use std::path::Path;
 
 use chrono::{Local, Datelike};
 use crate::cli::edit_argument::EditCommonArgs;
+use crate::core::constants::DEFAUTL_EDITOR;
 use crate::core::template;
 use crate::prelude::*;
 use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYear};
@@ -58,11 +59,21 @@ where
 {
     let to_open = file_access::create_new_path_for(journal.name(), option)?;
 
+    let editor_to_use = edit_option.resolve_editor(option).unwrap_or_else(|error| {
+        warn!(
+            "Falling back to default editor {} due to error in loading config file correctly.\n {}",
+            DEFAUTL_EDITOR, error,
+        );
+
+        DEFAUTL_EDITOR.to_owned()
+    });
+
     if !to_open.exists() {
         info!("No journal created so far at {:?}", &to_open);
         try_write_template_from_config(&to_open, journal, option)?;
     }
-    process_handling::start_process_with(option, edit_option.editor().as_deref(), &to_open)?;
+
+    process_handling::start_process_with(option, &editor_to_use, &to_open)?;
 
     Ok(())
 }
