@@ -30,7 +30,7 @@ pub struct DeleteYearArg {
 
 #[derive(Args, CopyGetters)]
 pub struct CommonDeleteArg {
-    #[arg(long, env = build_env_name!(SKIP_CONFIRMATION))]
+    #[arg(long, short, env = build_env_name!(SKIP_CONFIRMATION))]
     #[getset(get_copy = "pub")]
     /// If provided then no prompt will show up for confirmation before a deletion
     skip_confirmation: bool,

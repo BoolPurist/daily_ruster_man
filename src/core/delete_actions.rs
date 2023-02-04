@@ -5,6 +5,7 @@ use crate::prelude::*;
 use crate::core::file_access;
 
 use crate::core::app_options::AppOptions;
+use crate::cli::deletion_arguments::*;
 use super::date_models::open_by::OpenByMonthInYear;
 use super::date_models::units_validated::{ValidatedDate, ValidatedYear};
 use super::dates_names::yearly_name::YearlyName;
@@ -24,10 +25,11 @@ pub enum DeletionResult {
 /// for example permission
 pub fn delete_day_journal(
     to_delete: ValidatedDate,
+    deletion_option: &CommonDeleteArg,
     option: &AppOptions,
 ) -> AppResult<DeletionResult> {
     let daily_name: DailyName = to_delete.into();
-    delete_given_journal(daily_name, option, || {
+    delete_given_journal(daily_name, deletion_option, option, || {
         prompt::ask_for_confirmation("you want to delete the chosen daily journal ?")
     })
 }
@@ -36,10 +38,11 @@ pub fn delete_day_journal(
 /// for example permission
 pub fn delete_month_journal(
     to_delete: OpenByMonthInYear,
+    deletion_option: &CommonDeleteArg,
     option: &AppOptions,
 ) -> AppResult<DeletionResult> {
     let daily_name: MonthlyName = MonthlyName::from_month_in_year(&to_delete)?;
-    delete_given_journal(daily_name, option, || {
+    delete_given_journal(daily_name, deletion_option, option, || {
         prompt::ask_for_confirmation("you want to delete the chosen monthly journal ?")
     })
 }
@@ -49,16 +52,18 @@ pub fn delete_month_journal(
 /// for example permission
 pub fn delete_year_journal(
     to_delete: ValidatedYear,
+    deletion_option: &CommonDeleteArg,
     option: &AppOptions,
 ) -> AppResult<DeletionResult> {
     let daily_name: YearlyName = YearlyName::new(to_delete);
-    delete_given_journal(daily_name, option, || {
+    delete_given_journal(daily_name, deletion_option, option, || {
         prompt::ask_for_confirmation("you want to delete the chosen yearly journal ?")
     })
 }
 
 fn delete_given_journal<T>(
     journal: T,
+    deletion_option: &CommonDeleteArg,
     option: &AppOptions,
     on_confirmation: impl Fn() -> AppResult<bool>,
 ) -> AppResult<DeletionResult>
@@ -71,7 +76,12 @@ where
         Ok(does_exits) => {
             if does_exits {
                 if to_open.is_file() {
-                    let wants_to_delete = on_confirmation()?;
+                    let wants_to_delete = if !deletion_option.skip_confirmation() {
+                        on_confirmation()
+                    } else {
+                        Ok(true)
+                    }?;
+
                     if wants_to_delete {
                         fs::remove_file(to_open)?;
                         Ok(DeletionResult::Deleted)
