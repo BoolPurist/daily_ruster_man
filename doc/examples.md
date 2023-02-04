@@ -1,5 +1,12 @@
 # Examples
 
+## Specifying editor
+
+Opening journal for tomorrow with the editor nvim
+```text
+daily_ruster_man e --editor nvim 1
+```
+
 ## Deletion of journals
 
 Deletes daily journal from yesterday
