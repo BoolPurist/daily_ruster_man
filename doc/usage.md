@@ -15,6 +15,8 @@ Here you must provide a certain year for deletion in constrast of the edit comma
 By default before the deletion you prompted to confirm for safety.
 You can disable this safety prompt by providing the cli argument or setting the respective environment variable
 
+There also [examples deletion] 
+
 ## Configuration
 
 This application can be altered via option in a configuration file named config.toml.
