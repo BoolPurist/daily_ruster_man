@@ -81,21 +81,21 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             Ok(())
         }
         AppCommands::Delete(to_delete) => {
-            let validated = to_delete.to_advance_now()?;
+            let validated = to_delete.date().to_advance_now()?;
             let has_delteted = delete_actions::delete_day_journal(validated, &app_options)?;
 
             report_deletion_result(has_delteted);
             Ok(())
         }
         AppCommands::DeleteMonth(to_delete) => {
-            let validated = to_delete.to_valid_ym_pair()?;
+            let validated = to_delete.month().to_valid_ym_pair()?;
             let has_delteted = delete_actions::delete_month_journal(validated, &app_options)?;
 
             report_deletion_result(has_delteted);
             Ok(())
         }
-        AppCommands::DeleteYear { year } => {
-            let validated: ValidatedYear = (*year).try_into()?;
+        AppCommands::DeleteYear(to_delete) => {
+            let validated: ValidatedYear = (*to_delete.year()).try_into()?;
             let has_delteted = delete_actions::delete_year_journal(validated, &app_options)?;
 
             report_deletion_result(has_delteted);
