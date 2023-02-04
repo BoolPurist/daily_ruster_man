@@ -44,6 +44,18 @@ or the environment variable `CONFIG_PATH` instead. The path can be relative or a
 See the example [config.toml]. You can use this file as a starting point. 
 it provides all options ready out comment them.
 
+## Enviroment variables
+
+Some options for application can be provided via enviroment variables.
+Every option that can be provided via enviroment variable , can also be provided as CLI argument.
+
+The help pages aka "-h" of the application and of the subcommands show wihch CLI arguments can 
+also be given as enviroment variable.
+
+All names of an enviromnetal variable follow this convention: "RUSTER_JOURNAL_<name_of_cli_argument>".
+<name_of_cli_argument> is the name CLI option in upper case and with each "-" is replaced by "_".
+Example: the cli argument named "config-path" has an enviroment variable variant called "RUSTER_JOURNAL_CONFIG_PATH".
+
 ## Templates
 
 This application allows you to create template files which are used when a journal is created.
