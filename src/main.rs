@@ -4,6 +4,7 @@ use daily_ruster_man::{
         list_queries, open_actions,
         app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
+        delete_actions,
     },
 };
 use daily_ruster_man::prelude::*;
@@ -39,7 +40,7 @@ fn init_logger(generell_args: &GenerellArgs) {
 
 fn handle_commands(args: &CliArgs) -> AppResult {
     let app_options = AppOptions::new(args);
-    match args.commands() {
+    return match args.commands() {
         AppCommands::List(list_queries) => {
             let filter = list_queries.to_date_filter()?;
             let all = list_queries::fetch_all_daily_names(&filter, &app_options)?;
@@ -79,14 +80,32 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             }
             Ok(())
         }
-        AppCommands::Delete(_) => {
-            todo!("deletion for a selected day")
+        AppCommands::Delete(to_delete) => {
+            let validated = to_delete.to_advance_now()?;
+            let has_delteted = delete_actions::delete_day_journal(validated, &app_options)?;
+
+            may_communicate_no_journal_deleted(has_delteted);
+            Ok(())
         }
-        AppCommands::DeleteMonth(_) => {
-            todo!("deletion for a selected month")
+        AppCommands::DeleteMonth(to_delete) => {
+            let validated = to_delete.to_valid_ym_pair()?;
+            let has_delteted = delete_actions::delete_month_journal(validated, &app_options)?;
+
+            may_communicate_no_journal_deleted(has_delteted);
+            Ok(())
         }
-        AppCommands::DeleteYear { .. } => {
-            todo!("deletion for a selected year")
+        AppCommands::DeleteYear { year } => {
+            let validated: ValidatedYear = (*year).try_into()?;
+            let has_delteted = delete_actions::delete_year_journal(validated, &app_options)?;
+
+            may_communicate_no_journal_deleted(has_delteted);
+            Ok(())
+        }
+    };
+
+    fn may_communicate_no_journal_deleted(has_delteted: bool) {
+        if !has_delteted {
+            println!("There was no journal to be deleted.");
         }
     }
 }

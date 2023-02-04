@@ -49,7 +49,7 @@ pub enum AppCommands {
     YearEdit { year: Option<u32> },
     #[command(visible_alias = "yd")]
     /// Deletes selected year if created.
-    DeleteYear { year: Option<u32> },
+    DeleteYear { year: u32 },
     #[command(visible_alias = "yl")]
     /// List all created entries for a year.
     YearList,

@@ -1,6 +1,7 @@
 pub mod app_config;
 pub mod app_options;
 pub mod date_models;
+pub mod delete_actions;
 pub mod list_queries;
 pub mod open_actions;
 
