@@ -4,7 +4,6 @@
 
 ### Features
 
-- Editor should be adjustable via CLI, configuration file and environment variable.
 - Provide build in placeholders for data the app knows like date of the created journal 
 or the template content.
 - Add option to only show content of created journal 
