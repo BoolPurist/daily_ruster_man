@@ -49,12 +49,12 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             Ok(())
         }
         AppCommands::Edit(command_arg) => {
-            let edit_query = command_arg.to_advance_now()?;
-            open_actions::open_by_date(edit_query, &app_options)
+            let edit_query = command_arg.command().to_advance_now()?;
+            open_actions::open_by_date(edit_query, &app_options, command_arg.option())
         }
         AppCommands::MonthEdit(args) => {
-            let month_in_year: OpenByMonthInYear = args.to_valid_ym_pair()?;
-            open_actions::open_by_month_year(month_in_year, &app_options)
+            let month_in_year: OpenByMonthInYear = args.command().to_valid_ym_pair()?;
+            open_actions::open_by_month_year(month_in_year, &app_options, args.option())
         }
         AppCommands::MonthList(args) => {
             let month_in_year = args.create_find_month_in_year()?;
@@ -70,13 +70,13 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             println!("{lines}");
             Ok(())
         }
-        AppCommands::YearEdit { year } => {
-            if let Some(year_given) = year {
-                let year_given: ValidatedYear = (*year_given).try_into()?;
+        AppCommands::YearEdit(year_edit) => {
+            if let Some(year_given) = year_edit.year() {
+                let year_given: ValidatedYear = year_given.try_into()?;
 
-                open_actions::open_by_year(year_given, &app_options)?;
+                open_actions::open_by_year(year_given, &app_options, year_edit.option())?;
             } else {
-                open_actions::open_by_current_year(&app_options)?;
+                open_actions::open_by_current_year(&app_options, year_edit.option())?;
             }
             Ok(())
         }

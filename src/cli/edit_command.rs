@@ -2,9 +2,20 @@ use crate::core::date_models::open_by::OpenByDaysInTime;
 use crate::AppResult;
 use crate::core::date_models::units_validated::ValidatedDate;
 use chrono::Local;
-use clap::Parser;
+use clap::{Parser, Args};
 
-#[derive(Parser, Default)]
+use super::edit_argument::EditCommonArgs;
+
+#[derive(Parser, Default, Getters)]
+#[getset(get = "pub")]
+pub struct EditCommandAndArgs {
+    #[command(flatten)]
+    command: EditCommand,
+    #[command(flatten)]
+    option: EditCommonArgs,
+}
+
+#[derive(Args, Default)]
 pub struct EditCommand {
     /// If given as a single negative argument then it opens/creates the n-times day entry in the past.
     /// If given as a single positive argument then it opens/creates the n-times day entry in the

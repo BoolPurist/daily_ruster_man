@@ -33,6 +33,8 @@ pub struct AppConfig {
     #[getset(get = "pub")]
     data_foler: Option<String>,
     placeholders: Option<Vec<PlaceHolder>>,
+    #[getset(get = "pub")]
+    editor: Option<String>,
     #[serde(skip)]
     #[getset(get = "pub")]
     /// Path to folder where the config file loaded from

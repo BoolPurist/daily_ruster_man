@@ -5,7 +5,7 @@ use std::process::Command;
 
 use super::app_options::AppOptions;
 
-pub fn start_process_with(option: &AppOptions, path: &Path) -> AppResult {
+pub fn start_process_with(option: &AppOptions, _editor: Option<&str>, path: &Path) -> AppResult {
     let path_as_str = path
         .to_str()
         .ok_or_else(|| anyhow!("Could not convert path to a text as argument for editor."))?;

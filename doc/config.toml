@@ -7,6 +7,12 @@
 # ===============================================
 # this mean the incoming lines contain a option you can comment out
 
+# Allows your to choose your favorite editor for opening/changing journals.
+# Only provide the name of the editor without arguments
+# it is expected that editor is findable via $PATH
+# ===============================================
+# editor = "vim"
+
 # options which specify a location to file like a template file
 # can be given as absolute path, with tilde, with environment variables within
 # if path is prepended with a "+" sign then the location is relative to path of this configuration file
