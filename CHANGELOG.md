@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 
-- Confirmation prompt before deletion can skipped via cli arg or environment variable
+- Editor for opening journals can adjusted CLI option, environment variable and option in configuration file
+- Confirmation prompt before deletion can skipped via CLI argument or environment variable
 - Deletion of a journal is only done before confirming prompt 
 - Yearly, monthly and daily journals can be deleted via corresponding delete commands.
 - Added example template file for documentation

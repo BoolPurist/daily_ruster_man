@@ -1,8 +1,22 @@
 # Usage
 
+Serves manual what you can do with this app and how to achieve certain things.
+
+## Editor used for journals
+
+This application gives you the choice in which editor you open and alter your journals
+The editor can be provided by as a CLI argument, environment variable or in the configuration file.
+
+It recommended you only provide the name of editor without any argument. As moment of writing
+the argument would be interpreted as part of the name of the editor.
+
+If no editor is provided at all then the app will try open the journals with vim.
+
+[Example of choosing editor via CLI]
+
 ## Deletion of journals
 
-You can delete already created journals with the following subcommmand
+You can delete already created journals with the following sub command
 
 - *delete* for deleting a daily journal
 - *delete-month* for deleting a monthly journal
@@ -10,7 +24,7 @@ You can delete already created journals with the following subcommmand
 
 You specify a journal like you would in its respective edit command.
 There is one exception for the deletion of a yearly journal !
-Here you must provide a certain year for deletion in constrast of the edit command for yearly journals.
+Here you must provide a certain year for deletion in contrast of the edit command for yearly journals.
 
 By default before the deletion you prompted to confirm for safety.
 You can disable this safety prompt by providing the cli argument or setting the respective environment variable
@@ -51,3 +65,5 @@ The output of the command is then used as replacement for the key.
 [config.toml]:config.toml
 [example template file]:example.template
 [examples deletion]:examples.md##Deletion
+[Example of choosing editor via CLI]:examples.md##Specifying
+

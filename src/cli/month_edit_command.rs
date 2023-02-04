@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, Args};
 use crate::{
     core::date_models::{
         open_by::OpenByMonthInYear,
@@ -7,7 +7,17 @@ use crate::{
     AppResult,
 };
 
-#[derive(Parser)]
+use super::edit_argument::EditCommonArgs;
+
+#[derive(Parser, Getters)]
+#[getset(get = "pub")]
+pub struct EditByMonthCommandAndArgs {
+    #[command(flatten)]
+    command: EditByMonthCommand,
+    #[command(flatten)]
+    option: EditCommonArgs,
+}
+#[derive(Args)]
 pub struct EditByMonthCommand {
     /// month of current or given year.
     /// If given without year then month is opene for the current year

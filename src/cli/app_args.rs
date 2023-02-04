@@ -12,6 +12,10 @@ pub use crate::cli::{
 
 use crate::cli::build_env_name;
 
+use super::edit_command::EditCommandAndArgs;
+use super::edit_year::EditByYear;
+use super::month_edit_command::EditByMonthCommandAndArgs;
+
 #[derive(Parser, Getters)]
 #[command(author, version = "0.5.1", about)]
 #[getset(get = "pub")]
@@ -35,14 +39,14 @@ pub enum AppCommands {
     /// Note: Options flags can be combined for filtering. Example: --year 2013 and --month 08
     /// shows all created daily entries in year August in year 2013.
     #[command(visible_alias = "e")]
-    Edit(EditCommand),
+    Edit(EditCommandAndArgs),
     #[command(visible_alias = "d")]
     /// Deletes selected day if created.
     Delete(DeleteDateArg),
     #[command(visible_alias = "me")]
     /// Opens or creates an entry for given month in a year.
     /// If given no month and year then the current month is created or opened.
-    MonthEdit(EditByMonthCommand),
+    MonthEdit(EditByMonthCommandAndArgs),
     #[command(visible_alias = "md")]
     /// Deletes selected month if it is created.
     DeleteMonth(DeleteMonthArg),
@@ -51,7 +55,7 @@ pub enum AppCommands {
     MonthList(ListByMonthCommand),
     #[command(visible_alias = "ye")]
     /// Opens or creates given entry for a year.
-    YearEdit { year: Option<u32> },
+    YearEdit(EditByYear),
     #[command(visible_alias = "yd")]
     /// Deletes selected year if created.
     DeleteYear(DeleteYearArg),

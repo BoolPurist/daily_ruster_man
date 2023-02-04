@@ -23,7 +23,7 @@ pub mod constants {
     pub const DAILY_INFIX: &str = "daily";
     pub const MONTHLY_LABEL_IN_NAME: &str = "monthly";
     pub const YEARLY_LABEL_IN_NAME: &str = "yearly";
-    pub const NVIM: &str = "nvim";
+    pub const DEFAUTL_EDITOR: &str = "vim";
     pub const DIGIT_SEP: &str = "_";
     pub const SIGN_FOR_FROM_CONF_FOLDER: char = '+';
 

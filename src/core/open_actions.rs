@@ -2,6 +2,8 @@ use std::fs;
 use std::path::Path;
 
 use chrono::{Local, Datelike};
+use crate::cli::edit_argument::EditCommonArgs;
+use crate::core::constants::DEFAUTL_EDITOR;
 use crate::core::template;
 use crate::prelude::*;
 use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYear};
@@ -12,40 +14,66 @@ use super::{
     dates_names::{MonthlyName, DateNameForFile, yearly_name::YearlyName, InitialabeFromTemplate},
 };
 
-pub fn open_by_date(to_open_by: ValidatedDate, option: &AppOptions) -> AppResult {
+pub fn open_by_date(
+    to_open_by: ValidatedDate,
+    option: &AppOptions,
+    edit_option: &EditCommonArgs,
+) -> AppResult {
     let today_name: DailyName = to_open_by.into();
-    open_date_with_editor(today_name, option)
+    open_date_with_editor(today_name, option, edit_option)
 }
 
-pub fn open_by_month_year(month_year: OpenByMonthInYear, option: &AppOptions) -> AppResult {
+pub fn open_by_month_year(
+    month_year: OpenByMonthInYear,
+    option: &AppOptions,
+    edit_option: &EditCommonArgs,
+) -> AppResult {
     let monthly = MonthlyName::from_month_in_year(&month_year)?;
 
-    open_date_with_editor(monthly, option)
+    open_date_with_editor(monthly, option, edit_option)
 }
-pub fn open_by_year(year: ValidatedYear, option: &AppOptions) -> AppResult {
+pub fn open_by_year(
+    year: ValidatedYear,
+    option: &AppOptions,
+    edit_option: &EditCommonArgs,
+) -> AppResult {
     let yearly = YearlyName::new(year);
 
-    open_date_with_editor(yearly, option)
+    open_date_with_editor(yearly, option, edit_option)
 }
-pub fn open_by_current_year(option: &AppOptions) -> AppResult {
+pub fn open_by_current_year(option: &AppOptions, edit_option: &EditCommonArgs) -> AppResult {
     let now = Local::now().date_naive().year() as u32;
     let year = now.try_into()?;
     let yearly = YearlyName::new(year);
 
-    open_date_with_editor(yearly, option)
+    open_date_with_editor(yearly, option, edit_option)
 }
 
-fn open_date_with_editor<T>(journal: T, option: &AppOptions) -> AppResult
+fn open_date_with_editor<T>(
+    journal: T,
+    option: &AppOptions,
+    edit_option: &EditCommonArgs,
+) -> AppResult
 where
     T: DateNameForFile + InitialabeFromTemplate,
 {
     let to_open = file_access::create_new_path_for(journal.name(), option)?;
 
+    let editor_to_use = edit_option.resolve_editor(option).unwrap_or_else(|error| {
+        warn!(
+            "Falling back to default editor {} due to error in loading config file correctly.\n {}",
+            DEFAUTL_EDITOR, error,
+        );
+
+        DEFAUTL_EDITOR.to_owned()
+    });
+
     if !to_open.exists() {
         info!("No journal created so far at {:?}", &to_open);
         try_write_template_from_config(&to_open, journal, option)?;
     }
-    process_handling::start_process_with(option, &to_open)?;
+
+    process_handling::start_process_with(option, &editor_to_use, &to_open)?;
 
     Ok(())
 }
