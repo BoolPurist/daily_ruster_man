@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 
+- Yearly, monthly and daily journals can be deleted via corresponding delete commands.
 - Added example template file for documentation
 - Added example configuration file for documentation
 - Added usage file which describes configuration, templates and placeholders for documentation
