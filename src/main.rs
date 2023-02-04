@@ -4,7 +4,7 @@ use daily_ruster_man::{
         list_queries, open_actions,
         app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
-        delete_actions,
+        delete_actions::{self, DeletionResult},
     },
 };
 use daily_ruster_man::prelude::*;
@@ -84,28 +84,36 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             let validated = to_delete.to_advance_now()?;
             let has_delteted = delete_actions::delete_day_journal(validated, &app_options)?;
 
-            may_communicate_no_journal_deleted(has_delteted);
+            report_deletion_result(has_delteted);
             Ok(())
         }
         AppCommands::DeleteMonth(to_delete) => {
             let validated = to_delete.to_valid_ym_pair()?;
             let has_delteted = delete_actions::delete_month_journal(validated, &app_options)?;
 
-            may_communicate_no_journal_deleted(has_delteted);
+            report_deletion_result(has_delteted);
             Ok(())
         }
         AppCommands::DeleteYear { year } => {
             let validated: ValidatedYear = (*year).try_into()?;
             let has_delteted = delete_actions::delete_year_journal(validated, &app_options)?;
 
-            may_communicate_no_journal_deleted(has_delteted);
+            report_deletion_result(has_delteted);
             Ok(())
         }
     };
 
-    fn may_communicate_no_journal_deleted(has_delteted: bool) {
-        if !has_delteted {
-            println!("There was no journal to be deleted.");
+    fn report_deletion_result(has_delteted: DeletionResult) {
+        match has_delteted {
+            DeletionResult::NoJournalFound => {
+                println!("There was no journal to be deleted.");
+            }
+            DeletionResult::NoConfirmation => {
+                println!("Cancaled deletion of journal");
+            }
+            DeletionResult::Deleted => {
+                println!("Journal was deleted");
+            }
         }
     }
 }
