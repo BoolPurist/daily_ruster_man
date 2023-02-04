@@ -3,9 +3,14 @@ pub use clap::{Parser, Args};
 
 pub use crate::core::date_models;
 pub use crate::cli::{
-    edit_command::EditCommand, month_edit_command::EditByMonthCommand, list_command::ListCommand,
+    edit_command::EditCommand,
+    month_edit_command::EditByMonthCommand,
+    list_command::ListCommand,
     month_list_command::ListByMonthCommand,
+    deletion_arguments::{DeleteDateArg, DeleteYearArg, DeleteMonthArg},
 };
+
+use crate::cli::build_env_name;
 
 #[derive(Parser, Getters)]
 #[command(author, version = "0.5.1", about)]
@@ -31,18 +36,27 @@ pub enum AppCommands {
     /// shows all created daily entries in year August in year 2013.
     #[command(visible_alias = "e")]
     Edit(EditCommand),
+    #[command(visible_alias = "d")]
+    /// Deletes selected day if created.
+    Delete(DeleteDateArg),
+    #[command(visible_alias = "me")]
     /// Opens or creates an entry for given month in a year.
     /// If given no month and year then the current month is created or opened.
-    #[command(visible_alias = "me")]
     MonthEdit(EditByMonthCommand),
-    /// List months of a given year. If not further arguments are given, all months are shown.
+    #[command(visible_alias = "md")]
+    /// Deletes selected month if it is created.
+    DeleteMonth(DeleteMonthArg),
     #[command(visible_alias = "ml")]
+    /// List months of a given year. If not further arguments are given, all months are shown.
     MonthList(ListByMonthCommand),
-    /// Opens or creates given entry for a year.
     #[command(visible_alias = "ye")]
+    /// Opens or creates given entry for a year.
     YearEdit { year: Option<u32> },
-    /// List all created entries for a year.
+    #[command(visible_alias = "yd")]
+    /// Deletes selected year if created.
+    DeleteYear(DeleteYearArg),
     #[command(visible_alias = "yl")]
+    /// List all created entries for a year.
     YearList,
 }
 
@@ -60,11 +74,6 @@ pub struct DebugArgs {
     run_editor_dry: bool,
 }
 
-macro_rules! build_env_name {
-    ($field:ident) => {{
-        concat!("RUSTER_JOURNAL", concat!("_", stringify!($field)))
-    }};
-}
 #[derive(Args, CopyGetters, Getters, Clone, Default)]
 pub struct GenerellArgs {
     #[getset(get_copy = "pub")]

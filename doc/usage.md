@@ -1,5 +1,22 @@
 # Usage
 
+## Deletion of journals
+
+You can delete already created journals with the following subcommmand
+
+- *delete* for deleting a daily journal
+- *delete-month* for deleting a monthly journal
+- *delete-year* for deleting a yearly journal
+
+You specify a journal like you would in its respective edit command.
+There is one exception for the deletion of a yearly journal !
+Here you must provide a certain year for deletion in constrast of the edit command for yearly journals.
+
+By default before the deletion you prompted to confirm for safety.
+You can disable this safety prompt by providing the cli argument or setting the respective environment variable
+
+There also [examples deletion] 
+
 ## Configuration
 
 This application can be altered via option in a configuration file named config.toml.
@@ -33,3 +50,4 @@ The output of the command is then used as replacement for the key.
 
 [config.toml]:config.toml
 [example template file]:example.template
+[examples deletion]:examples.md##Deletion

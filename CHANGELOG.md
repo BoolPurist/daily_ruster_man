@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 
+- Confirmation prompt before deletion can skipped via cli arg or environment variable
+- Deletion of a journal is only done before confirming prompt 
+- Yearly, monthly and daily journals can be deleted via corresponding delete commands.
 - Added example template file for documentation
 - Added example configuration file for documentation
 - Added usage file which describes configuration, templates and placeholders for documentation

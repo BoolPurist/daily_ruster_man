@@ -4,6 +4,7 @@ use daily_ruster_man::{
         list_queries, open_actions,
         app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
+        delete_actions::{self, DeletionResult},
     },
 };
 use daily_ruster_man::prelude::*;
@@ -39,7 +40,7 @@ fn init_logger(generell_args: &GenerellArgs) {
 
 fn handle_commands(args: &CliArgs) -> AppResult {
     let app_options = AppOptions::new(args);
-    match args.commands() {
+    return match args.commands() {
         AppCommands::List(list_queries) => {
             let filter = list_queries.to_date_filter()?;
             let all = list_queries::fetch_all_daily_names(&filter, &app_options)?;
@@ -78,6 +79,53 @@ fn handle_commands(args: &CliArgs) -> AppResult {
                 open_actions::open_by_current_year(&app_options)?;
             }
             Ok(())
+        }
+        AppCommands::Delete(to_delete) => {
+            let validated = to_delete.date().to_advance_now()?;
+            let has_delteted = delete_actions::delete_day_journal(
+                validated,
+                to_delete.common_arg(),
+                &app_options,
+            )?;
+
+            report_deletion_result(has_delteted);
+            Ok(())
+        }
+        AppCommands::DeleteMonth(to_delete) => {
+            let validated = to_delete.month().to_valid_ym_pair()?;
+            let has_delteted = delete_actions::delete_month_journal(
+                validated,
+                to_delete.common_arg(),
+                &app_options,
+            )?;
+
+            report_deletion_result(has_delteted);
+            Ok(())
+        }
+        AppCommands::DeleteYear(to_delete) => {
+            let validated: ValidatedYear = (*to_delete.year()).try_into()?;
+            let has_delteted = delete_actions::delete_year_journal(
+                validated,
+                to_delete.common_arg(),
+                &app_options,
+            )?;
+
+            report_deletion_result(has_delteted);
+            Ok(())
+        }
+    };
+
+    fn report_deletion_result(has_delteted: DeletionResult) {
+        match has_delteted {
+            DeletionResult::NoJournalFound => {
+                println!("There was no journal to be deleted.");
+            }
+            DeletionResult::NoConfirmation => {
+                println!("Cancaled deletion of journal");
+            }
+            DeletionResult::Deleted => {
+                println!("Journal was deleted");
+            }
         }
     }
 }
