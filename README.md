@@ -25,6 +25,10 @@ or the template content.
 
 See [usage] for more details for how to use this application.
 
+## Examples 
+
+Examples can be found [here][examples].
+
 ## Development
 
 ### Bumping version
@@ -50,3 +54,4 @@ Licensed is under either of Apache License, Version 2.0 or MIT license at your o
 [Changelog]:CHANGELOG.md
 [Rust Cli File]:/src/cli/app_args.rs
 [usage]:/doc/usage.md
+[examples]:/doc/examples.md
