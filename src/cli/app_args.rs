@@ -17,7 +17,7 @@ use super::edit_year::EditByYear;
 use super::month_edit_command::EditByMonthCommandAndArgs;
 
 #[derive(Parser, Getters)]
-#[command(author, version = "0.5.1", about)]
+#[command(author, version = "0.5.3", about)]
 #[getset(get = "pub")]
 pub struct CliArgs {
     #[cfg(debug_assertions)]
