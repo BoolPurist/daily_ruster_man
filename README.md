@@ -1,20 +1,39 @@
 # README
 
-This CLI tools allows you to create/manage daily, monthly and yearly journals with your editor of 
+This CLI tool allows you to create/manage daily, monthly and yearly journals with your editor of 
 choice. You also can list your created journals by this app.
+
+This application is still considered an alpha ! Things can break for sure.
+This application is developed on a Linux system. So it is only tested on a Linux system !
 
 ## Installation
 
+### Prerequisite
+
+You need to have rust and cargo installed on your system to build this application and install it.
+It is recommended that you install rust/cargo via rustup. Follow instrucions [here][rustup]
+
+### Steps
 1. Clone this respo.
 2. Build and install this app via cargo through the following command
 ```text
 cargo install --path '.' --force
 ```
 
+### Installation path
+
 This install the app at ~/.cargo/bin/ by default. 
 You could choose another location via the option --root.
 Make sure the this path (~/.cargo/bin/) or the your choosen destination is in your $PATH 
 to make accessible everywhere.
+
+## Usage
+
+See [usage] for more details for how to use this application.
+
+## Examples 
+
+Examples can be found [here][examples].
 
 ## Roadmap
 
@@ -36,14 +55,6 @@ or the template content.
 #### Examples
 - examples for editing/opening of journals
 - examples for listing journals
-
-## Usage
-
-See [usage] for more details for how to use this application.
-
-## Examples 
-
-Examples can be found [here][examples].
 
 ## Development
 
@@ -86,3 +97,4 @@ Licensed is under either of Apache License, Version 2.0 or MIT license at your o
 [Rust Cli File]:/src/cli/app_args.rs
 [usage]:/doc/usage.md
 [examples]:/doc/examples.md
+[rustup]:https://rustup.rs/
