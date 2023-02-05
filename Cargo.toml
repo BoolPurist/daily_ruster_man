@@ -32,9 +32,6 @@ thiserror = "1.0.38"
 getset = "0.1.2"
 parse-display= "0.8.0"
 
-# Used during development target
-project-root = "0.2.2"
-
 # testing
 mockall = "0.11.3"
 
