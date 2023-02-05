@@ -1,7 +1,10 @@
+#![allow(clippy::uninlined_format_args)]
+
 use daily_ruster_man::{
     cli::app_args::*,
     core::{
-        list_queries, open_actions,
+        list_queries,
+        open_actions::{self, OpenResult},
         app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
         delete_actions::{self, DeletionResult},
@@ -48,14 +51,6 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             println!("{in_lines}");
             Ok(())
         }
-        AppCommands::Edit(command_arg) => {
-            let edit_query = command_arg.command().to_advance_now()?;
-            open_actions::open_by_date(edit_query, &app_options, command_arg.option())
-        }
-        AppCommands::MonthEdit(args) => {
-            let month_in_year: OpenByMonthInYear = args.command().to_valid_ym_pair()?;
-            open_actions::open_by_month_year(month_in_year, &app_options, args.option())
-        }
         AppCommands::MonthList(args) => {
             let month_in_year = args.create_find_month_in_year()?;
             let monthly_names =
@@ -70,15 +65,30 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             println!("{lines}");
             Ok(())
         }
+        AppCommands::Edit(command_arg) => {
+            let edit_query = command_arg.command().to_advance_now()?;
+            let open_result =
+                open_actions::open_by_date(edit_query, &app_options, command_arg.option());
+
+            report_open_result(open_result)
+        }
+        AppCommands::MonthEdit(args) => {
+            let month_in_year: OpenByMonthInYear = args.command().to_valid_ym_pair()?;
+            let open_result =
+                open_actions::open_by_month_year(month_in_year, &app_options, args.option());
+
+            report_open_result(open_result)
+        }
         AppCommands::YearEdit(year_edit) => {
-            if let Some(year_given) = year_edit.year() {
+            let open_result = if let Some(year_given) = year_edit.year() {
                 let year_given: ValidatedYear = year_given.try_into()?;
 
-                open_actions::open_by_year(year_given, &app_options, year_edit.option())?;
+                open_actions::open_by_year(year_given, &app_options, year_edit.option())
             } else {
-                open_actions::open_by_current_year(&app_options, year_edit.option())?;
-            }
-            Ok(())
+                open_actions::open_by_current_year(&app_options, year_edit.option())
+            };
+
+            report_open_result(open_result)
         }
         AppCommands::Delete(to_delete) => {
             let validated = to_delete.date().to_advance_now()?;
@@ -114,6 +124,15 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             Ok(())
         }
     };
+
+    fn report_open_result(from_open_action: OpenResult) -> AppResult {
+        let may_content = from_open_action?;
+        if let Some(content) = may_content {
+            println!("{}", content);
+        }
+
+        Ok(())
+    }
 
     fn report_deletion_result(has_delteted: DeletionResult) {
         match has_delteted {
