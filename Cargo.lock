@@ -215,7 +215,7 @@ dependencies = [
 
 [[package]]
 name = "daily_ruster_man"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "anyhow",
  "chrono",

@@ -1,6 +1,6 @@
 [package]
 name = "daily_ruster_man"
-version = "0.5.3"
+version = "0.5.4"
 edition = "2021"
 
 [dependencies]
