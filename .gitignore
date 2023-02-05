@@ -1,2 +1,3 @@
 /target
+# Folder under which config and journals are loaded and saved in dev mode
 /.dev_data

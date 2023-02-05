@@ -136,10 +136,11 @@ mod fetch_paths_names {
     }
 
     fn fetch_dev_dir_for(dir: &Path) -> AppResult<PathBuf> {
-        let project_root = get_project_folder();
+        let project_root = get_ensured_project_folder()?;
 
         let dev_data_folder = project_root.join(dir);
 
+        fs::create_dir_all(&dev_data_folder)?;
         Ok(dev_data_folder)
     }
 
@@ -201,19 +202,22 @@ mod fetch_paths_names {
         Ok(())
     }
 
-    fn get_project_folder() -> &'static Path {
+    fn get_ensured_project_folder() -> AppResult<&'static Path> {
+        static PROJECT_ROOT: &str = env!("CARGO_MANIFEST_DIR");
         if cfg!(debug_assertions) {
-            info!(
-                "Using {} as project path during dev mode",
-                env!("CARGO_MANIFEST_DIR")
-            );
-            Path::new(env!("CARGO_MANIFEST_DIR"))
+            info!("Using {} as project path during dev mode", PROJECT_ROOT);
+            let path = Path::new(PROJECT_ROOT);
+
+            fs::create_dir_all(path).with_context(|| {
+                format!(
+                    "Error ensuring the project path {}",
+                    env!("CARGO_MANIFEST_DIR")
+                )
+            })?;
+            Ok(path)
         } else {
             panic!("There is only project folder during dev mode.")
         }
-        // project_root::get_project_root()
-        //     .map_err(AppError::new)
-        //     .context("Could get the project folder from rust project")
     }
 
     pub fn get_app_name() -> &'static str {
