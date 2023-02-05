@@ -19,6 +19,7 @@ use super::month_edit_command::EditByMonthCommandAndArgs;
 #[derive(Parser, Getters)]
 #[command(author, version = "0.5.3", about)]
 #[getset(get = "pub")]
+/// Create/manage daily, monthly and yearly journals with your editor of choise.
 pub struct CliArgs {
     #[cfg(debug_assertions)]
     #[command(flatten)]

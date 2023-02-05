@@ -1,8 +1,24 @@
 # README
 
+This CLI tools allows you to create/manage daily, monthly and yearly journals with your editor of 
+choice. You also can list your created journals by this app.
+
+## Installation
+
+1. Clone this respo.
+2. Build and install this app via cargo through the following command
+```text
+cargo install --path '.' --force
+```
+
+This install the app at ~/.cargo/bin/ by default. 
+You could choose another location via the option --root.
+Make sure the this path (~/.cargo/bin/) or the your choosen destination is in your $PATH 
+to make accessible everywhere.
+
 ## Roadmap
 
-### Features
+### Features to implement
 
 - Provide build in placeholders for data the app knows like date of the created journal 
 or the template content.
@@ -11,7 +27,7 @@ or the template content.
 - Option to create journal with skipping inserting template
 - Option to reset journal with empty content or with template 
 
-### Documentation
+### Documentation to add
 
 #### Usage
 - editing/opening of journals
@@ -30,6 +46,21 @@ See [usage] for more details for how to use this application.
 Examples can be found [here][examples].
 
 ## Development
+
+### File system access during development
+
+If this app is complied in debug mode then a folder called ".dev_data" at the project root is used
+for accessing/saving configuration/journals.
+
+This allows testing/development the app without affecting the actual user journals/configuration.
+
+- .dev_data/conf for configuration path
+- .dev_data/share for path to saved journals
+
+All dev data folders are not checked in. 
+The folder .dev_data and its subfolders mentioned above, are created if not 
+present when the app needs them.
+
 
 ### Bumping version
 
