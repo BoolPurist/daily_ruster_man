@@ -35,32 +35,32 @@ pub enum AppCommands {
     /// Shows created daily entries so far.
     #[command(visible_alias = "l")]
     List(ListCommand),
-    /// Opens or creates an entry for today or for a given date via your editor of choice.
-    /// Note: Options flags can be combined for filtering. Example: --year 2013 and --month 08
-    /// shows all created daily entries in year August in year 2013.
+    /// Opens or creates an journal for certain day with your editor of choice. Opens for today
+    /// if no arguments are given.
+    /// Options flags can be combined for selecting a day in past or future
     #[command(visible_alias = "e")]
     Edit(EditCommandAndArgs),
     #[command(visible_alias = "d")]
-    /// Deletes selected day if created.
+    /// Deletes the selected day if it was created.
     Delete(DeleteDateArg),
     #[command(visible_alias = "me")]
     /// Opens or creates an entry for given month in a year.
     /// If given no month and year then the current month is created or opened.
     MonthEdit(EditByMonthCommandAndArgs),
     #[command(visible_alias = "md")]
-    /// Deletes selected month if it is created.
+    /// Deletes selected month if it was created.
     DeleteMonth(DeleteMonthArg),
     #[command(visible_alias = "ml")]
-    /// List months of a given year. If not further arguments are given, all months are shown.
+    /// List months of a given year. If no further arguments are given, all months are shown.
     MonthList(ListByMonthCommand),
     #[command(visible_alias = "ye")]
-    /// Opens or creates given entry for a year.
+    /// Opens or creates journal for a year.
     YearEdit(EditByYear),
     #[command(visible_alias = "yd")]
-    /// Deletes selected year if created.
+    /// Deletes selected year if it was created.
     DeleteYear(DeleteYearArg),
     #[command(visible_alias = "yl")]
-    /// List all created entries for a year.
+    /// Lists all created journal for a year.
     YearList,
 }
 
@@ -69,11 +69,11 @@ pub struct DebugArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
     /// If true then the journal files and config files are loaded and saved from the users folders
-    /// instead of the throw away dev data folders in the project root.
+    /// instead of the throw away dev data folder at the project root.
     user_local_share_data: bool,
     #[getset(get_copy = "pub")]
     #[arg(short, long)]
-    /// If true then selected journals will not be opened by editor nor created if not present
+    /// If true then the selected journals will not be opened by editor nor created if not present
     /// already.
     run_editor_dry: bool,
 }
@@ -86,10 +86,10 @@ pub struct GenerellArgs {
     debug: bool,
     #[arg(long, env = build_env_name!(CONFIG_PATH))]
     #[getset(get = "pub")]
-    /// Uses instead provided path to find config.toml file as configuration
+    /// Uses provided path to find config folder for this app
     config_path: Option<String>,
     #[arg(long, env = build_env_name!(DATA_PATH))]
     #[getset(get = "pub")]
-    /// Uses instead provided path to read/write journal files
+    /// Uses provided path to find folder with saved journals
     data_path: Option<String>,
 }

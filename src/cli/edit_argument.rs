@@ -1,4 +1,4 @@
-use crate::core::{constants::DEFAUTL_EDITOR, app_options::AppOptions};
+use crate::core::app_options::AppOptions;
 use crate::prelude::*;
 use super::build_env_name;
 use clap::Args;
@@ -12,6 +12,7 @@ pub struct EditCommonArgs {
 }
 
 impl EditCommonArgs {
+    pub const DEFAUTL_EDITOR: &str = "vim";
     /// Returns editor to use for opening/changing journals.
     /// It returns editor from either a CLI argument, environment variable, configuration file.
     /// If none of these sources provide an editor then the default editor of app is provided.
@@ -39,8 +40,8 @@ impl EditCommonArgs {
         return Ok(borrowed.to_owned());
 
         fn return_default_editor() -> &'static str {
-            info!("Using default editor {} .", DEFAUTL_EDITOR);
-            DEFAUTL_EDITOR
+            info!("Using default editor {} .", EditCommonArgs::DEFAUTL_EDITOR);
+            EditCommonArgs::DEFAUTL_EDITOR
         }
     }
 }

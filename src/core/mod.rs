@@ -23,7 +23,6 @@ pub mod constants {
     pub const DAILY_INFIX: &str = "daily";
     pub const MONTHLY_LABEL_IN_NAME: &str = "monthly";
     pub const YEARLY_LABEL_IN_NAME: &str = "yearly";
-    pub const DEFAUTL_EDITOR: &str = "vim";
     pub const DIGIT_SEP: &str = "_";
     pub const SIGN_FOR_FROM_CONF_FOLDER: char = '+';
 
@@ -33,9 +32,8 @@ pub mod constants {
     pub const DAY_LOWER_BOUND: u32 = 1;
     pub const DAY_UPPER_BOUND: u32 = 31;
 
-    pub const CONF_FILE_NAME: &str = "config.toml";
-
     pub const ENV_PREFIX: &str = "JOURNAL_RUSTER";
+    pub const CONF_FILE_NAME: &str = "config.toml";
 
     const DEV_DATA_INFIX: &str = ".dev_data";
 

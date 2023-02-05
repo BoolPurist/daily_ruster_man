@@ -3,7 +3,6 @@ use std::path::Path;
 
 use chrono::{Local, Datelike};
 use crate::cli::edit_argument::EditCommonArgs;
-use crate::core::constants::DEFAUTL_EDITOR;
 use crate::core::template;
 use crate::prelude::*;
 use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYear};
@@ -62,10 +61,11 @@ where
     let editor_to_use = edit_option.resolve_editor(option).unwrap_or_else(|error| {
         warn!(
             "Falling back to default editor {} due to error in loading config file correctly.\n {}",
-            DEFAUTL_EDITOR, error,
+            EditCommonArgs::DEFAUTL_EDITOR,
+            error,
         );
 
-        DEFAUTL_EDITOR.to_owned()
+        EditCommonArgs::DEFAUTL_EDITOR.to_owned()
     });
 
     if !to_open.exists() {

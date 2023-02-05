@@ -8,7 +8,7 @@ use crate::{
 use clap::Parser;
 #[derive(Parser)]
 pub struct ListByMonthCommand {
-    /// If provided as the only argument then all created monthly entries of this given year are shown
+    /// If provided as the only argument then all created monthly journals of this given year are shown
     year: Option<u32>,
     /// Will list the one month of a given year.
     month: Option<u32>,

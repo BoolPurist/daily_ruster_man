@@ -21,6 +21,7 @@ pub struct DeleteMonthArg {
 }
 #[derive(Args, CopyGetters, Getters)]
 pub struct DeleteYearArg {
+    /// which year journal to delete
     #[getset(get = "pub")]
     year: u32,
     #[command(flatten)]

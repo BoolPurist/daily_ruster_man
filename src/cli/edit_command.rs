@@ -3,7 +3,6 @@ use crate::AppResult;
 use crate::core::date_models::units_validated::ValidatedDate;
 use chrono::Local;
 use clap::{Parser, Args};
-
 use super::edit_argument::EditCommonArgs;
 
 #[derive(Parser, Default, Getters)]

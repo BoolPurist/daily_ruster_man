@@ -20,7 +20,7 @@ pub struct EditByMonthCommandAndArgs {
 #[derive(Args)]
 pub struct EditByMonthCommand {
     /// month of current or given year.
-    /// If given without year then month is opene for the current year
+    /// If given without year then month is opened for the current year
     month: Option<u32>,
     /// year in which the month resides
     year: Option<u32>,
