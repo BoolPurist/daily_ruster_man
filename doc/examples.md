@@ -1,5 +1,12 @@
 # Examples
 
+## Only showing content without using editor
+
+Only showing content of yearly journal for year 2022 without opening it with the editor.
+```text
+daily_ruster_man year-edit --show-only 2022
+```
+
 ## Specifying editor
 
 Opening journal for tomorrow with the editor nvim

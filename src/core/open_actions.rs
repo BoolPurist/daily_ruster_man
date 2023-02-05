@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, io};
 use std::path::Path;
 
 use chrono::{Local, Datelike};
@@ -13,11 +13,13 @@ use super::{
     dates_names::{MonthlyName, DateNameForFile, yearly_name::YearlyName, InitialabeFromTemplate},
 };
 
+pub type OpenResult = AppResult<Option<String>>;
+
 pub fn open_by_date(
     to_open_by: ValidatedDate,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
-) -> AppResult {
+) -> OpenResult {
     let today_name: DailyName = to_open_by.into();
     open_date_with_editor(today_name, option, edit_option)
 }
@@ -26,7 +28,7 @@ pub fn open_by_month_year(
     month_year: OpenByMonthInYear,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
-) -> AppResult {
+) -> OpenResult {
     let monthly = MonthlyName::from_month_in_year(&month_year)?;
 
     open_date_with_editor(monthly, option, edit_option)
@@ -35,12 +37,12 @@ pub fn open_by_year(
     year: ValidatedYear,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
-) -> AppResult {
+) -> OpenResult {
     let yearly = YearlyName::new(year);
 
     open_date_with_editor(yearly, option, edit_option)
 }
-pub fn open_by_current_year(option: &AppOptions, edit_option: &EditCommonArgs) -> AppResult {
+pub fn open_by_current_year(option: &AppOptions, edit_option: &EditCommonArgs) -> OpenResult {
     let now = Local::now().date_naive().year() as u32;
     let year = now.try_into()?;
     let yearly = YearlyName::new(year);
@@ -52,7 +54,7 @@ fn open_date_with_editor<T>(
     journal: T,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
-) -> AppResult
+) -> AppResult<Option<String>>
 where
     T: DateNameForFile + InitialabeFromTemplate,
 {
@@ -73,9 +75,27 @@ where
         try_write_template_from_config(&to_open, journal, option)?;
     }
 
+    if edit_option.show_only() {
+        return just_load_journal(&to_open);
+    }
+
     process_handling::start_process_with(option, &editor_to_use, &to_open)?;
 
-    Ok(())
+    return Ok(None);
+
+    fn just_load_journal(to_open: &Path) -> OpenResult {
+        match fs::read_to_string(to_open) {
+            Ok(content) => Ok(Some(content)),
+            Err(error) => {
+                if error.kind() == io::ErrorKind::NotFound {
+                    info!("No journal created to show so far");
+                    Ok(None)
+                } else {
+                    Err(AppError::new(error))
+                }
+            }
+        }
+    }
 }
 
 fn try_write_template_from_config(

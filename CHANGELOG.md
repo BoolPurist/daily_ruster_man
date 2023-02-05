@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] 
 
+### Added 
+
+- CLI argument show-only: For only printing out the content of journal to terminal without using editor.
+
 ## [0.5.3] - 2023.02.04
 
 ### Added 

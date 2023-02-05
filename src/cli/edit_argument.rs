@@ -3,12 +3,18 @@ use crate::prelude::*;
 use super::build_env_name;
 use clap::Args;
 
-#[derive(Args, Getters, Default)]
+#[derive(Args, Getters, CopyGetters, Default)]
 pub struct EditCommonArgs {
     #[arg(long, env = build_env_name!(EDITOR))]
     #[getset(get = "pub")]
     /// Name of the editor to use without any arguments. Must findable via $PATH.
     editor: Option<String>,
+    #[arg(short, long)]
+    #[getset(get_copy = "pub")]
+    /// If given then the content of selected journal is only printed out to stdout
+    /// without any involvement of editor.
+    /// Output will be empty if the selected journal was not created so far.
+    show_only: bool,
 }
 
 impl EditCommonArgs {
