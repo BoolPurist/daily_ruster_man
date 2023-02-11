@@ -1,4 +1,5 @@
 #![allow(clippy::uninlined_format_args)]
+use std::process::ExitCode;
 
 use daily_ruster_man::{
     cli::app_args::*,
@@ -13,14 +14,17 @@ use daily_ruster_man::{
 use daily_ruster_man::prelude::*;
 use env_logger::Env;
 
-fn main() {
+fn main() -> ExitCode {
     let cli_args = CliArgs::parse();
 
     init_logger(cli_args.args());
     set_up_env(cli_args.args());
 
     if let Err(error) = handle_commands(&cli_args) {
-        exit_with_error(&error, cli_args.args());
+        print_error(&error, cli_args.args());
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
     }
 }
 
@@ -149,11 +153,10 @@ fn handle_commands(args: &CliArgs) -> AppResult {
     }
 }
 
-fn exit_with_error(error: &AppError, generell_args: &GenerellArgs) {
+fn print_error(error: &AppError, generell_args: &GenerellArgs) {
     if cfg!(debug_assertions) || generell_args.debug() {
-        eprintln!("Error debug: {error:?}");
+        eprintln!("Error debug: {error:#?}");
     } else {
         eprintln!("Error: {error}");
     }
-    std::process::exit(1);
 }
