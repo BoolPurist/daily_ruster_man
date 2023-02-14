@@ -22,10 +22,10 @@ cargo install --path '.' --force
 
 ### Installation path
 
-This install the app at ~/.cargo/bin/ by default. 
+This installs the app at ~/.cargo/bin/ by default. 
 You could choose another location via the option --root.
-Make sure the this path ~/.cargo/bin/ or the your choosen destination is in your $PATH 
-to make accessible everywhere.
+Make sure the path ~/.cargo/bin/ or your chosen destination is in your $PATH environment variable
+to make this app accessible everywhere in your terminal.
 
 ## Usage
 
