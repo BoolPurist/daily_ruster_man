@@ -10,7 +10,7 @@ anyhow = { version = "1.0.68", features = ["backtrace"] }
 once_cell = "1.17.0"
 
 # needed for other app features
-chrono = { version = "0.4.23", features = ["clock"] } 
+chrono = { version = "0.4.23", default-features = false, features = ["clock", "std", "alloc"] } 
 clap = { version = "4.0.32", features = ["derive", "env"] }
 # Used for parsing commands for placeholders in a template
 shellwords = "1.1.0"
