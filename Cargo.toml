@@ -24,7 +24,7 @@ log = "0.4.17"
 
 # data from files
 serde = {version = "1.0.152", features = ["derive"]} 
-toml = "0.6.0"
+toml = "0.7.1"
 
 # Macros
 derive-new = "0.5.9"
@@ -37,5 +37,5 @@ mockall = "0.11.3"
 
 [dev-dependencies]
 insta = { version = "1.26.0", features = ["yaml"] }
-test-case = "2.2.2"
+test-case = "3.0.0"
 
