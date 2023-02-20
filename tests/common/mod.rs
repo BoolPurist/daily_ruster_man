@@ -9,7 +9,11 @@ pub fn create_sample_data_folder() -> TempDir {
 
     create_files(
         path,
-        &[Path::new("2022_yearly.md"), Path::new("2001_01_monthly.md")],
+        &[
+            Path::new("2022_yearly.md"),
+            Path::new("2001_01_monthly.md"),
+            Path::new("1988_11_22_daily.md"),
+        ],
     );
 
     return to_return;

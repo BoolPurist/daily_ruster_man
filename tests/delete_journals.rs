@@ -1,12 +1,15 @@
 mod common;
 use std::path::PathBuf;
 
+use daily_ruster_man::AppResult;
 use daily_ruster_man::core::app_options::AppOptions;
 use daily_ruster_man::core::date_models::open_by::OpenByMonthInYear;
 use daily_ruster_man::core::delete_actions::{self, DeletionResult};
 use daily_ruster_man::cli::{app_args::GenerellArgs, deletion_arguments::CommonDeleteArg};
 
-use daily_ruster_man::core::date_models::units_validated::{ValidatedYear, ValidatedMonth};
+use daily_ruster_man::core::date_models::units_validated::{
+    ValidatedYear, ValidatedMonth, ValidatedDate, ValidatedDay,
+};
 use tempfile::TempDir;
 
 #[test]
@@ -20,11 +23,10 @@ fn should_delete_yearly_journal() {
     let result = delete_actions::delete_year_journal(
         year,
         &provided_set_up.common,
-        &AppOptions::with(provided_set_up.general),
+        &AppOptions::with(provided_set_up.general.clone()),
     );
 
-    assert!(result.is_ok());
-    assert!(!provided_set_up.path_to_delete.exists());
+    assert_deletion(result, provided_set_up);
 }
 
 #[test]
@@ -40,17 +42,30 @@ fn should_delete_monthly_journal() {
     let result = delete_actions::delete_month_journal(
         OpenByMonthInYear::WithYear { month, year },
         &provided_set_up.common,
-        &AppOptions::with(provided_set_up.general),
+        &AppOptions::with(provided_set_up.general.clone()),
     );
 
-    // Assert
-    if let Ok(deletion_outcome) = result {
-        assert!(DeletionResult::Deleted == deletion_outcome);
-    } else {
-        panic!("Should have returned that the journal was deleted.");
-    }
+    assert_deletion(result, provided_set_up);
+}
 
-    assert!(!provided_set_up.path_to_delete.exists());
+#[test]
+fn should_delete_daily_journal() {
+    const TO_DELETE: &str = "1988_11_22_daily.md";
+
+    let provided_set_up = set_up(TO_DELETE);
+
+    let month: ValidatedMonth = 11.try_into().unwrap();
+    let year: ValidatedYear = 1988.try_into().unwrap();
+    let day: ValidatedDay = 22.try_into().unwrap();
+    let date: ValidatedDate = ValidatedDate::new(year, month, day).unwrap();
+    // Act
+    let result = delete_actions::delete_day_journal(
+        date,
+        &provided_set_up.common,
+        &AppOptions::with(provided_set_up.general.clone()),
+    );
+
+    assert_deletion(result, provided_set_up);
 }
 
 fn set_up(to_delete: &str) -> DeletionSetup {
@@ -75,6 +90,17 @@ fn set_up(to_delete: &str) -> DeletionSetup {
         general,
         common,
     }
+}
+
+fn assert_deletion(result: AppResult<DeletionResult>, provided_set_up: DeletionSetup) {
+    // Assert
+    if let Ok(deletion_outcome) = result {
+        assert!(DeletionResult::Deleted == deletion_outcome);
+    } else {
+        panic!("Should have returned that the journal was deleted.");
+    }
+
+    assert!(!provided_set_up.path_to_delete.exists());
 }
 
 struct DeletionSetup {
