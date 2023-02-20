@@ -1,4 +1,5 @@
 use clap::Args;
+use derive_new::new;
 use super::app_args::{EditByMonthCommand, EditCommand};
 
 #[derive(Args, CopyGetters, Getters)]
@@ -19,7 +20,7 @@ pub struct DeleteMonthArg {
     #[getset(get = "pub")]
     common_arg: CommonDeleteArg,
 }
-#[derive(Args, CopyGetters, Getters)]
+#[derive(Args, CopyGetters, Getters, new)]
 pub struct DeleteYearArg {
     /// which year journal to delete
     #[getset(get = "pub")]
@@ -29,7 +30,7 @@ pub struct DeleteYearArg {
     common_arg: CommonDeleteArg,
 }
 
-#[derive(Args, CopyGetters)]
+#[derive(Args, CopyGetters, new, Clone)]
 pub struct CommonDeleteArg {
     #[arg(long, short, env = build_env_name!(SKIP_CONFIRMATION))]
     #[getset(get_copy = "pub")]

@@ -28,6 +28,14 @@ impl AppOptions {
             debug,
         }
     }
+
+    pub fn with(general: GenerellArgs) -> Self {
+        Self {
+            general,
+            config: Default::default(),
+            debug: None,
+        }
+    }
     #[cfg(debug_assertions)]
     pub fn new(args: &CliArgs) -> Self {
         Self::init(args.args().clone(), Some(args.debug_args().clone()))
