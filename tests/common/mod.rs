@@ -7,7 +7,10 @@ pub fn create_sample_data_folder() -> TempDir {
         TempDir::new().expect("Unexpectd: Failed to create temp folder for integration test.");
     let path = to_return.path();
 
-    create_files(path, &[Path::new("2022_yearly.md")]);
+    create_files(
+        path,
+        &[Path::new("2022_yearly.md"), Path::new("2001_01_monthly.md")],
+    );
 
     return to_return;
 
