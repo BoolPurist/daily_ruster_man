@@ -15,7 +15,7 @@ use tempfile::TempDir;
 #[test]
 fn should_delete_yearly_journal() {
     const TO_DELETE: &str = "2022_yearly.md";
-    let provided_set_up = set_up(TO_DELETE);
+    let provided_set_up = set_up(TO_DELETE, true);
 
     let year: ValidatedYear = 2022.try_into().unwrap();
 
@@ -33,7 +33,7 @@ fn should_delete_yearly_journal() {
 fn should_delete_monthly_journal() {
     const TO_DELETE: &str = "2001_01_monthly.md";
 
-    let provided_set_up = set_up(TO_DELETE);
+    let provided_set_up = set_up(TO_DELETE, true);
 
     let month: ValidatedMonth = 1.try_into().unwrap();
     let year: ValidatedYear = 2001.try_into().unwrap();
@@ -52,7 +52,7 @@ fn should_delete_monthly_journal() {
 fn should_delete_daily_journal() {
     const TO_DELETE: &str = "1988_11_22_daily.md";
 
-    let provided_set_up = set_up(TO_DELETE);
+    let provided_set_up = set_up(TO_DELETE, true);
 
     let month: ValidatedMonth = 11.try_into().unwrap();
     let year: ValidatedYear = 1988.try_into().unwrap();
@@ -67,15 +67,60 @@ fn should_delete_daily_journal() {
 
     assert_deletion(result, provided_set_up);
 }
+#[test]
+fn should_return_no_daily_found_for_deletion() {
+    const TO_DELETE: &str = "1988_1_22_daily.md";
 
-fn set_up(to_delete: &str) -> DeletionSetup {
+    let provided_set_up = set_up(TO_DELETE, false);
+
+    let month: ValidatedMonth = 1.try_into().unwrap();
+    let year: ValidatedYear = 1988.try_into().unwrap();
+    let day: ValidatedDay = 22.try_into().unwrap();
+    let date: ValidatedDate = ValidatedDate::new(year, month, day).unwrap();
+    // Act
+    let result = delete_actions::delete_day_journal(
+        date,
+        &provided_set_up.common,
+        &AppOptions::with(provided_set_up.general.clone()),
+    );
+
+    assert_no_deletion_happened(result, provided_set_up);
+}
+#[test]
+fn should_return_no_monthly_found_for_deletion() {
+    const TO_DELETE: &str = "2001_06_monthly.md";
+
+    let provided_set_up = set_up(TO_DELETE, false);
+
+    let month: ValidatedMonth = 6.try_into().unwrap();
+    let year: ValidatedYear = 2001.try_into().unwrap();
+
+    // Act
+    let result = delete_actions::delete_month_journal(
+        OpenByMonthInYear::WithYear { month, year },
+        &provided_set_up.common,
+        &AppOptions::with(provided_set_up.general.clone()),
+    );
+
+    assert_no_deletion_happened(result, provided_set_up);
+}
+
+fn set_up(to_delete: &str, should_exit_before: bool) -> DeletionSetup {
     let files = common::create_sample_data_folder();
     let path_to_delete: PathBuf = files.path().join(to_delete);
 
-    assert!(
-        path_to_delete.exists(),
-        "Precondition: no path to delete exits in the 1. place."
-    );
+    let does_exists = path_to_delete.exists();
+    if should_exit_before {
+        assert!(
+            does_exists,
+            "Precondition: no path to delete exits in the 1. place."
+        );
+    } else {
+        assert!(
+            !does_exists,
+            "Precondition: Paht should not exit in the first place."
+        );
+    }
 
     let common = CommonDeleteArg::new(true);
     let general = GenerellArgs::new(
@@ -98,6 +143,16 @@ fn assert_deletion(result: AppResult<DeletionResult>, provided_set_up: DeletionS
         assert!(DeletionResult::Deleted == deletion_outcome);
     } else {
         panic!("Should have returned that the journal was deleted.");
+    }
+
+    assert!(!provided_set_up.path_to_delete.exists());
+}
+fn assert_no_deletion_happened(result: AppResult<DeletionResult>, provided_set_up: DeletionSetup) {
+    // Assert
+    if let Ok(deletion_outcome) = result {
+        assert!(DeletionResult::NoJournalFound == deletion_outcome);
+    } else {
+        panic!("Should have returned that there was no journal to deleted.");
     }
 
     assert!(!provided_set_up.path_to_delete.exists());
