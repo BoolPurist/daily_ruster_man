@@ -12,7 +12,13 @@ pub fn create_sample_data_folder() -> TempDir {
         &[
             Path::new("2022_yearly.md"),
             Path::new("2001_01_monthly.md"),
+            Path::new("2023_03_09_daily.md"),
+            Path::new("2023_03_08_daily.md"),
+            Path::new("2023_02_02_daily.md"),
+            Path::new("1999_02_21_daily.md"),
+            Path::new("1999_01_21_daily.md"),
             Path::new("1988_11_22_daily.md"),
+            Path::new("1788_08_12_daily.md"),
         ],
     );
 
