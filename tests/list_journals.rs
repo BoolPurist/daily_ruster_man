@@ -32,6 +32,15 @@ fn should_list_all_monthly_journals() {
     insta::assert_yaml_snapshot!(all_monthly_journals);
 }
 
+#[test]
+fn should_list_all_yearly_journals() {
+    let set_up = set_up_app_options();
+    let all_monthly_journals = list_queries::fetch_yearly_names(&set_up.app_options)
+        .expect("Could not fetch all monthly journals");
+
+    insta::assert_yaml_snapshot!(all_monthly_journals);
+}
+
 struct SetUpForListingQuerry {
     _files: TempDir,
     app_options: AppOptions,
