@@ -25,6 +25,20 @@ fn should_list_all_daily_journals() {
 }
 
 #[test]
+fn should_list_all_daily_journals_in_certain_year() {
+    const YEAR: u32 = 2023;
+
+    let querry = FindByYearMonthDay::new(Some(YEAR), None, None)
+        .unwrap_or_else(|_| panic!("Year {} not a valid year", YEAR));
+
+    let set_up = set_up_app_options();
+    let all_daily_journals = list_queries::fetch_all_daily_names(&querry, &set_up.app_options)
+        .unwrap_or_else(|_| panic!("Could not fetch all daily journals in year {}", YEAR));
+
+    insta::assert_yaml_snapshot!(all_daily_journals);
+}
+
+#[test]
 fn should_list_exact_daily_journal_by_date() {
     let querry = FindByYearMonthDay::new(Some(2023), Some(3), Some(8))
         .expect("Invalid date for querry provided");
