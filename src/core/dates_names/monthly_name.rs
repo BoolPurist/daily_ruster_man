@@ -77,13 +77,13 @@ impl ToDateTuple for MonthlyName {
 
 impl PartialOrd for MonthlyName {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.month.partial_cmp(&other.month)
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for MonthlyName {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.month.cmp(&other.month)
+        (self.year, self.month).cmp(&(other.year, other.month))
     }
 }
 
