@@ -1,7 +1,10 @@
 mod common;
 use daily_ruster_man::{
     core::{
-        date_models::find_by::{FindByYearMonthDay, FindByMonthInYear},
+        date_models::{
+            find_by::{FindByYearMonthDay, FindByMonthInYear},
+            units_validated::ValidatedYear,
+        },
         app_options::AppOptions,
         list_queries,
     },
@@ -36,6 +39,18 @@ fn should_list_all_monthly_journals() {
 fn should_list_all_yearly_journals() {
     let set_up = set_up_app_options();
     let all_monthly_journals = list_queries::fetch_yearly_names(&set_up.app_options)
+        .expect("Could not fetch all monthly journals");
+
+    insta::assert_yaml_snapshot!(all_monthly_journals);
+}
+
+#[test]
+fn should_list_monthly_journals_in_certain_year() {
+    let current_year: ValidatedYear = 2002.try_into().expect("Invalid year provided");
+    let querry = FindByMonthInYear::InCurrentYear(current_year);
+
+    let set_up = set_up_app_options();
+    let all_monthly_journals = list_queries::fetch_all_monthly_names(&querry, &set_up.app_options)
         .expect("Could not fetch all monthly journals");
 
     insta::assert_yaml_snapshot!(all_monthly_journals);
