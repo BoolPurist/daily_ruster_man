@@ -26,15 +26,26 @@ fn should_list_all_daily_journals() {
 
 #[test]
 fn should_list_exact_daily_journal_by_date() {
-    // - 2023 03 08
     let querry = FindByYearMonthDay::new(Some(2023), Some(3), Some(8))
         .expect("Invalid date for querry provided");
 
     let set_up = set_up_app_options();
-    let all_daily_journals = list_queries::fetch_all_daily_names(&querry, &set_up.app_options)
-        .expect("Could not fetch all daily journals");
+    let exact_daily_journal = list_queries::fetch_all_daily_names(&querry, &set_up.app_options)
+        .expect("Could not exact daily journal");
 
-    insta::assert_yaml_snapshot!(all_daily_journals);
+    insta::assert_yaml_snapshot!(exact_daily_journal);
+}
+
+#[test]
+fn should_list_all_daily_journal_in_months() {
+    let querry =
+        FindByYearMonthDay::new(Some(2023), Some(3), None).expect("Invalid year and month");
+
+    let set_up = set_up_app_options();
+    let daily_journals_in_month = list_queries::fetch_all_daily_names(&querry, &set_up.app_options)
+        .expect("Could not fetch all daily journals in certain month");
+
+    insta::assert_yaml_snapshot!(daily_journals_in_month);
 }
 
 #[test]
