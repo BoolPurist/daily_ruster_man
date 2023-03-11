@@ -11,6 +11,7 @@ use super::date_models::units_validated::{ValidatedDate, ValidatedYear};
 use super::dates_names::yearly_name::YearlyName;
 use super::dates_names::{DailyName, MonthlyName};
 
+#[derive(PartialEq, Eq)]
 pub enum DeletionResult {
     /// There was journal to be found for deletion
     NoJournalFound,

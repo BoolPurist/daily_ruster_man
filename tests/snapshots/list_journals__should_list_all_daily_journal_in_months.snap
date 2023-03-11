@@ -1,0 +1,7 @@
+---
+source: tests/list_journals.rs
+expression: daily_journals_in_month
+---
+- 2023 03 09
+- 2023 03 08
+

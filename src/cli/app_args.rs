@@ -1,5 +1,6 @@
 use clap::Subcommand;
 pub use clap::{Parser, Args};
+use derive_new::new;
 
 pub use crate::core::date_models;
 pub use crate::cli::{
@@ -79,7 +80,7 @@ pub struct DebugArgs {
     run_editor_dry: bool,
 }
 
-#[derive(Args, CopyGetters, Getters, Clone, Default)]
+#[derive(Args, CopyGetters, Getters, Clone, Default, new)]
 pub struct GenerellArgs {
     #[getset(get_copy = "pub")]
     #[arg(short, long)]

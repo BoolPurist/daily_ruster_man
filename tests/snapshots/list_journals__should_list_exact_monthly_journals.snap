@@ -1,0 +1,6 @@
+---
+source: tests/list_journals.rs
+expression: all_monthly_journals
+---
+- 2002 11
+
