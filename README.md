@@ -35,27 +35,6 @@ See [usage] for more details for how to use this application.
 
 Examples can be found [here][examples].
 
-## Roadmap
-
-### Features to implement
-
-- Provide build in placeholders for data the app knows like date of the created journal 
-or the template content.
-- Add option to only show content of created journal 
-  or content open first opening journal aka templates
-- Option to create journal with skipping inserting template
-- Option to reset journal with empty content or with template 
-
-### Documentation to add
-
-#### Usage
-- editing/opening of journals
-- listing journals
-
-#### Examples
-- examples for editing/opening of journals
-- examples for listing journals
-
 ## Development
 
 ### File system access during development
