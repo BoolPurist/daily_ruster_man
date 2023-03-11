@@ -2,6 +2,7 @@
 name = "daily_ruster_man"
 version = "0.5.4"
 edition = "2021"
+rust-version = "1.68.0"
 
 [dependencies]
 
