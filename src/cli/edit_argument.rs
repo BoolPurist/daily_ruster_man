@@ -2,11 +2,12 @@ use crate::core::app_options::AppOptions;
 use crate::prelude::*;
 use super::build_env_name;
 use clap::Args;
+use derive_new::new;
 
-#[derive(Args, Getters, CopyGetters, Default, Setters)]
+#[derive(Args, Getters, CopyGetters, Default, Setters, new)]
 pub struct EditCommonArgs {
     #[arg(long, env = build_env_name!(EDITOR))]
-    #[getset(get = "pub", set = "pub")]
+    #[getset(get = "pub")]
     /// Name of the editor to use without any arguments. Must findable via $PATH.
     editor: Option<String>,
     #[arg(short, long)]

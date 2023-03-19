@@ -59,8 +59,7 @@ fn should_open_specific_daily_journal_with_specific_editor() {
         None,
         Some(files.path().to_str().unwrap().to_string()),
     ));
-    let mut edit_option = EditCommonArgs::default();
-    edit_option.set_editor(Some(EXPECTED_EDITOR.to_owned()));
+    let edit_option = EditCommonArgs::new(Some(EXPECTED_EDITOR.to_owned()), false);
 
     let actual = open_actions::open_by_date(&processor, date, &app_options, &edit_option);
 
@@ -73,6 +72,62 @@ fn should_open_specific_daily_journal_with_specific_editor() {
     );
 }
 
+#[test]
+fn should_open_specific_daily_journal_with_show_only() {
+    let expected_content = Some("Some content".to_owned());
+
+    let processor = TestProcessExecuter::default();
+    let files = FileTmpBuilder::default()
+        .with_file(
+            PathBuf::from("2024_09_07_daily.md"),
+            expected_content.clone(),
+        )
+        .build();
+
+    let date = ValidatedDate::new(
+        2024.try_into().unwrap(),
+        9.try_into().unwrap(),
+        7.try_into().unwrap(),
+    )
+    .expect("Invalid date");
+
+    let app_options = AppOptions::with(GenerellArgs::new(
+        false,
+        None,
+        Some(files.path().to_str().unwrap().to_string()),
+    ));
+    let edit_option = EditCommonArgs::new(None, true);
+
+    let actual = open_actions::open_by_date(&processor, date, &app_options, &edit_option);
+
+    assert!(matches!(actual, Ok(actual_content) if actual_content == expected_content));
+    assert!(processor.get_last_executed_program().is_empty());
+}
+
+#[test]
+fn should_not_return_nothing_for_empty_with_show_only() {
+    let processor = TestProcessExecuter::default();
+    let files = FileTmpBuilder::default().build();
+
+    let date = ValidatedDate::new(
+        2024.try_into().unwrap(),
+        9.try_into().unwrap(),
+        7.try_into().unwrap(),
+    )
+    .expect("Invalid date");
+
+    let app_options = AppOptions::with(GenerellArgs::new(
+        false,
+        None,
+        Some(files.path().to_str().unwrap().to_string()),
+    ));
+    let edit_option = EditCommonArgs::new(None, true);
+
+    let actual = open_actions::open_by_date(&processor, date, &app_options, &edit_option);
+
+    assert!(matches!(actual, Ok(None)));
+    assert!(processor.get_last_executed_program().is_empty());
+}
 fn assert_open_action(
     processor: TestProcessExecuter,
     files: TempDir,
