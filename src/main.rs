@@ -73,7 +73,7 @@ fn handle_commands(args: &CliArgs) -> AppResult {
         AppCommands::Edit(command_arg) => {
             let edit_query = command_arg.command().to_advance_now()?;
             let open_result = open_actions::open_by_date(
-                RealProcessExecuter::default(),
+                &RealProcessExecuter::default(),
                 edit_query,
                 &app_options,
                 command_arg.option(),
@@ -84,7 +84,7 @@ fn handle_commands(args: &CliArgs) -> AppResult {
         AppCommands::MonthEdit(args) => {
             let month_in_year: OpenByMonthInYear = args.command().to_valid_ym_pair()?;
             let open_result = open_actions::open_by_month_year(
-                RealProcessExecuter::default(),
+                &RealProcessExecuter::default(),
                 month_in_year,
                 &app_options,
                 args.option(),
@@ -97,14 +97,14 @@ fn handle_commands(args: &CliArgs) -> AppResult {
                 let year_given: ValidatedYear = year_given.try_into()?;
 
                 open_actions::open_by_year(
-                    RealProcessExecuter::default(),
+                    &RealProcessExecuter::default(),
                     year_given,
                     &app_options,
                     year_edit.option(),
                 )
             } else {
                 open_actions::open_by_current_year(
-                    RealProcessExecuter::default(),
+                    &RealProcessExecuter::default(),
                     &app_options,
                     year_edit.option(),
                 )

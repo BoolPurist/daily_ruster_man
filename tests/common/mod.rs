@@ -1,5 +1,7 @@
-use std::fs::File;
-use std::path::Path;
+#![allow(dead_code)]
+
+use std::fs::{File, self};
+use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 
 pub fn create_sample_data_folder() -> TempDir {
@@ -33,6 +35,39 @@ pub fn create_sample_data_folder() -> TempDir {
             let dest_path = root.join(to_create);
             File::create(dest_path)
                 .expect("Failed to create temp journal file for integration test.");
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct FileTmpBuilder {
+    files: Vec<(PathBuf, Option<String>)>,
+}
+
+impl FileTmpBuilder {
+    pub fn with_file(&mut self, path: PathBuf, content: Option<String>) -> &mut Self {
+        self.files.push((path, content));
+        self
+    }
+
+    pub fn build(&self) -> TempDir {
+        let to_return =
+            TempDir::new().expect("Unexpectd: Failed to create temp folder for integration test.");
+        let path = to_return.path();
+
+        for (file_name, content) in self.files.iter() {
+            create_files(path, &file_name, content.clone());
+        }
+
+        return to_return;
+
+        fn create_files(root: &Path, file_name: &Path, maybe_content: Option<String>) {
+            let dest_path = root.join(file_name);
+            _ = File::create(&dest_path)
+                .expect("Failed to create temp journal file for integration test.");
+            if let Some(content) = maybe_content {
+                fs::write(dest_path, content).expect("Could not write content to file");
+            }
         }
     }
 }

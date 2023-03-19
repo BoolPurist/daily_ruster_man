@@ -3,10 +3,10 @@ use crate::prelude::*;
 use super::build_env_name;
 use clap::Args;
 
-#[derive(Args, Getters, CopyGetters, Default)]
+#[derive(Args, Getters, CopyGetters, Default, Setters)]
 pub struct EditCommonArgs {
     #[arg(long, env = build_env_name!(EDITOR))]
-    #[getset(get = "pub")]
+    #[getset(get = "pub", set = "pub")]
     /// Name of the editor to use without any arguments. Must findable via $PATH.
     editor: Option<String>,
     #[arg(short, long)]
