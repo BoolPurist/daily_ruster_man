@@ -6,6 +6,7 @@ use daily_ruster_man::{
     core::{
         list_queries,
         open_actions::{self, OpenResult},
+        process_handling::RealProcessExecuter,
         app_options::AppOptions,
         date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
         delete_actions::{self, DeletionResult},
@@ -71,15 +72,23 @@ fn handle_commands(args: &CliArgs) -> AppResult {
         }
         AppCommands::Edit(command_arg) => {
             let edit_query = command_arg.command().to_advance_now()?;
-            let open_result =
-                open_actions::open_by_date(edit_query, &app_options, command_arg.option());
+            let open_result = open_actions::open_by_date(
+                &RealProcessExecuter::default(),
+                edit_query,
+                &app_options,
+                command_arg.option(),
+            );
 
             report_open_result(open_result)
         }
         AppCommands::MonthEdit(args) => {
             let month_in_year: OpenByMonthInYear = args.command().to_valid_ym_pair()?;
-            let open_result =
-                open_actions::open_by_month_year(month_in_year, &app_options, args.option());
+            let open_result = open_actions::open_by_month_year(
+                &RealProcessExecuter::default(),
+                month_in_year,
+                &app_options,
+                args.option(),
+            );
 
             report_open_result(open_result)
         }
@@ -87,9 +96,18 @@ fn handle_commands(args: &CliArgs) -> AppResult {
             let open_result = if let Some(year_given) = year_edit.year() {
                 let year_given: ValidatedYear = year_given.try_into()?;
 
-                open_actions::open_by_year(year_given, &app_options, year_edit.option())
+                open_actions::open_by_year(
+                    &RealProcessExecuter::default(),
+                    year_given,
+                    &app_options,
+                    year_edit.option(),
+                )
             } else {
-                open_actions::open_by_current_year(&app_options, year_edit.option())
+                open_actions::open_by_current_year(
+                    &RealProcessExecuter::default(),
+                    &app_options,
+                    year_edit.option(),
+                )
             };
 
             report_open_result(open_result)

@@ -2,8 +2,9 @@ use crate::core::app_options::AppOptions;
 use crate::prelude::*;
 use super::build_env_name;
 use clap::Args;
+use derive_new::new;
 
-#[derive(Args, Getters, CopyGetters, Default)]
+#[derive(Args, Getters, CopyGetters, Default, Setters, new)]
 pub struct EditCommonArgs {
     #[arg(long, env = build_env_name!(EDITOR))]
     #[getset(get = "pub")]

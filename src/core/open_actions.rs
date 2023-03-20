@@ -7,50 +7,59 @@ use crate::core::template;
 use crate::prelude::*;
 use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYear};
 use super::app_config::AppConfig;
+use super::process_handling::ProcessExecuter;
 use super::{
     date_models::units_validated::{ValidatedDate, ValidatedYear},
-    file_access, process_handling, DailyName,
+    file_access, DailyName,
     dates_names::{MonthlyName, DateNameForFile, yearly_name::YearlyName, InitialabeFromTemplate},
 };
 
 pub type OpenResult = AppResult<Option<String>>;
 
 pub fn open_by_date(
+    process_executer: &impl ProcessExecuter,
     to_open_by: ValidatedDate,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
 ) -> OpenResult {
     let today_name: DailyName = to_open_by.into();
-    open_date_with_editor(today_name, option, edit_option)
+    open_date_with_editor(process_executer, today_name, option, edit_option)
 }
 
 pub fn open_by_month_year(
+    process_executer: &impl ProcessExecuter,
     month_year: OpenByMonthInYear,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
 ) -> OpenResult {
     let monthly = MonthlyName::from_month_in_year(&month_year)?;
 
-    open_date_with_editor(monthly, option, edit_option)
+    open_date_with_editor(process_executer, monthly, option, edit_option)
 }
 pub fn open_by_year(
+    process_executer: &impl ProcessExecuter,
     year: ValidatedYear,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
 ) -> OpenResult {
     let yearly = YearlyName::new(year);
 
-    open_date_with_editor(yearly, option, edit_option)
+    open_date_with_editor(process_executer, yearly, option, edit_option)
 }
-pub fn open_by_current_year(option: &AppOptions, edit_option: &EditCommonArgs) -> OpenResult {
+pub fn open_by_current_year(
+    process_executer: &impl ProcessExecuter,
+    option: &AppOptions,
+    edit_option: &EditCommonArgs,
+) -> OpenResult {
     let now = Local::now().date_naive().year() as u32;
     let year = now.try_into()?;
     let yearly = YearlyName::new(year);
 
-    open_date_with_editor(yearly, option, edit_option)
+    open_date_with_editor(process_executer, yearly, option, edit_option)
 }
 
 fn open_date_with_editor<T>(
+    process_executer: &impl ProcessExecuter,
     journal: T,
     option: &AppOptions,
     edit_option: &EditCommonArgs,
@@ -79,7 +88,7 @@ where
         return just_load_journal(&to_open);
     }
 
-    process_handling::start_process_with(option, &editor_to_use, &to_open)?;
+    process_executer.start_program(option, &editor_to_use, &to_open)?;
 
     return Ok(None);
 

@@ -4,11 +4,11 @@ pub mod date_models;
 pub mod delete_actions;
 pub mod list_queries;
 pub mod open_actions;
+pub mod process_handling;
 
 mod date_filtering;
 mod dates_names;
 mod file_access;
-mod process_handling;
 mod template;
 
 use self::dates_names::daily_names::DailyName;
