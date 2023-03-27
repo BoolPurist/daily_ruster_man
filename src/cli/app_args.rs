@@ -18,7 +18,7 @@ use super::edit_year::EditByYear;
 use super::month_edit_command::EditByMonthCommandAndArgs;
 
 #[derive(Parser, Getters)]
-#[command(author, version = "0.5.4", about)]
+#[command(author = "BoolPurist <https://github.com/BoolPurist>", version, about)]
 #[getset(get = "pub")]
 /// Create/manage daily, monthly and yearly journals with your editor of choise.
 pub struct CliArgs {

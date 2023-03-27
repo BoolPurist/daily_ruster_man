@@ -1,8 +1,16 @@
 [package]
 name = "daily_ruster_man"
 version = "0.5.4"
-edition = "2021"
+license = "MIT OR Apache-2.0"
 rust-version = "1.68.0"
+edition = "2021"
+readme = "README.md"
+keywords = [ "cli", "journal" ]
+repository = "https://github.com/BoolPurist/daily_ruster_man"
+authors = [ "BoolPurist <https://github.com/BoolPurist>" ]
+description = """
+Create/manage daily, monthly and yearly journals with your editor of choise.
+"""
 
 [dependencies]
 

@@ -58,7 +58,6 @@ If a significant version bump happens or a release is approaching then do the fo
 
 - Bump the version in the [Cargo File]
 - Adjust changelog file [Changelog]
-- Bump version in the [Rust Cli File] 
 
 ### CI
 
