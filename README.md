@@ -14,6 +14,7 @@ You need to have rust and cargo installed on your system to build this applicati
 It is recommended that you install rust/cargo via rustup. Follow instrucions [here][rustup]
 
 ### Steps
+
 1. Clone this respo.
 2. Build and install this app via cargo through the following command
 ```text
@@ -68,6 +69,7 @@ You can see if the ci on github works via running this script. It is recommended
 script before a push.
 
 ## License
+
 Licensed is under either of Apache License, Version 2.0 or MIT license at your option. 
 
 [Cargo File]:Cargo.toml

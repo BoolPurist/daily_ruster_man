@@ -146,7 +146,7 @@ where
         return Ok(None);
     };
     debug!("Augmenting template with placeholders from config file");
-    let mut placeholders = app_config.create_placeholder_for_template(journal);
+    let mut placeholders = app_config.create_template_placeholder_for(journal);
     let maybe_template_content = app_config.try_get_template_file_content(&template_path)?;
     if let Some(content) = maybe_template_content {
         let augmented_with_placeholders =
