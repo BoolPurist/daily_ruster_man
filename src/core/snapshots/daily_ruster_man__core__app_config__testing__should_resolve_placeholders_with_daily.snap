@@ -14,15 +14,33 @@ expression: actual_as_vec
         ),
     ),
     (
+        "day",
+        DirectValue(
+            "15",
+        ),
+    ),
+    (
         "hello",
         DirectValue(
             "world",
         ),
     ),
     (
+        "month",
+        DirectValue(
+            "5",
+        ),
+    ),
+    (
         "no_command",
         DirectValue(
             "pls_no_execute",
+        ),
+    ),
+    (
+        "year",
+        DirectValue(
+            "2000",
         ),
     ),
 ]

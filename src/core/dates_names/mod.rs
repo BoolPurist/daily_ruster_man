@@ -1,14 +1,17 @@
 pub mod daily_names;
 pub mod monthly_name;
-#[cfg(test)]
-pub mod test_daily_names;
 pub mod yearly_name;
 pub use daily_names::DailyName;
-use crate::core::app_config::AppConfig;
 pub use monthly_name::MonthlyName;
-use std::str::FromStr;
-
 pub use crate::core::app_config::PatchFromConfig;
+
+#[cfg(test)]
+pub mod test_daily_names;
+
+use crate::core::app_config::AppConfig;
+use crate::core::constants::{DAY_VAR_NAME, MONTH_VAR_NAME, YEAR_VAR_NAME};
+
+use std::{str::FromStr, borrow::Cow};
 
 pub trait HasYear {
     fn year(&self) -> u32;
@@ -35,4 +38,8 @@ pub trait DateNameForFile: ToDateTuple + FromStr + Ord {
 
 pub trait InitialabeFromTemplate {
     fn choose_template(&self, app_options: &AppConfig) -> PatchFromConfig;
+}
+
+pub trait ResolvePlaceholders {
+    fn resolve_variable<'a>(&self, to_resolve: &'a str) -> Cow<'a, str>;
 }

@@ -37,6 +37,15 @@ impl YearlyName {
     }
 }
 
+impl ResolvePlaceholders for YearlyName {
+    fn resolve_variable<'a>(&self, to_resolve: &'a str) -> Cow<'a, str> {
+        match to_resolve {
+            super::YEAR_VAR_NAME => Cow::Owned(u32::from(self.year).to_string()),
+            _ => Cow::Borrowed(to_resolve),
+        }
+    }
+}
+
 impl InitialabeFromTemplate for YearlyName {
     fn choose_template(&self, to_choose_from: &AppConfig) -> PatchFromConfig {
         to_choose_from.yearly_template()
