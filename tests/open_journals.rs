@@ -217,7 +217,7 @@ fn should_open_specific_daily_journal_with_show_only() {
 }
 
 #[test]
-fn should_not_return_nothing_for_empty_with_show_only() {
+fn should_return_nothing_for_empty_with_show_only() {
     let processor = TestProcessExecuter::default();
     let files = FileTmpBuilder::default().build();
 

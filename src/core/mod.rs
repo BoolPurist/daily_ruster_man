@@ -35,6 +35,22 @@ pub mod constants {
     pub const ENV_PREFIX: &str = "JOURNAL_RUSTER";
     pub const CONF_FILE_NAME: &str = "config.toml";
 
+    /// Placeholder value for which a journal inserts its day.
+    pub const DAY_VAR_NAME: &str = "DAY_JOURNAL";
+    /// Placeholder value for which a journal inserts its month.
+    pub const MONTH_VAR_NAME: &str = "MONTH_JOURNAL";
+    /// Placeholder value for which a journal inserts its year.
+    pub const YEAR_VAR_NAME: &str = "YEAR_JOURNAL";
+
+    /// Marks start of an builtin value for placeholder
+    /// Example: {{ is prefix for  builtin var {{SOME_BUILTIN_VAR}}
+    /// Makes sure user can still use the name of builtin variable
+    pub const PREFIX_FOR_BUITLIN_VAR: &str = "{{";
+    /// Marks end of an builtin value for placeholder
+    /// Example: }} is prefix for  builtin var {{SOME_BUILTIN_VAR}}
+    /// Makes sure user can still use the name of builtin variable
+    pub const SUFFIX_FOR_BUITLIN_VAR: &str = "}}";
+
     const DEV_DATA_INFIX: &str = ".dev_data";
 
     pub static YEAR_UPPER_BOUND: SyncLazy<u32> =

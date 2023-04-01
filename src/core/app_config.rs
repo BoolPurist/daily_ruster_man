@@ -13,6 +13,7 @@ use crate::prelude::*;
 
 use super::{
     constants::CONF_FILE_NAME, template::PlaceholderTemplate, file_access, app_options::AppOptions,
+    dates_names::ResolvePlaceholders,
 };
 
 macro_rules! path_from_conf_getter {
@@ -48,8 +49,9 @@ impl AppConfig {
 
     pub fn create_placeholder_for_template<'a>(
         &'a self,
+        journal: &impl ResolvePlaceholders,
     ) -> HashMap<&'_ str, PlaceholderTemplate<'_, OsCommandProcossor>> {
-        match &self.placeholders {
+        return match &self.placeholders {
             None => HashMap::new(),
             Some(read_placeholders_from_config) => {
                 let mut output: HashMap<&str, PlaceholderTemplate<'a, OsCommandProcossor>> =
@@ -62,17 +64,31 @@ impl AppConfig {
                                     to_convert.value(),
                                 ))
                             } else {
-                                PlaceholderTemplate::DirectValue(to_convert.value().as_str())
+                                resolve_direct_value(to_convert, journal)
                             }
                         }
-
-                        None => PlaceholderTemplate::DirectValue(to_convert.value()),
+                        None => resolve_direct_value(to_convert, journal),
                     };
                     output.insert(to_convert.key().as_str(), value);
                 }
 
                 output
             }
+        };
+
+        fn resolve_direct_value<'a>(
+            to_convert: &'a PlaceHolder,
+            journal: &impl ResolvePlaceholders,
+        ) -> PlaceholderTemplate<'a, OsCommandProcossor> {
+            use crate::core::constants::{PREFIX_FOR_BUITLIN_VAR, SUFFIX_FOR_BUITLIN_VAR};
+
+            let trimmeed = to_convert
+                .value()
+                .trim_start_matches(PREFIX_FOR_BUITLIN_VAR)
+                .trim_end_matches(SUFFIX_FOR_BUITLIN_VAR);
+
+            let resolved = journal.resolve_variable(trimmeed);
+            PlaceholderTemplate::DirectValue(resolved)
         }
     }
 
@@ -139,9 +155,11 @@ pub struct PlaceHolder {
 
 #[cfg(test)]
 mod testing {
+    use crate::core::dates_names::{DailyName, MonthlyName, yearly_name::YearlyName};
+
     use super::*;
     #[test]
-    fn should_transform_to_empty() {
+    fn should_resolve_placeholders_with_daily() {
         const TEST_INPUT: &str = r#"
 [[placeholders]]
 key = "hello"
@@ -154,19 +172,77 @@ is_command=false
 key = "command"
 value = "echo hello"
 is_command=true
+[[placeholders]]
+key = "day"
+value = "{{DAY_JOURNAL}}"
+[[placeholders]]
+key = "month"
+value = "{{MONTH_JOURNAL}}"
+[[placeholders]]
+key = "year"
+value = "{{YEAR_JOURNAL}}"
 "#;
         // Set up
         let config: AppConfig = toml::from_str(TEST_INPUT).expect("Invalid input from test input");
 
-        // Act
-        let actual = config.create_placeholder_for_template();
+        let daily = DailyName::new(2000, 5, 15, crate::core::constants::MD_EXT).unwrap();
+        let actual = act(&config, &daily);
+
+        // Assert
+        insta::assert_debug_snapshot!(actual);
+    }
+
+    #[test]
+    fn should_resolve_placeholders_with_monthly() {
+        const TEST_INPUT: &str = r#"
+value = "{{DAY_JOURNAL}}"
+[[placeholders]]
+key = "month"
+value = "{{MONTH_JOURNAL}}"
+[[placeholders]]
+key = "year"
+value = "{{YEAR_JOURNAL}}"
+"#;
+        // Set up
+        let config: AppConfig = toml::from_str(TEST_INPUT).expect("Invalid input from test input");
+
+        let monthly = MonthlyName::from_ym(1980, 2, crate::core::constants::MD_EXT).unwrap();
+        let actual = act(&config, &monthly);
+
+        // Assert
+        insta::assert_debug_snapshot!(actual);
+    }
+    #[test]
+    fn should_resolve_placeholders_with_yearly() {
+        const TEST_INPUT: &str = r#"
+value = "{{DAY_JOURNAL}}"
+[[placeholders]]
+key = "month"
+value = "{{MONTH_JOURNAL}}"
+[[placeholders]]
+key = "year"
+value = "{{YEAR_JOURNAL}}"
+"#;
+        // Set up
+        let config: AppConfig = toml::from_str(TEST_INPUT).expect("Invalid input from test input");
+
+        let monthly = YearlyName::new(412.try_into().unwrap());
+        let actual = act(&config, &monthly);
+
+        // Assert
+        insta::assert_debug_snapshot!(actual);
+    }
+
+    fn act<'a>(
+        config: &'a AppConfig,
+        journal: &'a impl ResolvePlaceholders,
+    ) -> Vec<(&'a str, PlaceholderTemplate<'a, OsCommandProcossor>)> {
+        let actual = config.create_placeholder_for_template(journal);
 
         // Prepare for assert
         let mut actual_as_vec: Vec<(&str, PlaceholderTemplate<'_, OsCommandProcossor>)> =
             actual.into_iter().collect();
         actual_as_vec.sort_by_key(|key_value| key_value.0);
-
-        // Assert
-        insta::assert_debug_snapshot!(actual_as_vec);
+        actual_as_vec
     }
 }

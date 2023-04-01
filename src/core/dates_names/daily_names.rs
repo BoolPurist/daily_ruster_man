@@ -1,5 +1,6 @@
 use super::*;
 
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::core::app_config::AppConfig;
@@ -45,6 +46,17 @@ impl DailyName {
 
     fn to_format(year: u32, month: u32, day: u32, ext: &str) -> String {
         format!("{year}{DIGIT_SEP}{month:02}{DIGIT_SEP}{day:02}{DIGIT_SEP}{DAILY_INFIX}.{ext}",)
+    }
+}
+
+impl ResolvePlaceholders for DailyName {
+    fn resolve_variable<'a>(&self, to_resolve: &'a str) -> Cow<'a, str> {
+        match to_resolve {
+            super::DAY_VAR_NAME => Cow::Owned(self.date.day().to_string()),
+            super::MONTH_VAR_NAME => Cow::Owned(self.date.month().to_string()),
+            super::YEAR_VAR_NAME => Cow::Owned(self.date.year().to_string()),
+            _ => Cow::Borrowed(to_resolve),
+        }
     }
 }
 

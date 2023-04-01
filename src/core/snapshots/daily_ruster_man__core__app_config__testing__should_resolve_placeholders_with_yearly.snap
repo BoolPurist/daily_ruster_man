@@ -1,0 +1,18 @@
+---
+source: src/core/app_config.rs
+expression: actual
+---
+[
+    (
+        "month",
+        DirectValue(
+            "MONTH_JOURNAL",
+        ),
+    ),
+    (
+        "year",
+        DirectValue(
+            "412",
+        ),
+    ),
+]

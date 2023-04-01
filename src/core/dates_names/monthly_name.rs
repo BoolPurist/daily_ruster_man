@@ -64,6 +64,16 @@ impl MonthlyName {
     }
 }
 
+impl ResolvePlaceholders for MonthlyName {
+    fn resolve_variable<'a>(&self, to_resolve: &'a str) -> Cow<'a, str> {
+        match to_resolve {
+            super::MONTH_VAR_NAME => Cow::Owned(u32::from(self.month).to_string()),
+            super::YEAR_VAR_NAME => Cow::Owned(u32::from(self.year).to_string()),
+            _ => Cow::Borrowed(to_resolve),
+        }
+    }
+}
+
 impl InitialabeFromTemplate for MonthlyName {
     fn choose_template(&self, to_choose_from: &AppConfig) -> PatchFromConfig {
         to_choose_from.monthly_template()

@@ -7,6 +7,7 @@ use crate::core::template;
 use crate::prelude::*;
 use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYear};
 use super::app_config::AppConfig;
+use super::dates_names::ResolvePlaceholders;
 use super::process_handling::ProcessExecuter;
 use super::{
     date_models::units_validated::{ValidatedDate, ValidatedYear},
@@ -65,7 +66,7 @@ fn open_date_with_editor<T>(
     edit_option: &EditCommonArgs,
 ) -> AppResult<Option<String>>
 where
-    T: DateNameForFile + InitialabeFromTemplate,
+    T: DateNameForFile + InitialabeFromTemplate + ResolvePlaceholders,
 {
     let to_open = file_access::create_new_path_for(journal.name(), option)?;
 
@@ -79,7 +80,8 @@ where
         EditCommonArgs::DEFAUTL_EDITOR.to_owned()
     });
 
-    if !to_open.exists() {
+    let initialize_content_with_templates = !edit_option.show_only() && !to_open.exists();
+    if initialize_content_with_templates {
         info!("No journal created so far at {:?}", &to_open);
         try_write_template_from_config(&to_open, journal, option)?;
     }
@@ -109,31 +111,43 @@ where
 
 fn try_write_template_from_config(
     to_open: &Path,
-    journal: impl InitialabeFromTemplate,
+    journal: impl InitialabeFromTemplate + ResolvePlaceholders,
     option: &AppOptions,
 ) -> AppResult {
     let config = option.load_config()?;
     if let Some(loaded) = config {
-        if let Some(path) = journal.choose_template(loaded).try_to_resolved_path(loaded) {
-            let template_content = try_create_template(loaded, &path)?;
-            if let Some(content) = template_content {
-                debug!("Used template content:\n{}", content);
-                if !option.run_editor_dry() {
-                    fs::write(to_open, content)?;
-                }
-                return Ok(());
+        let maybe_template_content = try_create_template(loaded, &journal)?;
+
+        if let Some(content) = maybe_template_content {
+            debug!("Used template content:\n{}", content);
+            if !option.run_editor_dry() {
+                fs::write(to_open, content)?;
             }
+            return Ok(());
         }
+        debug!("No template found to be used");
     }
 
     Ok(())
 }
 
-/// Returns none if there is no template file at the given parameter.
-fn try_create_template(app_config: &AppConfig, template_path: &Path) -> AppResult<Option<String>> {
+/// Tries to return an intial content of a journal which was created by a template.
+/// In success a none can be returned if there is no template file at the given `template_path`.
+fn try_create_template<T>(app_config: &AppConfig, journal: &T) -> AppResult<Option<String>>
+where
+    T: ResolvePlaceholders + InitialabeFromTemplate,
+{
+    let template_path = if let Some(path) = journal
+        .choose_template(app_config)
+        .try_to_resolved_path(app_config)
+    {
+        path
+    } else {
+        return Ok(None);
+    };
     debug!("Augmenting template with placeholders from config file");
-    let mut placeholders = app_config.create_placeholder_for_template();
-    let maybe_template_content = app_config.try_get_template_file_content(template_path)?;
+    let mut placeholders = app_config.create_placeholder_for_template(journal);
+    let maybe_template_content = app_config.try_get_template_file_content(&template_path)?;
     if let Some(content) = maybe_template_content {
         let augmented_with_placeholders =
             template::replace_template_placeholders(&content, &mut placeholders);

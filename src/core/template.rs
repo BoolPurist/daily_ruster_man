@@ -13,7 +13,7 @@ use crate::prelude::*;
 
 #[derive(Debug)]
 pub enum PlaceholderTemplate<'a, T> {
-    DirectValue(&'a str),
+    DirectValue(Cow<'a, str>),
     Commmand(CommandToExecute<'a, T>),
 }
 
@@ -104,7 +104,7 @@ Should inserted {how_long_error} even with errors
 "#;
         let mut map: HashMap<&str, FakeCommandOutput> = HashMap::from_iter(
             vec![
-                ("hello", PlaceholderTemplate::DirectValue("world")),
+                ("hello", PlaceholderTemplate::DirectValue("world".into())),
                 (
                     "how_long",
                     create_dummmy_command_processor("uptime", None, 1),

@@ -24,7 +24,7 @@ clap = { version = "4.1.8", features = ["derive", "env"] }
 # Used for parsing commands for placeholders in a template
 shellwords = "1.1.0"
 shellexpand = "3.0.0"
-dirs = "4.0.0"
+dirs = "5.0.0"
 regex = "1.7.1"
 
 # logging

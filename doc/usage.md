@@ -68,14 +68,40 @@ See the [example template file] how you can write a placeholder
 ## Placeholders
 
 Templates can be augmented via placeholders. 
-Each placeholder has a key and a value. The key is replaced with the respective value in template.
-If the value should be treated as command then the field called is_command = true must be given 
+Each placeholder has a key and a value. The key is replaced with the respective value in the template.
+The value of a key can be a:
+
+- Direct value
+- or command
+
+If the value should be treated as a command then the field called is_command = true must be given 
 to the key value pair. See the example [config.toml] how to provide placeholders.
+
 Values can also be given as command which are executed as you have entered it in terminal.
 The output of the command is then used as replacement for the key.
+
+### Builtin values for Placeholders
+
+Direct values for a placeholder can be surrounded by braces to mark a builtin variable.
+"{{" from the left and "}}" to the right.
+If the inner value, surrounded by the braces, is recognized as a builtin variable then the whole value is substituted by another value.
+
+These are current built variables for daily journal
+
+- DAY_JOURNAL: is substituted by day for the journal
+- MONTH_JOURNAL: is substituted by month for the journal
+- YEAR_JOURNAL: is substituted by year for the journal
+
+These are current built variables for monthly journal
+
+- MONTH_JOURNAL: is substituted by month for the journal
+- YEAR_JOURNAL: is substituted by year for the journal
+
+These are current built variables for yearly journal
+
+- YEAR_JOURNAL: is substituted by year for the journal
 
 [config.toml]:config.toml
 [example template file]:example.template
 [examples deletion]:examples.md##Deletion
 [Example of choosing editor via CLI]:examples.md##Specifying
-
