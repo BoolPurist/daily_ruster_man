@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] 
 
+### Added 
+
+- Templates can be given date components for day, month and year via builtin variables
+
 ## [0.5.4] - 2023.02.05
 
 ### Added 
 
-- Templates can be given date components for day, month and year via builtin variables
 - CLI argument show-only: For only printing out the content of journal to terminal without using editor.
 
 ## [0.5.3] - 2023.02.04
