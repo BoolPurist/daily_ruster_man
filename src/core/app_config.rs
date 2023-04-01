@@ -4,6 +4,7 @@ pub use path_from_config::PatchFromConfig;
 use std::{
     path::{PathBuf, Path},
     collections::HashMap,
+    borrow::Cow,
 };
 
 use serde::Deserialize;
@@ -47,7 +48,8 @@ impl AppConfig {
     path_from_conf_getter! {yearly_template}
     path_from_conf_getter! {daily_template}
 
-    pub fn create_placeholder_for_template<'a>(
+    /// Fetches all placeholders from the config.
+    pub fn create_template_placeholder_for<'a>(
         &'a self,
         journal: &impl ResolvePlaceholders,
     ) -> HashMap<&'_ str, PlaceholderTemplate<'_, OsCommandProcossor>> {
@@ -82,13 +84,20 @@ impl AppConfig {
         ) -> PlaceholderTemplate<'a, OsCommandProcossor> {
             use crate::core::constants::{PREFIX_FOR_BUITLIN_VAR, SUFFIX_FOR_BUITLIN_VAR};
 
-            let trimmeed = to_convert
-                .value()
+            let to_convert = to_convert.value().as_str();
+            let trimmed = to_convert
                 .trim_start_matches(PREFIX_FOR_BUITLIN_VAR)
                 .trim_end_matches(SUFFIX_FOR_BUITLIN_VAR);
 
-            let resolved = journal.resolve_variable(trimmeed);
-            PlaceholderTemplate::DirectValue(resolved)
+            let resolved = journal.resolve_variable(trimmed);
+
+            // PREFIX_FOR_BUITLIN_VAR, left, and SUFFIX_FOR_BUITLIN_VAR, right was removed.
+            // Use the intial ref with left and right not trimmed away
+            if let Cow::Borrowed(_trimmed) = resolved {
+                PlaceholderTemplate::DirectValue(to_convert.into())
+            } else {
+                PlaceholderTemplate::DirectValue(resolved)
+            }
         }
     }
 
@@ -237,7 +246,7 @@ value = "{{YEAR_JOURNAL}}"
         config: &'a AppConfig,
         journal: &'a impl ResolvePlaceholders,
     ) -> Vec<(&'a str, PlaceholderTemplate<'a, OsCommandProcossor>)> {
-        let actual = config.create_placeholder_for_template(journal);
+        let actual = config.create_template_placeholder_for(journal);
 
         // Prepare for assert
         let mut actual_as_vec: Vec<(&str, PlaceholderTemplate<'_, OsCommandProcossor>)> =

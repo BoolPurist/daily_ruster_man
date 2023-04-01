@@ -6,7 +6,7 @@ expression: actual
     (
         "month",
         DirectValue(
-            "MONTH_JOURNAL",
+            "{{MONTH_JOURNAL}}",
         ),
     ),
     (
