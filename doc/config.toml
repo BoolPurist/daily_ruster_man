@@ -53,3 +53,10 @@
 # value = "date +%Y_%m_%d"
 # is_command=true 
 
+# This key "year" is replaced by the year of a journal
+# The value here is a builtin variable.
+# A builtin variable is surrounded by braces "{{" "}}"
+# ===============================================
+# [[placeholders]]
+# key = "year"
+# value = "{{YEAR_JOURNAL}}"
