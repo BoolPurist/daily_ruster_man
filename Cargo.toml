@@ -5,21 +5,28 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.68.0"
 edition = "2021"
 readme = "README.md"
-keywords = [ "cli", "journal" ]
+keywords = ["cli", "journal"]
 repository = "https://github.com/BoolPurist/daily_ruster_man"
-authors = [ "BoolPurist <https://github.com/BoolPurist>" ]
+authors = ["BoolPurist <https://github.com/BoolPurist>"]
 description = """
 Create/manage daily, monthly and yearly journals with your editor of choise.
 """
 
 [dependencies]
 
+date_validation_types = { git = "https://github.com/BoolPurist/date_validation_types.git", tag = "v1.0.0" }
+
+# Own crates
 # quality of life
-anyhow = { version = "1.0.68", features = ["backtrace"] } 
+anyhow = { version = "1.0.68", features = ["backtrace"] }
 once_cell = "1.17.0"
 
 # needed for other app features
-chrono = { version = "0.4.23", default-features = false, features = ["clock", "std", "alloc"] } 
+chrono = { version = "0.4.26", default-features = false, features = [
+  "clock",
+  "std",
+  "alloc",
+] }
 clap = { version = "4.1.8", features = ["derive", "env"] }
 # Used for parsing commands for placeholders in a template
 shellwords = "1.1.0"
@@ -32,14 +39,14 @@ env_logger = "0.10.0"
 log = "0.4.17"
 
 # data from files
-serde = {version = "1.0.152", features = ["derive"]} 
+serde = { version = "1.0.152", features = ["derive"] }
 toml = "0.7.1"
 
 # Macros
 derive-new = "0.5.9"
 thiserror = "1.0.38"
 getset = "0.1.2"
-parse-display= "0.8.0"
+parse-display = "0.8.0"
 
 # testing
 mockall = "0.11.3"
@@ -48,4 +55,3 @@ mockall = "0.11.3"
 insta = { version = "1.26.0", features = ["yaml"] }
 tempfile = "3.4.0"
 test-case = "3.0.0"
-

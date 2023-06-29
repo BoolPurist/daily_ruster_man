@@ -1,6 +1,7 @@
 #![allow(clippy::uninlined_format_args)]
 use std::process::ExitCode;
 
+use date_validation_types::ValidatedYear;
 use daily_ruster_man::{
     cli::app_args::*,
     core::{
@@ -8,7 +9,7 @@ use daily_ruster_man::{
         open_actions::{self, OpenResult},
         process_handling::RealProcessExecuter,
         app_options::AppOptions,
-        date_models::{open_by::OpenByMonthInYear, units_validated::ValidatedYear},
+        date_models::open_by::OpenByMonthInYear,
         delete_actions::{self, DeletionResult},
     },
 };

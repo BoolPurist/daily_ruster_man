@@ -1,10 +1,5 @@
-use crate::{
-    core::date_models::{
-        find_by::FindByMonthInYear,
-        units_validated::{ValidatedMonth, ValidatedYear},
-    },
-    AppResult,
-};
+use date_validation_types::{ValidatedMonth, ValidatedYear};
+use crate::{core::date_models::find_by::FindByMonthInYear, AppResult};
 use clap::Parser;
 #[derive(Parser)]
 pub struct ListByMonthCommand {

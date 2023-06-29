@@ -9,9 +9,7 @@ use chrono::prelude::*;
 use thiserror::Error;
 
 use crate::prelude::*;
-use crate::core::date_models::units_validated::{
-    ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth,
-};
+use date_validation_types::{ValidatedDate, ValidatedYear, ValidatedDay, ValidatedMonth};
 #[derive(Debug, PartialEq, Eq, Getters, CopyGetters)]
 pub struct DailyName {
     #[getset(get_copy = "pub")]

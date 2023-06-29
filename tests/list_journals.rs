@@ -1,11 +1,9 @@
 #[cfg(test)]
 mod common;
+use date_validation_types::{ValidatedYear, ValidatedMonth};
 use daily_ruster_man::{
     core::{
-        date_models::{
-            find_by::{FindByYearMonthDay, FindByMonthInYear},
-            units_validated::{ValidatedYear, ValidatedMonth},
-        },
+        date_models::find_by::{FindByYearMonthDay, FindByMonthInYear},
         app_options::AppOptions,
         list_queries,
     },

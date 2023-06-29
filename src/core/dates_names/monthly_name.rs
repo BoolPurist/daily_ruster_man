@@ -3,7 +3,7 @@ use std::str::FromStr;
 use super::*;
 use chrono::{Local, Datelike};
 
-use crate::core::date_models::units_validated::{ValidatedYear, ValidatedMonth};
+use date_validation_types::{ValidatedYear, ValidatedMonth};
 use crate::{
     prelude::*,
     core::{constants::*, date_models::open_by::OpenByMonthInYear},
@@ -81,7 +81,7 @@ impl InitialabeFromTemplate for MonthlyName {
 }
 impl ToDateTuple for MonthlyName {
     fn to_date_tuple(&self) -> String {
-        format!("{:04} {:02}", self.year, self.month)
+        format!("{:04} {:02}", self.year(), self.month())
     }
 }
 

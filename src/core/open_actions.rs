@@ -9,8 +9,8 @@ use crate::core::{app_options::AppOptions, date_models::open_by::OpenByMonthInYe
 use super::app_config::AppConfig;
 use super::dates_names::ResolvePlaceholders;
 use super::process_handling::ProcessExecuter;
+use date_validation_types::{ValidatedDate, ValidatedYear};
 use super::{
-    date_models::units_validated::{ValidatedDate, ValidatedYear},
     file_access, DailyName,
     dates_names::{MonthlyName, DateNameForFile, yearly_name::YearlyName, InitialabeFromTemplate},
 };

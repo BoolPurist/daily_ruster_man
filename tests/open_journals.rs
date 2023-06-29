@@ -1,16 +1,12 @@
 mod common;
 use std::{path::PathBuf, fs};
 
+use date_validation_types::{ValidatedDate, ValidatedYear};
 use common::FileTmpBuilder;
 use daily_ruster_man::{
     core::{
-        open_actions,
-        process_handling::TestProcessExecuter,
-        date_models::{
-            units_validated::{ValidatedDate, ValidatedYear},
-            open_by::OpenByMonthInYear,
-        },
-        app_options::AppOptions,
+        open_actions, process_handling::TestProcessExecuter,
+        date_models::open_by::OpenByMonthInYear, app_options::AppOptions,
     },
     cli::{app_args::GenerellArgs, edit_argument::EditCommonArgs},
 };

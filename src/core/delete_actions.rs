@@ -7,7 +7,7 @@ use crate::core::file_access;
 use crate::core::app_options::AppOptions;
 use crate::cli::deletion_arguments::*;
 use super::date_models::open_by::OpenByMonthInYear;
-use super::date_models::units_validated::{ValidatedDate, ValidatedYear};
+use date_validation_types::{ValidatedDate, ValidatedYear};
 use super::dates_names::yearly_name::YearlyName;
 use super::dates_names::{DailyName, MonthlyName};
 

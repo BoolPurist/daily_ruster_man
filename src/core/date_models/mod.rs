@@ -1,6 +1,5 @@
 pub mod find_by;
 pub mod open_by;
-pub mod units_validated;
 use crate::{
     prelude::*,
     core::constants::{MONTH_LOWER_BOUND, MONTH_UPPER_BOUND, DAY_LOWER_BOUND, DAY_UPPER_BOUND},
