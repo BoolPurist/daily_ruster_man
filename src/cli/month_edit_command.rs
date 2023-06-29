@@ -1,11 +1,6 @@
 use clap::{Parser, Args};
-use crate::{
-    core::date_models::{
-        open_by::OpenByMonthInYear,
-        units_validated::{ValidatedMonth, ValidatedYear},
-    },
-    AppResult,
-};
+use date_validation_types::{ValidatedMonth, ValidatedYear};
+use crate::{core::date_models::open_by::OpenByMonthInYear, AppResult};
 
 use super::edit_argument::EditCommonArgs;
 

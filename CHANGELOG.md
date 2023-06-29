@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Templates can be given date components for day, month and year via builtin variables
 
+### Changed
+
+- Validation of day, month, year and date is now handled by different lib crate instead of this app
+
 ## [0.5.4] - 2023.02.05
 
 ### Added 

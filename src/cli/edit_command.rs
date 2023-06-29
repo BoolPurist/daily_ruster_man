@@ -1,6 +1,6 @@
 use crate::core::date_models::open_by::OpenByDaysInTime;
 use crate::AppResult;
-use crate::core::date_models::units_validated::ValidatedDate;
+use date_validation_types::ValidatedDate;
 use chrono::Local;
 use clap::{Parser, Args};
 use super::edit_argument::EditCommonArgs;
@@ -60,7 +60,7 @@ impl EditCommand {
                 if year < 0 {
                     Err(anyhow!("year must be positive with provided day and month"))
                 } else {
-                    ValidatedDate::from_ymd(year as u32, month, day)
+                    ValidatedDate::from_ymd(year as u32, month, day).map_err(anyhow::Error::from)
                 }
             }
             (None, None, None) => Ok(now),

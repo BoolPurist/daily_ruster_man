@@ -3,7 +3,7 @@ source: tests/list_journals.rs
 expression: all_monthly_journals
 ---
 - 2002 11
-- 2002 2
-- 2001 2
-- 2001 1
+- 2002 02
+- 2001 02
+- 2001 01
 

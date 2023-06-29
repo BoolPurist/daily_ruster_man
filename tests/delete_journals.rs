@@ -7,9 +7,7 @@ use daily_ruster_man::core::date_models::open_by::OpenByMonthInYear;
 use daily_ruster_man::core::delete_actions::{self, DeletionResult};
 use daily_ruster_man::cli::{app_args::GenerellArgs, deletion_arguments::CommonDeleteArg};
 
-use daily_ruster_man::core::date_models::units_validated::{
-    ValidatedYear, ValidatedMonth, ValidatedDate, ValidatedDay,
-};
+use date_validation_types::{ValidatedYear, ValidatedMonth, ValidatedDate, ValidatedDay};
 use tempfile::TempDir;
 
 #[test]

@@ -4,7 +4,7 @@ use crate::{prelude::*, core::app_config::AppConfig};
 use std::str::FromStr;
 use thiserror::Error;
 use crate::core::constants::{DIGIT_SEP, MD_EXT, YEARLY_LABEL_IN_NAME};
-use crate::core::date_models::units_validated::ValidatedYear;
+use date_validation_types::ValidatedYear;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct YearlyName {
@@ -91,6 +91,7 @@ impl FromStr for YearlyName {
 
                 let year = year
                     .try_into()
+                    .map_err(AppError::from)
                     .map_err(ParseErrorForYearName::InvalidYear)?;
 
                 if maybe_digit.parse::<u32>().is_ok() {

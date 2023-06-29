@@ -7,8 +7,6 @@ extern crate getset;
 extern crate anyhow;
 #[macro_use]
 extern crate log;
-#[macro_use]
-extern crate parse_display;
 
 pub mod cli;
 pub mod core;

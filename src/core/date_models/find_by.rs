@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use super::units_validated::{ValidatedYear, ValidatedMonth, ValidatedDay};
+use date_validation_types::{ValidatedYear, ValidatedMonth, ValidatedDay};
 
 #[derive(CopyGetters, Debug)]
 #[getset(get_copy = "pub")]

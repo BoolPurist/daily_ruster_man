@@ -1,8 +1,7 @@
 use chrono::{NaiveDate, Days};
 
 use crate::AppResult;
-
-use super::units_validated::{ValidatedDate, ValidatedMonth, ValidatedYear};
+use date_validation_types::{ValidatedDate, ValidatedMonth, ValidatedYear};
 
 #[derive(Debug)]
 pub enum OpenByDaysInTime {

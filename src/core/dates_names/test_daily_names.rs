@@ -1,10 +1,7 @@
 use chrono::NaiveDate;
 
-use crate::core::{
-    date_models::{open_by::OpenByDaysInTime, units_validated::ValidatedDate},
-    DailyName,
-    constants::MD_EXT,
-};
+use date_validation_types::ValidatedDate;
+use crate::core::{date_models::open_by::OpenByDaysInTime, DailyName, constants::MD_EXT};
 use super::{daily_names::ParseDailyNameError, ToDateTuple, DateNameForFile};
 
 #[test]
